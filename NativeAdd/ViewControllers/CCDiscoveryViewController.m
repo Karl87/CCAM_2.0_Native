@@ -12,6 +12,9 @@
 #import <MJRefresh/MJRefresh.h>
 #import "TimelineCell.h"
 #import "TimelineTopCell.h"
+
+#import "CCTimeLine.h"
+
 //test
 #import "TestDetailViewController.h"
 #import "lhScanQCodeViewController.h"
@@ -38,6 +41,7 @@
 @property (nonatomic,strong) NSMutableArray *popularPhotos;
 @property (nonatomic,strong) NSMutableArray *selectionPhotos;
 
+@property (nonatomic,strong) NSMutableArray *timeLines;
 
 @property (nonatomic,strong) UIView *photoSegView;
 @property (nonatomic,strong) NSMutableArray *photoSegItems;
@@ -97,6 +101,8 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     self.selectionPhotos = [[NSMutableArray alloc] initWithCapacity:0];
     self.popularPhotos = [[NSMutableArray alloc] initWithCapacity:0];
     self.lastPhotos = [[NSMutableArray alloc] initWithCapacity:0];
+    
+    self.timeLines = [[NSMutableArray alloc] initWithCapacity:0];
     
     [self.selectionPhotos addObjectsFromArray:[[CoreDataHelper sharedManager] showStoreInfoWithEntity:@"CCSelectionPhoto"]];
     [self.popularPhotos addObjectsFromArray:[[CoreDataHelper sharedManager] showStoreInfoWithEntity:@"CCHotPhoto"]];
@@ -189,6 +195,14 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     lastFooter.automaticallyChangeAlpha = YES;
     _lastCollection.mj_footer = lastFooter;
     
+    MJRefreshNormalHeader *timelineHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadTimeline)];
+    timelineHeader.automaticallyChangeAlpha = YES;
+    timelineHeader.lastUpdatedTimeLabel.hidden = YES;
+    _timeline.mj_header = timelineHeader;
+    
+    MJRefreshAutoNormalFooter *timelineFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreTimeline)];
+    timelineFooter.automaticallyChangeAlpha = YES;
+    _timeline.mj_footer = timelineFooter;
 
     _photoSegView = [[UIView alloc] initWithFrame:CGRectMake(0, -64, CCamViewWidth, 44)];
     [_photoSegView setBackgroundColor:CCamViewBackgroundColor];
@@ -222,8 +236,9 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     }
     
     
-    [self loadTimeline];
+    [self loadLocalTimeline];
 }
+
 - (void)loadTimeline{
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -231,14 +246,78 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     NSString *token = CCamTestToken;
     NSDictionary *parameters = @{@"token" :token};
     [manager GET:CCamGetTimeLineURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        NSError *error;
-        NSString *jsonString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-        NSLog(@"%@",jsonString);
         
+        [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCTimeLine"];
+
+        NSError *error;
+        NSArray *receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
+        NSLog(@"%ld",(unsigned long)receiveArray.count);
+        NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
+        for (int i = 0; i < receiveArray.count; i++) {
+            NSDictionary* timelineDic = [receiveArray objectAtIndex:i];
+            
+            CCTimeLine *timeline =[NSEntityDescription insertNewObjectForEntityForName:@"CCTimeLine" inManagedObjectContext:context];
+            [timeline initTimelineWith:timelineDic];
+            if (![context save:&error]) {
+                NSLog(@"保存失败");
+            }
+        }
+        [_timeline.mj_header endRefreshing];
+        [self loadLocalTimeline];
+
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        [_timeline.mj_header endRefreshing];
+    }];
+}
+- (void)loadMoreTimeline{
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    NSString *token = CCamTestToken;
+    CCTimeLine *lastTimeline = (CCTimeLine*)[_timeLines lastObject];
+    NSString *lastID = lastTimeline.timelineID;
+    NSDictionary *parameters = @{@"token" :token,@"lastid":lastID};
+    [manager GET:CCamGetTimeLineURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    
+        NSError *error;
+        NSArray *receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
+        NSLog(@"%ld",(unsigned long)receiveArray.count);
+        NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
+        for (int i = 0; i < receiveArray.count; i++) {
+            NSDictionary* timelineDic = [receiveArray objectAtIndex:i];
+            
+            CCTimeLine *timeline =[NSEntityDescription insertNewObjectForEntityForName:@"CCTimeLine" inManagedObjectContext:context];
+            [timeline initTimelineWith:timelineDic];
+            if (![context save:&error]) {
+                NSLog(@"保存失败");
+            }
+        }
+        [_timeline.mj_footer endRefreshing];
+        [self loadLocalTimeline];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        
+        [_timeline.mj_footer endRefreshing];
+
     }];
+}
+- (void)loadLocalTimeline{
+    NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"CCTimeLine" inManagedObjectContext:context];
+    [request setEntity:entity];
+    NSError *error;
+    NSArray *infos = [context executeFetchRequest:request error:&error];
+    if ([infos count] == 0) {
+        NSLog(@"本地无数据，需要联网同步数据");
+        return;
+    }else{
+        NSLog(@"本地数据库读取%lu个朋友圈",(unsigned long)infos.count);
+    }
+    
+    [self.timeLines removeAllObjects];
+    [self.timeLines addObjectsFromArray:[context executeFetchRequest:request error:&error]];
+    
+    NSLog(@"=========>本地朋友圈数%lu",(unsigned long)self.timeLines.count);
+    [self.timeline reloadData];
 }
 - (void)refreshSelection{
     [self loadDiscoveryWithRefresh:YES
@@ -326,6 +405,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     if (!self.needUpdate) {
         return;
     }
+//    [_timeline.mj_header beginRefreshing];
     [_selectionCollection.mj_header beginRefreshing];
     [_popularCollection.mj_header beginRefreshing];
     [_lastCollection.mj_header beginRefreshing];
@@ -749,17 +829,21 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         
         if (scrollView.contentOffset.x == 0) {
             if (self.selectionPhotos.count == 0) {
-//                [self autonAnimationRefreshPhotosWithType:@"selection"];
-            }
+                if (![_selectionCollection.mj_header isRefreshing]) {
+                    [_selectionCollection.mj_header beginRefreshing];            }
+                }
             [self setSegmentApprenceWithOffset:scrollView.contentOffset.x];
         }else if (scrollView.contentOffset.x == CCamViewWidth){
             if (self.popularPhotos.count == 0) {
-//                [self autonAnimationRefreshPhotosWithType:@"like"];
-            }
+                if (![_popularCollection.mj_header isRefreshing]) {
+                    [_popularCollection.mj_header beginRefreshing];            }
+                }
             [self setSegmentApprenceWithOffset:scrollView.contentOffset.x];
         }else if (scrollView.contentOffset.x == CCamViewWidth*2){
             if (self.lastPhotos.count == 0) {
-//                [self autonAnimationRefreshPhotosWithType:@""];
+                if (![_lastCollection.mj_header isRefreshing]) {
+                    [_lastCollection.mj_header beginRefreshing];
+                }
             }
             [self setSegmentApprenceWithOffset:scrollView.contentOffset.x];
         }
@@ -774,15 +858,24 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         [self setPhotoSegmentApprenceWithOffset:scrollView.contentOffset.x];
         if (scrollView.contentOffset.x == 0) {
             if (self.selectionPhotos.count == 0) {
-//                [self autonAnimationRefreshPhotosWithType:@"selection"];
+                if ([_selectionCollection.mj_header isRefreshing]) {
+                    return;
+                }
+                [_selectionCollection.mj_header beginRefreshing];
             }
         }else if (scrollView.contentOffset.x == CCamViewWidth){
             if (self.popularPhotos.count == 0) {
-//                [self autonAnimationRefreshPhotosWithType:@"like"];
+                if ([_popularCollection.mj_header isRefreshing]) {
+                    return;
+                }
+                [_popularCollection.mj_header beginRefreshing];
             }
         }else if (scrollView.contentOffset.x == CCamViewWidth*2){
             if (self.lastPhotos.count == 0) {
-//                [self autonAnimationRefreshPhotosWithType:@""];
+                if ([_lastCollection.mj_header isRefreshing]) {
+                    return;
+                }
+                [_lastCollection.mj_header beginRefreshing];
             }
         }
     }else if (scrollView == self.backgroundView){
@@ -825,15 +918,15 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 #pragma mark - UITableView Delegate and Datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    return 1;
+    return [_timeLines count]+1;//1;
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 1;//[_timeLines count];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    if (indexPath.section==0 && indexPath.row == 0) {
+    if (indexPath.row==0){// && indexPath.row == 0) {
         static NSString *identifier = @"topCell";
         TimelineTopCell * cell = [[TimelineTopCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         [cell setBackgroundColor:[UIColor clearColor]];
@@ -850,6 +943,13 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         [cell.photoTitle setTitle:@"#角色相机#" forState:UIControlStateNormal];
         [cell.photoDes setText:@"我是一段描述"];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        CCTimeLine *timeLine = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row-1];
+        [cell.profileImage sd_setImageWithURL:[NSURL URLWithString:timeLine.timelineUserImage] placeholderImage:nil];
+        [cell.userName setText:timeLine.timelineUserName];
+        [cell.photo sd_setImageWithURL:[NSURL URLWithString:timeLine.image_contest] placeholderImage:nil];
+        [cell.photoDes setText:timeLine.timelineDes];
+        
         return cell;
     }
     
@@ -857,29 +957,33 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     return cell;
 }
-
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+//    if ([cell isKindOfClass:[TimelineCell class]]) {
+//        TimelineCell *tCell = (TimelineCell*)cell;
+//        CCTimeLine *timeLine = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row-1];
+//        [tCell.profileImage sd_setImageWithURL:[NSURL URLWithString:timeLine.timelineUserImage] placeholderImage:nil];
+//        [tCell.userName setText:timeLine.timelineUserName];
+//        [tCell.photo sd_setImageWithURL:[NSURL URLWithString:timeLine.image_fullsize] placeholderImage:nil];
+//        [tCell.photoDes setText:timeLine.timelineDes];
+//    }
+}
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
 }
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-
-{
-    
-    if (section == 0) {
-        
-        return 0;
-        
-    }else{
-        
-        return 44;
-        
-    }
-    
-}
+//-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+//
+//{
+//    if (section == 0) {
+//        return 0;
+//    }else{
+//        return 44;
+//    }
+//    
+//}
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 
 {
-    if (indexPath.section==0&& indexPath.row == 0) {
+    if (indexPath.row == 0){//(indexPath.section==0&& indexPath.row == 0) {
         return 44;
     }else{
         return 154+30+CCamViewWidth+44;
@@ -887,29 +991,20 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     
     return 0;
 }
-//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+
+//- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+//    static NSString *identifier = @"header";
+//    UITableViewHeaderFooterView *view = [[UITableViewHeaderFooterView alloc] initWithReuseIdentifier:identifier];
+//
+//    [view setFrame:CGRectMake(0, 0, CCamViewWidth, 44)];
 //    
-//    return [NSString stringWithFormat:@"%ld",(long)section];
+//    UIView *place = [[UIView alloc] initWithFrame:CGRectMake(10, 10, 22, 22)];
+//    [place setBackgroundColor:CCamRedColor];
+//    [view addSubview:place];
+//    
+//    return view;
 //}
-
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
-    static NSString *identifier = @"header";
-    UITableViewHeaderFooterView *view = [[UITableViewHeaderFooterView alloc] initWithReuseIdentifier:identifier];
-
-//    [view.contentView setBackgroundColor:[UIColor clearColor]];
-    [view setFrame:CGRectMake(0, 0, CCamViewWidth, 44)];
-    
-    UIView *place = [[UIView alloc] initWithFrame:CGRectMake(10, 10, 22, 22)];
-    [place setBackgroundColor:CCamRedColor];
-    [view addSubview:place];
-//    UIView *bg = [[UIView alloc] initWithFrame:view.frame];
-//    [bg setBackgroundColor:[UIColor whiteColor]];
-//    [bg setAlpha:0.9];
-//    [view.contentView addSubview:bg];
-    
-    return view;
-}
-- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(nonnull UIView *)view forSection:(NSInteger)section {
-    view.tintColor = [UIColor clearColor];
-}
+//- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(nonnull UIView *)view forSection:(NSInteger)section {
+//    view.tintColor = [UIColor clearColor];
+//}
 @end

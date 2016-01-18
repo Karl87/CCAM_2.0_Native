@@ -180,6 +180,24 @@
         <attribute name="stickersetID" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="stickers" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="CCSticker" inverseName="stickerset" inverseEntity="CCSticker" syncable="YES"/>
     </entity>
+    <entity name="CCTimeLine" representedClassName="CCTimeLine" syncable="YES">
+        <attribute name="comment" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="countDown" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_contest" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_fullsize" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_share" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastLikeInfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="likeCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="liked" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ranking" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="report" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timelineContestID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timelineDes" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timelineID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timelineUserID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timelineUserImage" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timelineUserName" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="CCUser" syncable="YES">
         <attribute name="userAddress" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userBirth" optional="YES" attributeType="String" syncable="YES"/>
@@ -220,8 +238,9 @@
         <element name="CCNewPhoto" positionX="-522" positionY="9" width="128" height="435"/>
         <element name="CCSelectionPhoto" positionX="-252" positionY="9" width="128" height="435"/>
         <element name="CCSerie" positionX="-659" positionY="9" width="128" height="388"/>
-        <element name="CCUser" positionX="-108" positionY="180" width="128" height="493"/>
-        <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
         <element name="CCSticker" positionX="-450" positionY="162" width="128" height="210"/>
+        <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
+        <element name="CCUser" positionX="-108" positionY="180" width="128" height="493"/>
+        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="285"/>
     </elements>
 </model>
