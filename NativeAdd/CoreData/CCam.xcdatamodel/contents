@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="14F27" minimumToolsVersion="Automatic">
+    <entity name="CCAnimation" representedClassName="CCAnimation" syncable="YES">
+        <attribute name="animationID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="audio" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="characterID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="clipName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="frameFirst" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="frameLast" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameCN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameEN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameJP" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameZH" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="playType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="poseFace" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serieID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="character" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CCCharacter" inverseName="animations" inverseEntity="CCCharacter" syncable="YES"/>
+    </entity>
+    <entity name="CCCharacter" representedClassName="CCCharacter" syncable="YES">
+        <attribute name="allowOffline" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="assetBundle" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="characterID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateEnd" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateStart" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_List" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_Mini" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameCN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameEN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameJP" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameZH" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="regionInfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="regionType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serieID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="version" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="animations" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="CCAnimation" inverseName="character" inverseEntity="CCAnimation" syncable="YES"/>
+        <relationship name="serie" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="CCSerie" inverseName="characters" inverseEntity="CCSerie" syncable="YES"/>
+    </entity>
+    <entity name="CCEvent" syncable="YES">
+        <attribute name="eventCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventCountDown" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventImageURLCn" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventImageURLEn" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventImageURLZh" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventIsStart" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventURL" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="CCHotPhoto" syncable="YES">
+        <attribute name="big_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="character_id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="checked" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="clicknum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="contest" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="contestid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="groupid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isfinalist" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="like" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="liked" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="memberid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="middle_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="report" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serieid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="share_click" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="share_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stageid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="upload_type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="upnum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="winner_status" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="workid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="CCNewPhoto" syncable="YES">
+        <attribute name="big_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="character_id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="checked" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="clicknum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="contest" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="contestid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="groupid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isfinalist" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="like" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="liked" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="memberid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="middle_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="report" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serieid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="share_click" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="share_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stageid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="upload_type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="upnum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="winner_status" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="workid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="CCSelectionPhoto" syncable="YES">
+        <attribute name="big_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="character_id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="checked" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="clicknum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="contest" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="contestid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="groupid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isfinalist" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="like" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="liked" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="memberid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="middle_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="report" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serieid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="share_click" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="share_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stageid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="upload_type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="upnum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="winner_status" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="workid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="CCSerie" representedClassName="CCSerie" syncable="YES">
+        <attribute name="allFilter" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="allowErase" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="allowMultiple" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="allowSticker" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateEnd" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateStart" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="id_Sticker" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_Inner" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_List" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_Mini" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_Watermark" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="indexLastest" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="indexPopular" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="indexRecommend" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameCN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameEN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameJP" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameZH" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="redirectURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="regionInfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="regionType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serieID" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="characters" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="CCCharacter" inverseName="serie" inverseEntity="CCCharacter" syncable="YES"/>
+    </entity>
+    <entity name="CCSticker" representedClassName="CCSticker" syncable="YES">
+        <attribute name="image_Preview" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_Res" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stickerID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stickersetID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="text_Coordinates" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="textColor" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="textFont" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="stickerset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CCStickerSet" inverseName="stickers" inverseEntity="CCStickerSet" syncable="YES"/>
+    </entity>
+    <entity name="CCStickerSet" representedClassName="CCStickerSet" syncable="YES">
+        <attribute name="image_List" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_Mini" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_Res" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameCN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameEN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameJP" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="nameZH" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stickersetID" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="stickers" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="CCSticker" inverseName="stickerset" inverseEntity="CCSticker" syncable="YES"/>
+    </entity>
+    <entity name="CCUser" syncable="YES">
+        <attribute name="userAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userBirth" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userContestsCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userContestURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userCountry" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userCSNAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userCSNName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userCSNPhone" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userEmail" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userFacebookName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userFansCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userFansURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userFollowsCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userFollowsURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userGender" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userGroupID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userImageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userLikePhotoesCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userLikesCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userLikeURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userLocation" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userPhone" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userQQName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userTrueName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userWechatName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userWeiboName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userWorksCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userWorksURL" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="CCAnimation" positionX="-416" positionY="540" width="128" height="283"/>
+        <element name="CCCharacter" positionX="-468" positionY="414" width="126" height="298"/>
+        <element name="CCEvent" positionX="-108" positionY="9" width="128" height="165"/>
+        <element name="CCHotPhoto" positionX="-387" positionY="9" width="128" height="435"/>
+        <element name="CCNewPhoto" positionX="-522" positionY="9" width="128" height="435"/>
+        <element name="CCSelectionPhoto" positionX="-252" positionY="9" width="128" height="435"/>
+        <element name="CCSerie" positionX="-659" positionY="9" width="128" height="388"/>
+        <element name="CCUser" positionX="-108" positionY="180" width="128" height="493"/>
+        <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
+        <element name="CCSticker" positionX="-450" positionY="162" width="128" height="210"/>
+    </elements>
+</model>
