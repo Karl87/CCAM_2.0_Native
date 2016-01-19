@@ -26,6 +26,7 @@
 - (void)setLightStrength:(CGFloat)strength;
 - (void)setShadowStrength:(CGFloat)strength;
 - (void)SetAnimationControlAppear;
+- (void)setAnimationInfo:(NSString*)info;
 - (void)SetAnimationControlDisappear;
 @end
 

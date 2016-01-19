@@ -9,11 +9,11 @@
 #ifndef Constants_h
 #define Constants_h
 
-//#ifdef __OPTIMIZE__
-//# define NSLog(...) {}
-//#else
-//# define NSLog(...) NSLog(__VA_ARGS__)
-//#endif
+#ifdef __OPTIMIZE__
+# define NSLog(...) {}
+#else
+# define NSLog(...) NSLog(__VA_ARGS__)
+#endif
 
 #define GetValidString(_x_) (![_x_ isKindOfClass:[NSNull class]] && _x_ != nil) ? [NSString stringWithFormat:@"%@",_x_] : [NSString stringWithFormat:@""]
 #define GetValidNumber(_x_) (![_x_ isKindOfClass:[NSNull class]] && _x_ != nil) ? [NSString stringWithFormat:@"%@",_x_] : [NSString stringWithFormat:@"0"]

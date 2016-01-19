@@ -41,9 +41,14 @@
 @property (nonatomic,strong) NSMutableArray *segments;
 @property (nonatomic,strong) NSMutableArray *filters;
 
+@property (nonatomic,strong) NSMutableDictionary *currentAnimationInfo;
+@property (nonatomic,strong) NSArray *currentPoses;
+@property (nonatomic,strong) NSArray *currentFaces;
+
 @property (nonatomic,strong) UIView *bgView;
 
-@property (nonatomic,strong) UIView *navigationView;
+@property (nonatomic,strong) UIScrollView *navigationView;
+@property (nonatomic,strong) UIScrollView *navigationSurface;
 @property (nonatomic,strong) UILabel *navigationTitle;
 @property (nonatomic,strong) UIButton *backButton;
 @property (nonatomic,strong) UIButton *nextButton;
@@ -51,12 +56,18 @@
 @property (nonatomic,assign) NSInteger eraseType;
 @property (nonatomic,assign) float eraseSize;
 
-@property (nonatomic,strong) UIView *animationControl;
-@property (nonatomic,strong) UIView *lightControl;
+@property (nonatomic,strong) UIScrollView *animationControl;
+@property (nonatomic,strong) UIScrollView *lightControl;
 @property (nonatomic,strong) CCamCircleView *lightCircle;
 @property (nonatomic,strong) CCamCircleView *poseCircle;
 @property (nonatomic,strong) CCamCircleView *headCircle;
 @property (nonatomic,strong) CCamCircleView *faceCircle;
+@property (nonatomic,strong) UIButton * lastPoseBtn;
+@property (nonatomic,strong) UIButton * nextPoseBtn;
+@property (nonatomic,strong) UIButton * currentPoseBtn;
+@property (nonatomic,strong) UIButton * lastFaceBtn;
+@property (nonatomic,strong) UIButton * nextFaceBtn;
+@property (nonatomic,strong) UIButton * currentFaceBtn;
 @property (nonatomic,strong) EFCircularSlider *lightSlider;
 @property (nonatomic,strong) EFCircularSlider *shadowSlider;
 @end
@@ -95,7 +106,7 @@
 }
 - (void)setAnimationControlView{
     if (!_animationControl) {
-        _animationControl = [[UIView alloc] init];
+        _animationControl = [[UIScrollView alloc] init];
 //        CCamThinNaviHeight+CCamViewWidth
         [_animationControl setFrame:CGRectMake(0, CCamViewHeight, CCamViewWidth, CCamViewHeight-CCamThinNaviHeight-CCamViewWidth)];
         [_animationControl setBackgroundColor:[UIColor whiteColor]];
@@ -105,12 +116,20 @@
         [animationControlBar setBackgroundColor:CCamViewBackgroundColor];
         [_animationControl addSubview:animationControlBar];
         
-        UIButton *animationControlLeftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [animationControlLeftBtn setImage:[[UIImage imageNamed:@"albumClose"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-        [animationControlLeftBtn setTintColor:CCamRedColor];
-        [animationControlLeftBtn sizeToFit];
-        [animationControlBar addSubview:animationControlLeftBtn];
-        [animationControlLeftBtn setCenter:CGPointMake(10+animationControlLeftBtn.bounds.size.width/2, animationControlBar.bounds.size.height/2)];
+//        UIButton *animationControlLeftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [animationControlLeftBtn setImage:[[UIImage imageNamed:@"albumClose"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+//        [animationControlLeftBtn setTintColor:CCamRedColor];
+//        [animationControlLeftBtn sizeToFit];
+//        [animationControlBar addSubview:animationControlLeftBtn];
+//        [animationControlLeftBtn setCenter:CGPointMake(10+animationControlLeftBtn.bounds.size.width/2, animationControlBar.bounds.size.height/2)];
+        
+        UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, animationControlBar.bounds.size.width, animationControlBar.bounds.size.height)];
+        [title setBackgroundColor:[UIColor clearColor]];
+        [title setText:@"动作表情调节"];
+        [title setTextColor:CCamGrayTextColor];
+        [title setFont:[UIFont boldSystemFontOfSize:17.0]];
+        [title setTextAlignment:NSTextAlignmentCenter];
+        [animationControlBar addSubview:title];
         
         UIButton *animationControlRightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [animationControlRightBtn setImage:[[UIImage imageNamed:@"controlOK"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
@@ -120,13 +139,75 @@
         [animationControlRightBtn setCenter:CGPointMake(animationControlBar.bounds.size.width-10-animationControlRightBtn.bounds.size.width/2, animationControlBar.bounds.size.height/2)];
         [animationControlRightBtn addTarget:self action:@selector(SetAnimationControlDisappear) forControlEvents:UIControlEventTouchUpInside];
     }
-    if (!_poseCircle) {
-        _poseCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _animationControl.bounds.size.width/2*0.8,_animationControl.bounds.size.width/2*0.8)];
-        [_poseCircle setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2)];
-        [_poseCircle.circleBG setImage:[UIImage imageNamed:@"poseCircle"]];
-        [_animationControl addSubview:_poseCircle];
-        [_poseCircle setDelegate:self];
+//    if (!_poseCircle) {
+//        _poseCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _animationControl.bounds.size.width/2*0.8,_animationControl.bounds.size.width/2*0.8)];
+//        [_poseCircle setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2)];
+//        [_poseCircle.circleBG setImage:[UIImage imageNamed:@"poseCircle"]];
+//        [_animationControl addSubview:_poseCircle];
+//        [_poseCircle setDelegate:self];
+//    }
+    
+    if (!_lastPoseBtn && !_nextPoseBtn && !_currentPoseBtn) {
+        _currentPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_currentPoseBtn setFrame:CGRectMake(0, 0, 88, 40)];
+        [_currentPoseBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_currentPoseBtn.layer setCornerRadius:_currentPoseBtn.bounds.size.height/2];
+        [_currentPoseBtn.layer setMasksToBounds:YES];
+        [_currentPoseBtn setBackgroundColor:CCamRedColor];
+        [_currentPoseBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
+        [_currentPoseBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_animationControl addSubview:_currentPoseBtn];
+        
+        _lastPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_lastPoseBtn setFrame:CGRectMake(0, 0, 40, 40)];
+        [_lastPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x-10-(_currentPoseBtn.bounds.size.width+_lastPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_lastPoseBtn setBackgroundColor:[UIColor clearColor]];
+        [_lastPoseBtn setImage:[[UIImage imageNamed:@"lastIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [_lastPoseBtn setTintColor:CCamRedColor];
+        [_lastPoseBtn addTarget:self action:@selector(changeLastPose) forControlEvents:UIControlEventTouchUpInside];
+        [_animationControl addSubview:_lastPoseBtn];
+        
+        _nextPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_nextPoseBtn setFrame:CGRectMake(0, 0, 40, 40)];
+        [_nextPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x+10+(_currentPoseBtn.bounds.size.width+_nextPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_nextPoseBtn setBackgroundColor:[UIColor clearColor]];
+        [_nextPoseBtn setImage:[[UIImage imageNamed:@"nextIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [_nextPoseBtn setTintColor:CCamRedColor];        [_nextPoseBtn addTarget:self action:@selector(changeNextPose) forControlEvents:UIControlEventTouchUpInside];
+        [_animationControl addSubview:_nextPoseBtn];
+
     }
+    
+    if (!_lastFaceBtn && !_nextFaceBtn && !_currentFaceBtn) {
+        _currentFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_currentFaceBtn setFrame:CGRectMake(0, 0, 88, 40)];
+        [_currentFaceBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_currentFaceBtn.layer setCornerRadius:_currentFaceBtn.bounds.size.height/2];
+        [_currentFaceBtn.layer setMasksToBounds:YES];
+        [_currentFaceBtn setBackgroundColor:CCamRedColor];
+        [_currentFaceBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
+        [_currentFaceBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_animationControl addSubview:_currentFaceBtn];
+        
+        _lastFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_lastFaceBtn setFrame:CGRectMake(0, 0, 40, 40)];
+        [_lastFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x-10-(_currentFaceBtn.bounds.size.width+_lastFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_lastFaceBtn setBackgroundColor:[UIColor clearColor]];
+        [_lastFaceBtn setImage:[[UIImage imageNamed:@"lastIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [_lastFaceBtn setTintColor:CCamRedColor];
+        [_lastFaceBtn setContentMode:UIViewContentModeScaleAspectFit];
+        [_lastFaceBtn addTarget:self action:@selector(changeLastFace) forControlEvents:UIControlEventTouchUpInside];
+        [_animationControl addSubview:_lastFaceBtn];
+        
+        _nextFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_nextFaceBtn setFrame:CGRectMake(0, 0, 40, 40)];
+        [_nextFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x+10+(_currentFaceBtn.bounds.size.width+_nextFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_nextFaceBtn setBackgroundColor:[UIColor clearColor]];
+        [_nextFaceBtn setImage:[[UIImage imageNamed:@"nextIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [_nextFaceBtn setTintColor:CCamRedColor];        [_animationControl addSubview:_nextFaceBtn];
+        [_nextFaceBtn addTarget:self action:@selector(changeNextFace) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    
     if (!_headCircle) {
         _headCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _animationControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
         [_headCircle setCenter:CGPointMake(_animationControl.bounds.size.width*0.75, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2)];
@@ -144,6 +225,86 @@
     ani.beginTime = CACurrentMediaTime();
     ani.duration = 0.25f;
     [_animationControl pop_addAnimation:ani forKey:@"position"];
+    [_navigationSurface setHidden:NO];
+}
+- (void)setAnimationInfo:(NSString *)info{
+    NSError *error;
+    NSDictionary *infoDic =[NSJSONSerialization JSONObjectWithData:[info dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+    if (!_currentAnimationInfo) {
+        _currentAnimationInfo = [[NSMutableDictionary alloc] initWithCapacity:0];
+    }
+    [_currentAnimationInfo removeAllObjects];
+    [_currentAnimationInfo addEntriesFromDictionary:infoDic];
+    _currentPoses = [infoDic objectForKey:@"mPoseList"];
+    _currentFaces = [infoDic objectForKey:@"mFaceList"];
+    
+    if ([_currentFaces count]<2) {
+        [_lastFaceBtn setHidden:YES];
+        [_nextFaceBtn setHidden:YES];
+    }else{
+        [_nextFaceBtn setHidden:NO];
+        [_lastFaceBtn setHidden:NO];
+    }
+    if ([_currentPoses count]<2) {
+        [_lastPoseBtn setHidden:YES];
+        [_nextPoseBtn setHidden:YES];
+    }else{
+        [_lastPoseBtn setHidden:NO];
+        [_nextPoseBtn setHidden:NO];
+    }
+    
+    [_currentPoseBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectPose"] forState:UIControlStateNormal];
+    if ([[infoDic objectForKey:@"mSelectFace"] isEqualToString:@""]) {
+        [_currentAnimationInfo setObject:@"face1" forKey:@"mSelectFace"];
+    }
+    [_currentFaceBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectFace"] forState:UIControlStateNormal];
+}
+
+- (void)changeNextPose{
+    NSInteger index = [_currentPoses indexOfObject:[_currentAnimationInfo objectForKey:@"mSelectPose"]];
+    index ++;
+    if (index == [_currentPoses count]) {
+        index = 0;
+    }
+    [_currentAnimationInfo setObject:[_currentPoses objectAtIndex:index] forKey:@"mSelectPose"];
+    [_currentPoseBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectPose"] forState:UIControlStateNormal];
+    [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectPose"]];
+
+}
+- (void)changeLastPose{
+    NSInteger index = [_currentPoses indexOfObject:[_currentAnimationInfo objectForKey:@"mSelectPose"]];
+    index --;
+    if (index <0) {
+        index = [_currentPoses count]-1;
+    }
+    [_currentAnimationInfo setObject:[_currentPoses objectAtIndex:index] forKey:@"mSelectPose"];
+    [_currentPoseBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectPose"] forState:UIControlStateNormal];
+    [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectPose"]];
+
+}
+- (void)changeNextFace{
+    NSInteger index = [_currentFaces indexOfObject:[_currentAnimationInfo objectForKey:@"mSelectFace"]];
+    index ++;
+    if (index == [_currentFaces count]) {
+        index = 0;
+    }
+    [_currentAnimationInfo setObject:[_currentFaces objectAtIndex:index] forKey:@"mSelectFace"];
+    [_currentFaceBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectFace"] forState:UIControlStateNormal];
+    [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectFace"]];
+
+}
+- (void)changeLastFace{
+    NSInteger index = [_currentFaces indexOfObject:[_currentAnimationInfo objectForKey:@"mSelectFace"]];
+    index --;
+    if (index <0) {
+        index = [_currentFaces count]-1;
+    }
+    [_currentAnimationInfo setObject:[_currentFaces objectAtIndex:index] forKey:@"mSelectFace"];
+    [_currentFaceBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectFace"] forState:UIControlStateNormal];
+    [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectFace"]];
+}
+- (void)changePoseOrFace:(NSString*)info{
+    UnitySendMessage(UnityController.UTF8String, "ChangeCharacterAnimation", info.UTF8String);
 }
 - (void)SetAnimationControlDisappear{
     CGRect frame =CGRectMake(0, CCamViewHeight, CCamViewWidth, CCamViewHeight-CCamThinNaviHeight-CCamViewWidth);
@@ -153,6 +314,7 @@
     ani.beginTime = CACurrentMediaTime();
     ani.duration = 0.25f;
     [_animationControl pop_addAnimation:ani forKey:@"position"];
+    [_navigationSurface setHidden:YES];
 }
 
 - (void)SetLightControlAppear{
@@ -164,6 +326,7 @@
     ani.beginTime = CACurrentMediaTime();
     ani.duration = 0.25f;
     [_lightControl pop_addAnimation:ani forKey:@"position"];
+    [_navigationSurface setHidden:NO];
 }
 - (void)setLightDirectionX:(CGFloat)x andY:(CGFloat)y{
     [_lightCircle.circlePoint setCenter:CGPointMake(_lightCircle.bounds.size.width/2+x*0.9*0.5*_lightCircle.bounds.size.width, _lightCircle.bounds.size.height/2+y*0.9*0.5*_lightCircle.bounds.size.height)];
@@ -182,10 +345,11 @@
     ani.beginTime = CACurrentMediaTime();
     ani.duration = 0.25f;
     [_lightControl pop_addAnimation:ani forKey:@"position"];
+    [_navigationSurface setHidden:YES];
 }
 - (void)setLightControlView{
     if (!_lightControl) {
-        _lightControl = [[UIView alloc] init];
+        _lightControl = [[UIScrollView alloc] init];
         [_lightControl setFrame:CGRectMake(0, CCamViewHeight, CCamViewWidth, CCamViewHeight-CCamThinNaviHeight-CCamViewWidth)];
         [_lightControl setBackgroundColor:[UIColor whiteColor]];
         [self.view addSubview:_lightControl];
@@ -194,12 +358,20 @@
         [lightControlBar setBackgroundColor:CCamViewBackgroundColor];
         [_lightControl addSubview:lightControlBar];
         
-        UIButton *lightControlLeftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [lightControlLeftBtn setImage:[[UIImage imageNamed:@"albumClose"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-        [lightControlLeftBtn setTintColor:CCamRedColor];
-        [lightControlLeftBtn sizeToFit];
-        [lightControlBar addSubview:lightControlLeftBtn];
-        [lightControlLeftBtn setCenter:CGPointMake(10+lightControlLeftBtn.bounds.size.width/2, lightControlBar.bounds.size.height/2)];
+//        UIButton *lightControlLeftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [lightControlLeftBtn setImage:[[UIImage imageNamed:@"albumClose"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+//        [lightControlLeftBtn setTintColor:CCamRedColor];
+//        [lightControlLeftBtn sizeToFit];
+//        [lightControlBar addSubview:lightControlLeftBtn];
+//        [lightControlLeftBtn setCenter:CGPointMake(10+lightControlLeftBtn.bounds.size.width/2, lightControlBar.bounds.size.height/2)];
+        
+        UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, lightControlBar.bounds.size.width, lightControlBar.bounds.size.height)];
+        [title setBackgroundColor:[UIColor clearColor]];
+        [title setText:@"灯光阴影调节"];
+        [title setTextColor:CCamGrayTextColor];
+        [title setFont:[UIFont boldSystemFontOfSize:17.0]];
+        [title setTextAlignment:NSTextAlignmentCenter];
+        [lightControlBar addSubview:title];
         
         UIButton *lightControlRightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [lightControlRightBtn setImage:[[UIImage imageNamed:@"controlOK"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
@@ -309,9 +481,14 @@
     [_bgView setUserInteractionEnabled:NO];
     [self.view addSubview:_bgView];
     
-    _navigationView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, CCamThinNaviHeight)];
+    _navigationView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, CCamThinNaviHeight)];
     [_navigationView setBackgroundColor:CCamSegmentColor];
     [self.view addSubview:_navigationView];
+    
+    _navigationSurface = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, CCamThinNaviHeight)];
+    [_navigationSurface setBackgroundColor:CCamSegmentColor];
+    [self.view addSubview:_navigationSurface];
+    [_navigationSurface setHidden:YES];
     
     _navigationTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, _navigationView.frame.size.width, CCamThinNaviHeight)];
     [_navigationView addSubview:_navigationTitle];
@@ -319,7 +496,7 @@
     [_navigationTitle setText:@"3D角色"];
     [_navigationTitle setTextAlignment:NSTextAlignmentCenter];
     [_navigationTitle setTextColor:[UIColor whiteColor]];
-    [_navigationTitle setFont:[UIFont systemFontOfSize:21.]];
+    [_navigationTitle setFont:[UIFont boldSystemFontOfSize:17.0]];
     
     
     _backButton = [UIButton buttonWithType:UIButtonTypeCustom];

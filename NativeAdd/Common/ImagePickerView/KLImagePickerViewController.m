@@ -119,6 +119,7 @@
     [self backToAlbum];
 }
 - (void)getAlbumsData{
+    [self.albums removeAllObjects];
     ALAssetsLibraryGroupsEnumerationResultsBlock resultsBlock = ^(ALAssetsGroup *group, BOOL *stop) {
         if (group) {
             [group setAssetsFilter:self.assetsFilter];
@@ -317,7 +318,7 @@
     //init albumBG
     _albumBG = [[UIScrollView alloc] initWithFrame:self.view.frame];
     [_albumBG setBounces:NO];
-    [_albumBG setContentSize:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height + 44 + self.view.frame.size.width)];
+    [_albumBG setContentSize:CGSizeMake(self.view.frame.size.width, self.view.frame.size.height + 2*CCamThinNaviHeight+self.view.frame.size.width*4/5)];
     [_albumBG setBackgroundColor:[UIColor blackColor]];
     [_albumBG setPagingEnabled:YES];
     [self.view addSubview:_albumBG];
@@ -325,7 +326,7 @@
     
     
     //init albumNavi
-    _albumNavi = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.albumBG.contentSize.width, 44)];
+    _albumNavi = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.albumBG.contentSize.width, CCamThinNaviHeight)];
     [_albumNavi setBackgroundColor:CCamCameraNaviColor];
     [self.albumBG addSubview:_albumNavi];
     //init naviClose
@@ -341,8 +342,8 @@
     [_albumNaviContinue setTitle:@"下一步" forState:UIControlStateNormal];
     [_albumNaviContinue.titleLabel setFont:[UIFont systemFontOfSize:14.]];
     [_albumNaviContinue setTitleColor:CCamRedColor forState:UIControlStateNormal];
-    [_albumNaviContinue setFrame:CGRectMake(0, 0, 70, 30)];
-    [_albumNaviContinue.layer setCornerRadius:15.0];
+    [_albumNaviContinue setFrame:CGRectMake(0, 0, 70, 24)];
+    [_albumNaviContinue.layer setCornerRadius:12.0];
     [_albumNaviContinue setBackgroundColor:[UIColor whiteColor]];
     [_albumNaviContinue setTintColor:CCamRedColor];
     [_albumNaviContinue setCenter:CGPointMake(_albumNavi.frame.size.width-15-_albumNaviContinue.frame.size.width/2, _albumNavi.frame.size.height/2)];
@@ -355,15 +356,15 @@
     [_albumNaviChoose setImageEdgeInsets:UIEdgeInsetsMake(0, -10, 0, 10)];
     [_albumNaviChoose setTintColor:[UIColor whiteColor]];
     [_albumNaviChoose setTitle:@"" forState:UIControlStateNormal];
-    [_albumNaviChoose.titleLabel setFont:[UIFont systemFontOfSize:21.]];
+    [_albumNaviChoose.titleLabel setFont:[UIFont boldSystemFontOfSize:17.]];
     [_albumNaviChoose setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [_albumNaviChoose setFrame:CGRectMake(0, 0, 200, 44)];
+    [_albumNaviChoose setFrame:CGRectMake(0, 0, 200, CCamThinNaviHeight)];
     [_albumNaviChoose setCenter:CGPointMake(_albumNavi.frame.size.width/2, _albumNavi.frame.size.height/2)];
     [_albumNaviChoose addTarget:self action:@selector(showAlbums) forControlEvents:UIControlEventTouchUpInside];
     [_albumNavi addSubview:_albumNaviChoose];
     
     //init album tool bar
-    _albumToolBar = [[UIView alloc] initWithFrame:CGRectMake(0, 44+_albumBG.contentSize.width, _albumBG.contentSize.width, 44)];
+    _albumToolBar = [[UIView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight+_albumBG.contentSize.width, _albumBG.contentSize.width, CCamThinNaviHeight)];
     [_albumToolBar setBackgroundColor:[UIColor redColor]];
     [_albumBG addSubview:_albumToolBar];
     
@@ -371,7 +372,7 @@
     [_albumMoveBtn setImage:[[UIImage imageNamed:@"cameraBarmove"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_albumMoveBtn setTintColor:CCamRedColor];
     [_albumMoveBtn setBackgroundColor:[UIColor whiteColor]];
-    [_albumMoveBtn setFrame:CGRectMake(0, 0, _albumToolBar.frame.size.width, 44)];
+    [_albumMoveBtn setFrame:CGRectMake(0, 0, _albumToolBar.frame.size.width, CCamThinNaviHeight)];
     [_albumMoveBtn setCenter:CGPointMake(_albumToolBar.frame.size.width/2, _albumToolBar.frame.size.height/2)];
     [_albumToolBar addSubview:_albumMoveBtn];
     [_albumMoveBtn addTarget:self action:@selector(poppop) forControlEvents:UIControlEventTouchUpInside];
@@ -380,7 +381,7 @@
     [_albumImgRotateBtn setImage:[[UIImage imageNamed:@"camera90Degree"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_albumImgRotateBtn setTintColor:CCamRedColor];
     [_albumImgRotateBtn setBackgroundColor:[UIColor whiteColor]];
-    [_albumImgRotateBtn setFrame:CGRectMake(0, 0, 44, 44)];
+    [_albumImgRotateBtn setFrame:CGRectMake(0, 0, CCamThinNaviHeight, CCamThinNaviHeight)];
     [_albumImgRotateBtn setCenter:CGPointMake(22 + 15, _albumToolBar.frame.size.height/2)];
     [_albumToolBar addSubview:_albumImgRotateBtn];
     [_albumImgRotateBtn addTarget:self action:@selector(rotateImage) forControlEvents:UIControlEventTouchUpInside];
@@ -390,12 +391,12 @@
     [_albumImgFitSizeBtn setImage:[[UIImage imageNamed:@"cameraFitsize"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_albumImgFitSizeBtn setTintColor:CCamRedColor];
     [_albumImgFitSizeBtn setBackgroundColor:[UIColor whiteColor]];
-    [_albumImgFitSizeBtn setFrame:CGRectMake(0, 0, 44, 44)];
+    [_albumImgFitSizeBtn setFrame:CGRectMake(0, 0, CCamThinNaviHeight, CCamThinNaviHeight)];
     [_albumImgFitSizeBtn setCenter:CGPointMake(_albumToolBar.frame.size.width-22-15, _albumToolBar.frame.size.height/2)];
     [_albumToolBar addSubview:_albumImgFitSizeBtn];
     [_albumImgFitSizeBtn addTarget:self action:@selector(changeImageToFitSize) forControlEvents:UIControlEventTouchUpInside];
     
-    _albumImgBG = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 44, self.view.frame.size.width, self.view.frame.size.width)];
+    _albumImgBG = [[UIScrollView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight, self.view.frame.size.width, self.view.frame.size.width)];
     [_albumImgBG setMaximumZoomScale:2.0];
     [_albumImgBG setMinimumZoomScale:1.0];
     [_albumBG addSubview:_albumImgBG];
@@ -415,7 +416,7 @@
     UICollectionViewFlowLayout *flowLayout=[[UICollectionViewFlowLayout alloc] init];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
     
-    _photoCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 44+44+self.view.frame.size.width, self.view.frame.size.width, _albumBG.contentSize.height-44-44-self.view.frame.size.width) collectionViewLayout:flowLayout];
+    _photoCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight+CCamThinNaviHeight+self.view.frame.size.width, self.view.frame.size.width, _albumBG.contentSize.height-CCamThinNaviHeight-CCamThinNaviHeight-self.view.frame.size.width) collectionViewLayout:flowLayout];
     [_photoCollection registerClass:[PickPhotoCell class] forCellWithReuseIdentifier:@"capturecell"];
     [_photoCollection registerClass:[PickPhotoCell class] forCellWithReuseIdentifier:@"photocell"];
     
@@ -433,7 +434,7 @@
     [self.view addSubview:_captureBG];
     [_captureBG setHidden:YES];
     
-    _captureButtonsBG = [[UIView alloc] initWithFrame:CGRectMake(0, 44+CCamViewWidth, CCamViewWidth, 44)];
+    _captureButtonsBG = [[UIView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight+CCamViewWidth, CCamViewWidth, CCamThinNaviHeight)];
     [_captureButtonsBG setBackgroundColor:CCamSegmentColor];
     [_captureBG addSubview:_captureButtonsBG];
     
@@ -495,7 +496,7 @@
     [_showAlbumBtn.layer setMasksToBounds:YES];
     [_showAlbumBtn addTarget:self action:@selector(backToAlbum) forControlEvents:UIControlEventTouchUpInside];
     
-    _albumCollection = [[UITableView alloc] initWithFrame:CGRectMake(0, 44, self.view.frame.size.width, self.view.frame.size.height-44) style:UITableViewStylePlain];
+    _albumCollection = [[UITableView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight, self.view.frame.size.width, self.view.frame.size.height-CCamThinNaviHeight) style:UITableViewStylePlain];
     [_albumCollection setDelegate:self];
     [_albumCollection setDataSource:self];
     [_albumCollection setHidden:YES];
@@ -535,8 +536,8 @@
         [_albumCollection setHidden:NO];
         [_albumBG setScrollEnabled:NO];
         POPSpringAnimation *anim = [POPSpringAnimation animationWithPropertyNamed:kPOPViewFrame];
-        anim.fromValue =[NSValue valueWithCGRect:CGRectMake(0, -self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height-44)];
-        anim.toValue = [NSValue valueWithCGRect:CGRectMake(0, 44, self.view.frame.size.width, self.view.frame.size.height-44)];
+        anim.fromValue =[NSValue valueWithCGRect:CGRectMake(0, -self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height-CCamThinNaviHeight)];
+        anim.toValue = [NSValue valueWithCGRect:CGRectMake(0, CCamThinNaviHeight, self.view.frame.size.width, self.view.frame.size.height-CCamThinNaviHeight)];
         anim.beginTime = CACurrentMediaTime();
         anim.springBounciness = 10.0f;
         [anim setCompletionBlock:^(POPAnimation *anim,BOOL finish){
@@ -764,7 +765,7 @@ static CGRect TWScaleRect(CGRect rect, CGFloat scale)
 }
 - (void) poppop{
     if (_albumBG.contentOffset.y == 0) {
-        [_albumBG setContentOffset:CGPointMake(_albumBG.contentOffset.x, 44 + self.view.frame.size.width) animated:YES];
+        [_albumBG setContentOffset:CGPointMake(_albumBG.contentOffset.x, CCamThinNaviHeight + self.view.frame.size.width*4/5) animated:YES];
         [_photoCollection setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
         
     }else{
@@ -784,14 +785,14 @@ static CGRect TWScaleRect(CGRect rect, CGFloat scale)
     if (scrollView == _albumImgBG) {
         [_albumBG setScrollEnabled:NO];
     }else if (scrollView == _albumBG){
-        if (_albumBG.contentOffset.y>0) {
-            
-            if (_albumBG.contentOffset.y<_albumBG.contentSize.height) {
-                [_photoCollection setContentInset:UIEdgeInsetsMake(0, 0, _albumBG.contentSize.height-self.view.frame.size.height-_albumBG.contentOffset.y, 0)];
-            }else if (_albumBG.contentOffset.y==_albumBG.contentSize.height){
-                [_photoCollection setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
-            }
-        }
+//        if (_albumBG.contentOffset.y>0) {
+//            
+//            if (_albumBG.contentOffset.y<_albumBG.contentSize.height) {
+//                [_photoCollection setContentInset:UIEdgeInsetsMake(0, 0, _albumBG.contentSize.height-self.view.frame.size.height-_albumBG.contentOffset.y, 0)];
+//            }else if (_albumBG.contentOffset.y==_albumBG.contentSize.height){
+//                [_photoCollection setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
+//            }
+//        }
     }
 }
 //-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{

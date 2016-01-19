@@ -102,10 +102,16 @@ UIViewController *UnityGetGLViewController();
 }
 - (void)setLightStrength:(NSString *)strength{
     CGFloat strengthValue = [strength floatValue];
+    if (strengthValue == 0) {
+        strengthValue = 0.8;
+    }
     [[DataHelper sharedManager].ccamVC setLightStrength:strengthValue];
 }
 - (void)setShadowStrength:(NSString *)strength{
     CGFloat strengthValue = [strength floatValue];
+    if (strengthValue == 0) {
+        strengthValue = 0.8;
+    }
     [[DataHelper sharedManager].ccamVC setShadowStrength:strengthValue];
 }
 - (void)callAnimationControl{
@@ -115,7 +121,8 @@ UIViewController *UnityGetGLViewController();
     [[DataHelper sharedManager].ccamVC SetAnimationControlDisappear];
 }
 - (void)setAnimationInfo:(NSString *)info{
-    
+    NSLog(@"当前角色动画信息：%@",info);
+    [[DataHelper sharedManager].ccamVC setAnimationInfo:info];
 }
 
 - (void)moveStuffOut{
