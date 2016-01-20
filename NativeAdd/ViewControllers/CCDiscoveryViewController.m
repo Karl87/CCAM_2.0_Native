@@ -15,6 +15,8 @@
 
 #import "CCTimeLine.h"
 
+#import "CCPhotoViewController.h"
+
 //test
 #import "TestDetailViewController.h"
 #import "lhScanQCodeViewController.h"
@@ -918,15 +920,19 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 #pragma mark - UITableView Delegate and Datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    return [_timeLines count]+1;//1;
+    if(section == 0){
+        return 1;
+    }
+    
+    return [_timeLines count];//1;
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;//[_timeLines count];
+    return 2;//[_timeLines count];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    if (indexPath.row==0){// && indexPath.row == 0) {
+    if (indexPath.section==0){// && indexPath.row == 0) {
         static NSString *identifier = @"topCell";
         TimelineTopCell * cell = [[TimelineTopCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         [cell setBackgroundColor:[UIColor clearColor]];
@@ -944,10 +950,12 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         [cell.photoDes setText:@"我是一段描述"];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        CCTimeLine *timeLine = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row-1];
+        CCTimeLine *timeLine = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row];
+        cell.timeline = timeLine;
+        
         [cell.profileImage sd_setImageWithURL:[NSURL URLWithString:timeLine.timelineUserImage] placeholderImage:nil];
         [cell.userName setText:timeLine.timelineUserName];
-        [cell.photo sd_setImageWithURL:[NSURL URLWithString:timeLine.image_contest] placeholderImage:nil];
+        [cell.photo sd_setImageWithURL:[NSURL URLWithString:timeLine.image_fullsize] placeholderImage:nil];
         [cell.photoDes setText:timeLine.timelineDes];
         
         return cell;
@@ -968,7 +976,9 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 //    }
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+    CCPhotoViewController *photo = [[CCPhotoViewController alloc] init];
+    photo.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:photo animated:YES];
 }
 //-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 //
@@ -983,7 +993,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 
 {
-    if (indexPath.row == 0){//(indexPath.section==0&& indexPath.row == 0) {
+    if (indexPath.section == 0){//(indexPath.section==0&& indexPath.row == 0) {
         return 44;
     }else{
         return 154+30+CCamViewWidth+44;

@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CCTimeLine.h"
 
-@interface TimelineCell : UITableViewCell
+@interface TimelineCell : UITableViewCell<UITableViewDataSource,UITableViewDelegate>
+@property (nonatomic,strong) CCTimeLine *timeline;
 @property (nonatomic,strong) UIView* cellBG;
 @property (nonatomic,strong) UIImageView *profileImage;
 @property (nonatomic,strong) UILabel *userName;
@@ -20,4 +22,5 @@
 @property (nonatomic,strong) UIButton *photoMore;
 @property (nonatomic,strong) UIView *likeView;
 @property (nonatomic,strong) UIView *messageView;
+@property (nonatomic,strong) UITableView *commentTable;
 @end

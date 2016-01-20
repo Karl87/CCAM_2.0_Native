@@ -38,10 +38,10 @@
     
     [DataHelper sharedManager].serieVC = vc_serie;
     
-    vc_me.vcTitle = @"Me";
-    vc_event.vcTitle = @"Event";
-    vc_home.vcTitle = @"Home";
-    vc_serie.vcTitle = @"Serie";
+    vc_me.vcTitle = @"我";
+    vc_event.vcTitle = @"活动";
+    vc_home.vcTitle = @"首页";
+    vc_serie.vcTitle = @"系列";
     vc_nil.vcTitle = @"";
     
     vc_me.setNavigationBar =YES;
