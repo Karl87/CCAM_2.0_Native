@@ -29,6 +29,7 @@
 #import <pop/POP.h>
 #import "CCamCircleView.h"
 #import "EFCircularSlider.h"
+#import "WCCircularSlider.h"
 
 @interface CCamCollectionView : UICollectionView
 @property (assign) CCamCollectionViewType type;
@@ -68,8 +69,8 @@
 @property (nonatomic,strong) UIButton * lastFaceBtn;
 @property (nonatomic,strong) UIButton * nextFaceBtn;
 @property (nonatomic,strong) UIButton * currentFaceBtn;
-@property (nonatomic,strong) EFCircularSlider *lightSlider;
-@property (nonatomic,strong) EFCircularSlider *shadowSlider;
+@property (nonatomic,strong) WCCircularSlider *lightSlider;
+@property (nonatomic,strong) WCCircularSlider *shadowSlider;
 @end
 
 @implementation CCamViewController
@@ -316,7 +317,17 @@
     [_animationControl pop_addAnimation:ani forKey:@"position"];
     [_navigationSurface setHidden:YES];
 }
-
+- (void)setHeadDirectionAvilable:(BOOL)avilable X:(CGFloat)x andY:(CGFloat)y{
+    if (avilable) {
+        [_headCircle setUserInteractionEnabled:YES];
+        [_headCircle.circlePoint setUserInteractionEnabled:YES];
+        [_headCircle.circlePoint setCenter:CGPointMake(_headCircle.bounds.size.width/2+x*0.9*0.5*_headCircle.bounds.size.width, _headCircle.bounds.size.height/2+y*0.9*0.5*_headCircle.bounds.size.height)];
+    }else{
+        [_headCircle setUserInteractionEnabled:NO];
+        [_headCircle.circlePoint setUserInteractionEnabled:NO];
+        [_headCircle.circlePoint setCenter:CGPointMake(_headCircle.bounds.size.width/2, _headCircle.bounds.size.height/2)];
+    }
+}
 - (void)SetLightControlAppear{
     [self SetAnimationControlDisappear];
     CGRect frame =CGRectMake(0, CCamThinNaviHeight+CCamViewWidth, CCamViewWidth, CCamViewHeight-CCamThinNaviHeight-CCamViewWidth);
@@ -332,10 +343,10 @@
     [_lightCircle.circlePoint setCenter:CGPointMake(_lightCircle.bounds.size.width/2+x*0.9*0.5*_lightCircle.bounds.size.width, _lightCircle.bounds.size.height/2+y*0.9*0.5*_lightCircle.bounds.size.height)];
 }
 - (void)setLightStrength:(CGFloat)strength{
-    [_lightSlider setCurrentValue:strength];
+    [_lightSlider setProgress:strength];
 }
 - (void)setShadowStrength:(CGFloat)strength{
-    [_shadowSlider setCurrentValue:strength];
+    [_shadowSlider setProgress:strength];
 }
 - (void)SetLightControlDisappear{
     CGRect frame =CGRectMake(0, CCamViewHeight, CCamViewWidth, CCamViewHeight-CCamThinNaviHeight-CCamViewWidth);
@@ -390,37 +401,84 @@
     }
     
     if (!_lightSlider) {
-        _lightSlider = [[EFCircularSlider alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
+//        _lightSlider = [[EFCircularSlider alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
+//        [_lightSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+//        [_lightSlider setUnfilledColor:CCamBackgoundGrayColor];
+//        [_lightSlider setFilledColor:CCamRedColor];
+//        [_lightSlider setHandleType:CircularSliderHandleTypeBigCircle];
+//        [_lightSlider setHandleColor:CCamRedColor];
+//        [_lightSlider setMinimumValue:0.0];
+//        [_lightSlider setMaximumValue:1.0];
+//        [_lightSlider setCurrentValue:0.8];
+        _lightSlider = [[WCCircularSlider alloc] init];
+        [_lightSlider setBackgroundColor:[UIColor clearColor]];
+        [_lightSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
         [_lightSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
-        [_lightSlider setUnfilledColor:CCamBackgoundGrayColor];
-        [_lightSlider setFilledColor:CCamRedColor];
-        [_lightSlider setHandleType:CircularSliderHandleTypeBigCircle];
-        [_lightSlider setHandleColor:CCamRedColor];
-        [_lightSlider setMinimumValue:0.0];
-        [_lightSlider setMaximumValue:1.0];
+        [_lightSlider setStartAngle:-90];
+        [_lightSlider setCutoutAngle:60];
+        [_lightSlider setProgress:0.8];
+        [_lightSlider setLineWidth:3];
+        [_lightSlider setGuideLineColor:CCamBackgoundGrayColor];
+        [_lightSlider setTintColor:CCamRedColor];
         [_lightSlider addTarget:self action:@selector(lightStrengthChanged:) forControlEvents:UIControlEventValueChanged];
         [_lightControl addSubview:_lightSlider];
+        UILabel *lightSliderTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
+        [lightSliderTitle setUserInteractionEnabled:NO];
+        [lightSliderTitle setCenter:CGPointMake(_lightSlider.center.x, _lightSlider.center.y+_lightSlider.bounds.size.height/2-15)];
+        [lightSliderTitle setTextAlignment:NSTextAlignmentCenter];
+        [lightSliderTitle setText:@"灯光强度"];
+        [lightSliderTitle setTextColor:CCamGrayTextColor];
+        [lightSliderTitle setFont:[UIFont boldSystemFontOfSize:11.0]];
+        [lightSliderTitle setBackgroundColor:[UIColor clearColor]];
+        [_lightControl addSubview:lightSliderTitle];
     }
     
     if (!_shadowSlider) {
-        _shadowSlider = [[EFCircularSlider alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/3*0.8,_lightControl.bounds.size.width/3*0.8)];
+//        _shadowSlider = [[EFCircularSlider alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/3*0.8,_lightControl.bounds.size.width/3*0.8)];
+//        [_shadowSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+//        [_shadowSlider setUnfilledColor:CCamBackgoundGrayColor];
+//        [_shadowSlider setFilledColor:CCamRedColor];
+//        [_shadowSlider setHandleType:CircularSliderHandleTypeDoubleCircleWithClosedCenter];
+//        [_shadowSlider setHandleColor:CCamRedColor];
+//        [_shadowSlider setMinimumValue:0.0];
+//        [_shadowSlider setMaximumValue:1.0];
+//        [_shadowSlider setCurrentValue:0.5];
+        _shadowSlider = [[WCCircularSlider alloc] init];
+        [_shadowSlider setBackgroundColor:[UIColor clearColor]];
+        [_shadowSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/3*0.8,_lightControl.bounds.size.width/3*0.8)];
         [_shadowSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
-        [_shadowSlider setUnfilledColor:CCamBackgoundGrayColor];
-        [_shadowSlider setFilledColor:CCamRedColor];
-        [_shadowSlider setHandleType:CircularSliderHandleTypeDoubleCircleWithClosedCenter];
-        [_shadowSlider setHandleColor:CCamRedColor];
-        [_shadowSlider setMinimumValue:0.0];
-        [_shadowSlider setMaximumValue:1.0];
+        [_shadowSlider setStartAngle:-90];
+        [_shadowSlider setCutoutAngle:90];
+        [_shadowSlider setProgress:0.5];
+        [_shadowSlider setLineWidth:3];
+        [_shadowSlider setGuideLineColor:CCamBackgoundGrayColor];
+        [_shadowSlider setTintColor:CCamRedColor];
         [_shadowSlider addTarget:self action:@selector(ShadowStrengthChanged:) forControlEvents:UIControlEventValueChanged];
         [_lightControl addSubview:_shadowSlider];
+        UILabel *shadowSliderTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 66, 20)];
+        [shadowSliderTitle setUserInteractionEnabled:NO];
+        [shadowSliderTitle setCenter:CGPointMake(_shadowSlider.center.x, _shadowSlider.center.y+_shadowSlider.bounds.size.height/2-15)];
+        [shadowSliderTitle setTextAlignment:NSTextAlignmentCenter];
+        [shadowSliderTitle setText:@"阴影强度"];
+        [shadowSliderTitle setTextColor:CCamGrayTextColor];
+        [shadowSliderTitle setFont:[UIFont boldSystemFontOfSize:11.0]];
+        [shadowSliderTitle setBackgroundColor:[UIColor clearColor]];
+        [_lightControl addSubview:shadowSliderTitle];
     }
 }
-- (void)lightStrengthChanged:(EFCircularSlider*)slider{
-    NSString *strength = [NSString stringWithFormat:@"%f",slider.currentValue];
-    UnitySendMessage(UnityController.UTF8String, "ChangeLightIntensity", strength.UTF8String);
+- (void)lightStrengthChanged:(WCCircularSlider*)slider{
+    NSString *eStrength = [NSString stringWithFormat:@"%f",slider.progress];
+    NSString *mStrength = [NSString stringWithFormat:@"%f",0.5*slider.progress];
+    NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
+    [lightDic setObject:eStrength forKey:@"environment"];
+    [lightDic setObject:mStrength forKey:@"mainLight"];
+    NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
+    NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+//    NSString *strength = [NSString stringWithFormat:@"%f",slider.currentValue];
+    UnitySendMessage(UnityController.UTF8String, "ChangeLightIntensity", jsonString.UTF8String);
 }
-- (void)ShadowStrengthChanged:(EFCircularSlider*)slider{
-    NSString *strength = [NSString stringWithFormat:@"%f",slider.currentValue];
+- (void)ShadowStrengthChanged:(WCCircularSlider*)slider{
+    NSString *strength = [NSString stringWithFormat:@"%f",slider.progress];
     UnitySendMessage(UnityController.UTF8String, "ChangeShadowIntensity", strength.UTF8String);
 }
 - (void)pointValueChanged:(CCamCircleView *)circle{
@@ -429,6 +487,9 @@
         NSString *direction = [NSString stringWithFormat:@"%f|%f",2*circle.x/circle.bounds.size.width/0.9,2*circle.y/circle.bounds.size.height/0.9];
         UnitySendMessage(UnityController.UTF8String, "ShadowPickerValueChanged", direction.UTF8String);
 
+    }else if (circle == _headCircle){
+        NSString *direction = [NSString stringWithFormat:@"%f|%f",2*circle.x/circle.bounds.size.width/0.9,2*circle.y/circle.bounds.size.height/0.9];
+        UnitySendMessage(UnityController.UTF8String, "SetLookScreenPosStr", direction.UTF8String);
     }
 }
 - (void)didReceiveMemoryWarning {
@@ -442,14 +503,14 @@
     [super touchesMoved:touches withEvent:event];
     [UnityGetGLView() touchesMoved:touches withEvent:event];
 }
-- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    [super touchesCancelled:touches withEvent:event];
-    [UnityGetGLView() touchesCancelled:touches withEvent:event];
-}
--(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
-    [super touchesEnded:touches withEvent:event];
-    [UnityGetGLView() touchesEnded:touches withEvent:event];
-}
+//- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+//    [super touchesCancelled:touches withEvent:event];
+//    [UnityGetGLView() touchesCancelled:touches withEvent:event];
+//}
+//-(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+//    [super touchesEnded:touches withEvent:event];
+//    [UnityGetGLView() touchesEnded:touches withEvent:event];
+//}
 
 
 #pragma mark - getter / setter

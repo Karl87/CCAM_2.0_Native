@@ -2,16 +2,22 @@
 //  CCTimeLine.m
 //  Unity-iPhone
 //
-//  Created by Karl on 2016/1/18.
+//  Created by Karl on 2016/1/21.
 //
 //
 
 #import "CCTimeLine.h"
+#import "CCComment.h"
+#import "CCLike.h"
 #import "Constants.h"
 
 @implementation CCTimeLine
 
 - (void)initTimelineWith:(NSDictionary *)dic{
+    self.dateline = GetValidString([dic objectForKey:@"dateline"]);
+    self.cNameZH = GetValidChar([dic objectForKey:@"zh_name"]);
+    self.cNameEN = GetValidChar([dic objectForKey:@"en_name"]);
+    self.cNameCN = GetValidChar([dic objectForKey:@"cname"]);
     self.timelineID = GetValidString([dic objectForKey:@"workid"]);
     self.image_contest = GetValidString([dic objectForKey:@"contest"]);
     self.image_fullsize = GetValidString([dic objectForKey:@"big_img"]);
@@ -22,13 +28,9 @@
     self.timelineUserName = GetValidString([dic objectForKey:@"name"]);
     self.timelineUserImage = GetValidString([dic objectForKey:@"image_url"]);
     self.timelineContestID = GetValidString([dic objectForKey:@"contestid"]);
-    self.comment = GetValidString([dic objectForKey:@"comment"]);
     self.ranking = GetValidString([dic objectForKey:@"ranking"]);
-    self.lastLikeInfo = GetValidString([dic objectForKey:@"last_like"]);
     self.countDown = GetValidString([dic objectForKey:@"countdown"]);
     self.liked = GetValidString([dic objectForKey:@"liked"]);
     self.report = GetValidString([dic objectForKey:@"Report"]);
-    NSLog(@"%@",self);
 }
-
 @end

@@ -37,6 +37,17 @@
         <relationship name="animations" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="CCAnimation" inverseName="character" inverseEntity="CCAnimation" syncable="YES"/>
         <relationship name="serie" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="CCSerie" inverseName="characters" inverseEntity="CCSerie" syncable="YES"/>
     </entity>
+    <entity name="CCComment" representedClassName="CCComment" syncable="YES">
+        <attribute name="comment" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="commentID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userImage" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="timeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CCTimeLine" inverseName="comments" inverseEntity="CCTimeLine" syncable="YES"/>
+    </entity>
     <entity name="CCEvent" syncable="YES">
         <attribute name="eventCount" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventCountDown" optional="YES" attributeType="String" syncable="YES"/>
@@ -74,6 +85,13 @@
         <attribute name="upnum" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="winner_status" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="workid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="CCLike" representedClassName="CCLike" syncable="YES">
+        <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="timeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CCTimeLine" inverseName="likes" inverseEntity="CCTimeLine" syncable="YES"/>
     </entity>
     <entity name="CCNewPhoto" syncable="YES">
         <attribute name="big_img" optional="YES" attributeType="String" syncable="YES"/>
@@ -181,12 +199,14 @@
         <relationship name="stickers" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="CCSticker" inverseName="stickerset" inverseEntity="CCSticker" syncable="YES"/>
     </entity>
     <entity name="CCTimeLine" representedClassName="CCTimeLine" syncable="YES">
-        <attribute name="comment" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cNameCN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cNameEN" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cNameZH" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="countDown" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_contest" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_fullsize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_share" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="lastLikeInfo" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="likeCount" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="liked" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="ranking" optional="YES" attributeType="String" syncable="YES"/>
@@ -197,6 +217,8 @@
         <attribute name="timelineUserID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineUserImage" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineUserName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="CCComment" inverseName="timeline" inverseEntity="CCComment" syncable="YES"/>
+        <relationship name="likes" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="CCLike" inverseName="timeline" inverseEntity="CCLike" syncable="YES"/>
     </entity>
     <entity name="CCUser" syncable="YES">
         <attribute name="userAddress" optional="YES" attributeType="String" syncable="YES"/>
@@ -233,14 +255,16 @@
     <elements>
         <element name="CCAnimation" positionX="-416" positionY="540" width="128" height="283"/>
         <element name="CCCharacter" positionX="-468" positionY="414" width="126" height="298"/>
+        <element name="CCComment" positionX="-459" positionY="153" width="128" height="180"/>
         <element name="CCEvent" positionX="-108" positionY="9" width="128" height="165"/>
         <element name="CCHotPhoto" positionX="-387" positionY="9" width="128" height="435"/>
+        <element name="CCLike" positionX="-450" positionY="162" width="128" height="120"/>
         <element name="CCNewPhoto" positionX="-522" positionY="9" width="128" height="435"/>
         <element name="CCSelectionPhoto" positionX="-252" positionY="9" width="128" height="435"/>
         <element name="CCSerie" positionX="-659" positionY="9" width="128" height="388"/>
         <element name="CCSticker" positionX="-450" positionY="162" width="128" height="210"/>
         <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
-        <element name="CCUser" positionX="-108" positionY="180" width="128" height="493"/>
-        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="285"/>
+        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="345"/>
+        <element name="CCUser" positionX="-108" positionY="180" width="128" height="495"/>
     </elements>
 </model>

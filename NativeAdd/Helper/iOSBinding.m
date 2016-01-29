@@ -10,6 +10,12 @@
 #import "iOSBindingManager.h"
 
 #define GetStringParam( _x_ ) ( _x_ != NULL ) ? [NSString stringWithUTF8String:_x_] : [NSString stringWithUTF8String:""]
+void _cannotAddMoreCharacter(){
+    [[iOSBindingManager sharedManager] cannotAddMoreCharacter];
+}
+void _cannotAddDifferentSerieCharacter(){
+    [[iOSBindingManager sharedManager] cannotAddDifferentSerieCharacter];
+}
 void _homeAddNativeSurface(){
     [[iOSBindingManager sharedManager] homeAddNativeSurface];
 }

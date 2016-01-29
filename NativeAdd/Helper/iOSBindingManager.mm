@@ -17,6 +17,7 @@
 #import "CCamViewController.h"
 #import "KLTabBarController.h"
 
+#import <MBProgressHUD/MBProgressHUD.h>
 
 void UnitySendMessage( const char * className, const char * methodName, const char * param );
 void UnityPause( bool pause );
@@ -93,21 +94,35 @@ UIViewController *UnityGetGLViewController();
 - (void)setLightDirection:(NSString *)direction{
     NSLog(@"direction = %@",direction);
     if ([direction isEqualToString:@""]) {
-        direction = @"0|0";
+        direction = @"0|0.2";
     }
     NSArray *directionArray = [direction componentsSeparatedByString:@"|"];
     CGFloat x = [[directionArray objectAtIndex:0] floatValue];
     CGFloat y = [[directionArray objectAtIndex:1] floatValue];
     [[DataHelper sharedManager].ccamVC setLightDirectionX:x andY:y];
 }
+- (void)setHeadDirection:(NSString *)direction{
+    NSLog(@"head direction = %@",direction);
+    NSError *error;
+    NSDictionary *infoDic =[NSJSONSerialization JSONObjectWithData:[direction dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+    BOOL hasFunction = NO;
+    if ([[infoDic objectForKey:@"hasFunction"] isEqualToString:@"true"]) {
+        hasFunction = YES;
+    }
+    CGFloat xPos = [[infoDic objectForKey:@"xPos"] floatValue];
+    CGFloat yPos = [[infoDic objectForKey:@"yPos"] floatValue];
+    [[DataHelper sharedManager].ccamVC setHeadDirectionAvilable:hasFunction X:xPos andY:yPos];
+}
 - (void)setLightStrength:(NSString *)strength{
+    NSLog(@"LIGHTSTRENGTH = %@",strength);
     CGFloat strengthValue = [strength floatValue];
     if (strengthValue == 0) {
-        strengthValue = 0.8;
+        strengthValue = 0.4;
     }
-    [[DataHelper sharedManager].ccamVC setLightStrength:strengthValue];
+    [[DataHelper sharedManager].ccamVC setLightStrength:strengthValue*2];
 }
 - (void)setShadowStrength:(NSString *)strength{
+    NSLog(@"SHADOWSTRENGTH = %@",strength);
     CGFloat strengthValue = [strength floatValue];
     if (strengthValue == 0) {
         strengthValue = 0.8;
@@ -124,7 +139,25 @@ UIViewController *UnityGetGLViewController();
     NSLog(@"当前角色动画信息：%@",info);
     [[DataHelper sharedManager].ccamVC setAnimationInfo:info];
 }
-
+- (void)cannotAddDifferentSerieCharacter{
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view.window animated:YES];
+    [[[ViewHelper sharedManager] getCurrentVC].view.window addSubview:hud];
+    hud.labelText = @"无法添加其他系列角色!";
+    hud.mode = MBProgressHUDModeText;
+    hud.removeFromSuperViewOnHide = YES;
+    hud.margin = 15.0f;
+    [hud hide:YES afterDelay:1.0];
+    
+}
+- (void)cannotAddMoreCharacter{
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view.window animated:YES];
+    [[[ViewHelper sharedManager] getCurrentVC].view.window addSubview:hud];
+    hud.labelText = @"无法添加更多角色!";
+    hud.mode = MBProgressHUDModeText;
+    hud.removeFromSuperViewOnHide = YES;
+    hud.margin = 15.0f;
+    [hud hide:YES afterDelay:1.0];
+}
 - (void)moveStuffOut{
     if (_imagePicker !=nil) {
         [_imagePicker.view removeFromSuperview];

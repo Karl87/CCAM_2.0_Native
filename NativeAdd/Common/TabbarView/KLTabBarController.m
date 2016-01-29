@@ -15,7 +15,6 @@
 #import "CCSerieViewController.h"
 //test
 #import "TestPostRequestWebViewController.h"
-#import "TestSMSLoginViewController.h"
 #import "KLImagePickerViewController.h"
 
 @interface KLTabBarController () <UITabBarDelegate>
@@ -104,10 +103,16 @@
 }
 
 - (void)customTabbarItemOnClick{
-    NSLog(@"Click Middle!");
-//    [[AuthorizeHelper sharedManager] callAuthorizeView];
     
-    UnitySendMessage(UnityController.UTF8String, "LoadEditScene", "");
+    if ([[AuthorizeHelper sharedManager] checkToken]) {
+        UnitySendMessage(UnityController.UTF8String, "LoadEditScene", "");
+
+    }else{
+        [[AuthorizeHelper sharedManager] callAuthorizeView];
+
+    }
+    
+    
 }
 - (void)KillWindow{
 

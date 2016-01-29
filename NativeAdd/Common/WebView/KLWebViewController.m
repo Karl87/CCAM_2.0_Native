@@ -26,6 +26,9 @@
 - (void)viewDidLoad{
     [super viewDidLoad];
     
+    [self.view setBackgroundColor:CCamViewBackgroundColor];
+    
+    
     _topBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_topBtn setBackgroundColor:[UIColor clearColor]];
     [_topBtn setFrame:CGRectMake(0, 0, CCamNavigationBarHeight - 20, CCamNavigationBarHeight - 20)];
@@ -34,54 +37,54 @@
     [self.navigationController.navigationBar addSubview:_topBtn];
     
     
-    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, -CCamNavigationBarHeight, CCamViewWidth, CCamViewHeight+CCamNavigationBarHeight)];
+    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0,CCamViewWidth,CCamViewHeight+20)];
     [_webView setBackgroundColor:CCamViewBackgroundColor];
     [_webView setDelegate:self];
     [self.view addSubview:_webView];
     
-    UIToolbar *toolBar  =[[ UIToolbar alloc] initWithFrame:CGRectMake(0, CCamViewHeight-CCamTabBarHeight, CCamViewWidth, CCamTabBarHeight)];
-    if(iOS8){
-        [toolBar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
-        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-        UIVisualEffectView * blur = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-        [blur setFrame:CGRectMake(0, 0, CCamViewWidth, CCamTabBarHeight)];
-        [toolBar addSubview:blur];
-    }else{
-        [toolBar setBarTintColor:CCamBarTintColor];
-    }
-    [toolBar setTintColor:CCamGoldColor];
-    [self.view addSubview:toolBar];
+//    UIToolbar *toolBar  =[[ UIToolbar alloc] initWithFrame:CGRectMake(0, CCamViewHeight-CCamTabBarHeight, CCamViewWidth, CCamTabBarHeight)];
+//    if(iOS8){
+//        [toolBar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+//        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+//        UIVisualEffectView * blur = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+//        [blur setFrame:CGRectMake(0, 0, CCamViewWidth, CCamTabBarHeight)];
+//        [toolBar addSubview:blur];
+//    }else{
+//        [toolBar setBarTintColor:CCamBarTintColor];
+//    }
+//    [toolBar setTintColor:CCamGoldColor];
+//    [self.view addSubview:toolBar];
     
     UIBarButtonItem * refreshBtn = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(webRefresh)];
     self.navigationItem.rightBarButtonItem = refreshBtn;
     
-    VBFPopFlatButton *backBtn = [[VBFPopFlatButton alloc] initWithFrame:CGRectMake(CCamViewWidth/3 -15, 12, 30, 30) buttonType:buttonBackType buttonStyle:buttonPlainStyle animateToInitialState:YES];
-    backBtn.lineThickness = 2;
-    [backBtn setTintColor:CCamGoldColor forState:UIControlStateNormal];
-    [backBtn setTintColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [backBtn setEnabled:NO];
-    [backBtn addTarget:self
-                action:@selector(webGoBack)
-      forControlEvents:UIControlEventTouchUpInside];
-    
-    [toolBar addSubview:backBtn];
-    self.backBtn = backBtn;
-    
-    VBFPopFlatButton *forwardBtn = [[VBFPopFlatButton alloc] initWithFrame:CGRectMake(CCamViewWidth*2/3 - 15, 12, 30, 30) buttonType:buttonForwardType buttonStyle:buttonPlainStyle animateToInitialState:YES];
-    forwardBtn.lineThickness = 2;
-    [forwardBtn setTintColor:CCamGoldColor forState:UIControlStateNormal];
-    [forwardBtn setTintColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [forwardBtn setEnabled:NO];
-    [forwardBtn addTarget:self
-                action:@selector(webGoForward)
-      forControlEvents:UIControlEventTouchUpInside];
-    
-    [toolBar addSubview:forwardBtn];
-    self.forwardBtn = forwardBtn;
-
-    UIActivityIndicatorView *webLoading = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(CCamViewWidth/2-15, 12, 30, 30)];
-    [toolBar addSubview:webLoading];
-    self.webLoading = webLoading;
+//    VBFPopFlatButton *backBtn = [[VBFPopFlatButton alloc] initWithFrame:CGRectMake(CCamViewWidth/3 -15, 12, 30, 30) buttonType:buttonBackType buttonStyle:buttonPlainStyle animateToInitialState:YES];
+//    backBtn.lineThickness = 2;
+//    [backBtn setTintColor:CCamGoldColor forState:UIControlStateNormal];
+//    [backBtn setTintColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+//    [backBtn setEnabled:NO];
+//    [backBtn addTarget:self
+//                action:@selector(webGoBack)
+//      forControlEvents:UIControlEventTouchUpInside];
+//    
+//    [toolBar addSubview:backBtn];
+//    self.backBtn = backBtn;
+//    
+//    VBFPopFlatButton *forwardBtn = [[VBFPopFlatButton alloc] initWithFrame:CGRectMake(CCamViewWidth*2/3 - 15, 12, 30, 30) buttonType:buttonForwardType buttonStyle:buttonPlainStyle animateToInitialState:YES];
+//    forwardBtn.lineThickness = 2;
+//    [forwardBtn setTintColor:CCamGoldColor forState:UIControlStateNormal];
+//    [forwardBtn setTintColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+//    [forwardBtn setEnabled:NO];
+//    [forwardBtn addTarget:self
+//                action:@selector(webGoForward)
+//      forControlEvents:UIControlEventTouchUpInside];
+//    
+//    [toolBar addSubview:forwardBtn];
+//    self.forwardBtn = forwardBtn;
+//
+//    UIActivityIndicatorView *webLoading = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(CCamViewWidth/2-15, 12, 30, 30)];
+//    [toolBar addSubview:webLoading];
+//    self.webLoading = webLoading;
     
     
     UIRefreshControl *refresh = [self returnUIRefreshControlWithTintColor:CCamGoldColor
@@ -92,8 +95,7 @@
                                                                    action:@selector(webRefresh)];
     _refresh = refresh;
     [_webView.scrollView addSubview:_refresh];
-    [_webView.scrollView setContentInset:UIEdgeInsetsMake(CCamNavigationBarHeight, 0, CCamTabBarHeight, 0)];
-    [_webView.scrollView setScrollIndicatorInsets:UIEdgeInsetsMake(CCamNavigationBarHeight, 0, CCamTabBarHeight, 0)];
+    
     [_webView.scrollView setDelegate:self];
     
     [_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.webURL]]];
@@ -107,7 +109,7 @@
 }
 - (void)webGoTop{
     NSLog(@"GoTop!");
-    [_webView.scrollView setContentOffset:CGPointMake(0, -CCamNavigationBarHeight-CCamTabBarHeight-10) animated:YES];
+//    [_webView.scrollView setContentOffset:CGPointMake(0, -CCamNavigationBarHeight-CCamTabBarHeight-10) animated:YES];
 }
 - (void)webGoBack{
     NSLog(@"GoBack!");
@@ -178,7 +180,10 @@
     [self manageWebControlButtons];
     [self webProgressAnimationWithType:@"End"];
     [self showWebPageLoadingStatus];
-    self.title = [_webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+//    self.title = [_webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+    [_webView.scrollView setContentInset:UIEdgeInsetsMake(0, 0, CCamNavigationBarHeight+20, 0)];
+    [_webView.scrollView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, CCamNavigationBarHeight+20, 0)];
+    
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(nullable NSError *)error{
     NSLog(@"Load error web");

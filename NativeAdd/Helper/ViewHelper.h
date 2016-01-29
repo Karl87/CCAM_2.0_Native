@@ -16,6 +16,7 @@
 @interface ViewHelper : NSObject
 
 + (ViewHelper*)sharedManager;
+- (UIViewController *)getCurrentVC;
 
 
 

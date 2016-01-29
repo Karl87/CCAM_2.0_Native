@@ -284,7 +284,7 @@
     [_submitHud show:YES];
     
     [_submitButton setEnabled:NO];
-    NSDictionary *parameters= @{@"token":CCamTestToken,@"contestid":@"0",@"description":_submitText.text,@"characterid":@"[0]"};
+    NSDictionary *parameters= @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"contestid":@"0",@"description":_submitText.text,@"characterid":@"[0]"};
     NSData *imageData = UIImageJPEGRepresentation(_submitImage.image, 1.0);
     
     NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:CCamSubmitPhotoURL parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {

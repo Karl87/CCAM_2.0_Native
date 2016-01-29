@@ -11,5 +11,4 @@
 @interface KLWebViewController : KLViewController
 
 @property (nonatomic,copy) NSString * webURL;
-
 @end

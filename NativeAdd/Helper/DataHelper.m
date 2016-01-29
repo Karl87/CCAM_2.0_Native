@@ -134,7 +134,7 @@
     NSLog(@"Start request Series info");
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSString *token = CCamTestToken;
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
     NSString *version = [[SettingHelper sharedManager] getSettingAttributeWithKey:CCamSettingTagInfoVersion];
     NSDictionary *parameters = @{@"token" :token,@"version":version};
     
@@ -206,7 +206,7 @@
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSString *token = CCamTestToken;
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
 //    NSString *version = character.version;
     NSString *characterID = character.characterID;
     NSDictionary *parameters = @{@"token" :token,@"version":@"",@"character_id":characterID};

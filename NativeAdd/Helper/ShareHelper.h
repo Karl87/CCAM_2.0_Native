@@ -10,5 +10,5 @@
 
 @interface ShareHelper : NSObject
 + (ShareHelper*)sharedManager;
-
+- (void)initShareSDK;
 @end

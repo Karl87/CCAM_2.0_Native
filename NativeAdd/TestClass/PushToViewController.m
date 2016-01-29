@@ -42,7 +42,7 @@
 //    
 //    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
 //    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-//    NSString *token = CCamTestToken;
+//    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
 //    NSDictionary *parameters = @{@"token" :token,@"version":@""};
 //    [manager POST:@"http://www.c-cam.cc/index.php/Api_new/Getmemberxml/get_xml.html" parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
 //        NSLog(@"%lu",(unsigned long)[responseObject length]);

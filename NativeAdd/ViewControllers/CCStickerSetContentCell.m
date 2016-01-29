@@ -113,6 +113,9 @@
         CCSticker *sticker = [_stickerInfos objectAtIndex: indexPath.row];
         stickerCell.sticker = sticker;
         
+        NSLog(@"%@",sticker.image_Preview);
+        NSLog(@"%@",sticker.image_Res);
+        
         stickerCell.downloadProgress.tag = 9000 + [sticker.stickerID intValue];
         
         if ([[DownloadHelper sharedManager].downloadInfos objectForKey:[NSString stringWithFormat:@"Sticker%@",sticker.stickerID]]) {
@@ -125,7 +128,7 @@
             [stickerCell.downloadProgress setHidden:YES];
             [stickerCell.stateImage setHidden:NO];
         }
-            [stickerCell.stickerImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",stickerCell.sticker.image_Preview]] placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType,NSURL *imageURL){
+            [stickerCell.stickerImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,stickerCell.sticker.image_Preview]] placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType,NSURL *imageURL){
             POPBasicAnimation *ani = [POPBasicAnimation animationWithPropertyNamed:kPOPViewAlpha];
             ani.fromValue = [NSNumber numberWithFloat:0.0];
             ani.toValue = [NSNumber numberWithFloat:1.0];

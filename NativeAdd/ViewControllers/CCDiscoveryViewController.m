@@ -14,8 +14,11 @@
 #import "TimelineTopCell.h"
 
 #import "CCTimeLine.h"
+#import "CCComment.h"
+#import "CCLike.h"
 
 #import "CCPhotoViewController.h"
+#import "KLWebViewController.h"
 
 //test
 #import "TestDetailViewController.h"
@@ -58,7 +61,9 @@
 
 @implementation CCDiscoveryViewController
 static NSString *const MJCollectionViewCellIdentifier = @"color";
-
+- (void)logout{
+    [[AuthorizeHelper sharedManager] logout];
+}
 - (void)viewDidLoad{
     [super viewDidLoad];
     
@@ -67,6 +72,9 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     self.loadingSelection = NO;
     self.loadingPopular = NO;
     self.loadingLast = NO;
+    
+    UIBarButtonItem *logout = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(logout)];
+    [self.navigationItem setLeftBarButtonItem:logout];
     
     NSArray* segArray = @[@"订阅",@"广场"];
     _segmegtItems = [[NSMutableArray alloc] initWithCapacity:0];
@@ -245,9 +253,9 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSString *token = CCamTestToken;
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
     NSDictionary *parameters = @{@"token" :token};
-    [manager GET:CCamGetTimeLineURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [manager POST:CCamGetTimeLineURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         
         [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCTimeLine"];
 
@@ -260,6 +268,39 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
             
             CCTimeLine *timeline =[NSEntityDescription insertNewObjectForEntityForName:@"CCTimeLine" inManagedObjectContext:context];
             [timeline initTimelineWith:timelineDic];
+            
+            if ([[timelineDic objectForKey:@"last_like"] isKindOfClass:[NSArray class]]) {
+                NSArray *tempLikes = (NSArray *)[timelineDic objectForKey:@"last_like"];
+                NSMutableArray *theLikes = [[NSMutableArray alloc] initWithCapacity:0];
+                [theLikes removeAllObjects];
+                for (int j = 0; j <tempLikes.count; j++) {
+                    NSDictionary *tempLike = [tempLikes objectAtIndex:j];
+                    CCLike * like = [NSEntityDescription insertNewObjectForEntityForName:@"CCLike" inManagedObjectContext:context];
+                    [like initLikeWith:tempLike];
+                    [theLikes addObject:like];
+                    if (![context save:&error]) {
+                        NSLog(@"保存失败");
+                    }
+                }
+                [timeline setLikes:[[NSOrderedSet alloc] initWithArray:theLikes]];
+            }
+            
+            if ([[timelineDic objectForKey:@"comment"] isKindOfClass:[NSArray class]]) {
+                NSArray *tempComments = (NSArray *)[timelineDic objectForKey:@"comment"];
+                NSMutableArray *theComments = [[NSMutableArray alloc] initWithCapacity:0];
+                [theComments removeAllObjects];
+                for (int j = 0; j <tempComments.count; j++) {
+                    NSDictionary *tempComment = [tempComments objectAtIndex:j];
+                    CCComment * comment = [NSEntityDescription insertNewObjectForEntityForName:@"CCComment" inManagedObjectContext:context];
+                    [comment initCommentWith:tempComment];
+                    [theComments addObject:comment];
+                    if (![context save:&error]) {
+                        NSLog(@"保存失败");
+                    }
+                }
+                [timeline setComments:[[NSOrderedSet alloc] initWithArray:theComments]];
+            }
+            
             if (![context save:&error]) {
                 NSLog(@"保存失败");
             }
@@ -274,11 +315,12 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 - (void)loadMoreTimeline{
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSString *token = CCamTestToken;
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
     CCTimeLine *lastTimeline = (CCTimeLine*)[_timeLines lastObject];
     NSString *lastID = lastTimeline.timelineID;
+    NSLog(@"%@",lastID);
     NSDictionary *parameters = @{@"token" :token,@"lastid":lastID};
-    [manager GET:CCamGetTimeLineURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [manager POST:CCamGetMoreTimeLineURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
     
         NSError *error;
         NSArray *receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
@@ -289,10 +331,44 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
             
             CCTimeLine *timeline =[NSEntityDescription insertNewObjectForEntityForName:@"CCTimeLine" inManagedObjectContext:context];
             [timeline initTimelineWith:timelineDic];
+            
+            if ([[timelineDic objectForKey:@"last_like"] isKindOfClass:[NSArray class]]) {
+                NSArray *tempLikes = (NSArray *)[timelineDic objectForKey:@"last_like"];
+                NSMutableArray *theLikes = [[NSMutableArray alloc] initWithCapacity:0];
+                [theLikes removeAllObjects];
+                for (int j = 0; j <tempLikes.count; j++) {
+                    NSDictionary *tempLike = [tempLikes objectAtIndex:j];
+                    CCLike * like = [NSEntityDescription insertNewObjectForEntityForName:@"CCLike" inManagedObjectContext:context];
+                    [like initLikeWith:tempLike];
+                    [theLikes addObject:like];
+                    if (![context save:&error]) {
+                        NSLog(@"保存失败");
+                    }
+                }
+                [timeline setLikes:[[NSOrderedSet alloc] initWithArray:theLikes]];
+            }
+            
+            if ([[timelineDic objectForKey:@"comment"] isKindOfClass:[NSArray class]]) {
+                NSArray *tempComments = (NSArray *)[timelineDic objectForKey:@"comment"];
+                NSMutableArray *theComments = [[NSMutableArray alloc] initWithCapacity:0];
+                [theComments removeAllObjects];
+                for (int j = 0; j <tempComments.count; j++) {
+                    NSDictionary *tempComment = [tempComments objectAtIndex:j];
+                    CCComment * comment = [NSEntityDescription insertNewObjectForEntityForName:@"CCComment" inManagedObjectContext:context];
+                    [comment initCommentWith:tempComment];
+                    [theComments addObject:comment];
+                    if (![context save:&error]) {
+                        NSLog(@"保存失败");
+                    }
+                }
+                [timeline setComments:[[NSOrderedSet alloc] initWithArray:theComments]];
+            }
+            
             if (![context save:&error]) {
                 NSLog(@"保存失败");
             }
         }
+
         [_timeline.mj_footer endRefreshing];
         [self loadLocalTimeline];
         
@@ -484,7 +560,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     collectionCell.photo.liked = @"1";
     collectionCell.photo.like = [NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue+1];
     
-    NSDictionary *parameters = @{@"token":CCamTestToken,@"workid":collectionCell.photo.workid};
+    NSDictionary *parameters = @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"workid":collectionCell.photo.workid};
     NSLog(@"Request parmeters is %@",parameters);
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -541,13 +617,13 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     
     if (refresh) {
         url = CCamGetDiscoveryURL;
-        parameters = @{@"order":order,@"token":CCamTestToken};
+        parameters = @{@"order":order,@"token":[[AuthorizeHelper sharedManager] getUserToken]};
     }else{
         url = CCamGetDiscoveryMoreURL;
         if ([order isEqualToString:@"like"]) {
-            parameters = @{@"order":order,@"lastid":lastid,@"lastlike":lastlike,@"ids":ids,@"token":CCamTestToken};
+            parameters = @{@"order":order,@"lastid":lastid,@"lastlike":lastlike,@"ids":ids,@"token":[[AuthorizeHelper sharedManager] getUserToken]};
         }else{
-            parameters = @{@"order":order,@"lastid":lastid,@"token":CCamTestToken};
+            parameters = @{@"order":order,@"lastid":lastid,@"token":[[AuthorizeHelper sharedManager] getUserToken]};
         }
     }
     
@@ -943,20 +1019,11 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         static NSString *identifier = @"timelineCell";
         TimelineCell *cell = [[TimelineCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         [cell setBackgroundColor:[UIColor clearColor]];
-        [cell.profileImage setImage:[UIImage imageNamed:@"icon132"]];
-        [cell.userName setText:@"角色相机"];
-        [cell.photo setImage:[UIImage imageNamed:@"test.jpg"]];
-        [cell.photoTitle setTitle:@"#角色相机#" forState:UIControlStateNormal];
-        [cell.photoDes setText:@"我是一段描述"];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         CCTimeLine *timeLine = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row];
         cell.timeline = timeLine;
-        
-        [cell.profileImage sd_setImageWithURL:[NSURL URLWithString:timeLine.timelineUserImage] placeholderImage:nil];
-        [cell.userName setText:timeLine.timelineUserName];
-        [cell.photo sd_setImageWithURL:[NSURL URLWithString:timeLine.image_fullsize] placeholderImage:nil];
-        [cell.photoDes setText:timeLine.timelineDes];
+        [cell reloadComments];
         
         return cell;
     }
@@ -966,19 +1033,79 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     return cell;
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-//    if ([cell isKindOfClass:[TimelineCell class]]) {
-//        TimelineCell *tCell = (TimelineCell*)cell;
-//        CCTimeLine *timeLine = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row-1];
-//        [tCell.profileImage sd_setImageWithURL:[NSURL URLWithString:timeLine.timelineUserImage] placeholderImage:nil];
-//        [tCell.userName setText:timeLine.timelineUserName];
-//        [tCell.photo sd_setImageWithURL:[NSURL URLWithString:timeLine.image_fullsize] placeholderImage:nil];
-//        [tCell.photoDes setText:timeLine.timelineDes];
-//    }
+    if (![cell isKindOfClass:[TimelineCell class]]) {
+        return;
+    }
+    TimelineCell * timelineCell = (TimelineCell*)cell;
+    [timelineCell layoutTimelineCell];
+    
+    if (![timelineCell.timeline.cNameCN isEqualToString:@""]&&![timelineCell.timeline.cNameCN isEqualToString:@"<null>"]) {
+        [timelineCell.photoTitle setTitle:[NSString stringWithFormat:@"#%@#",timelineCell.timeline.cNameCN] forState:UIControlStateNormal];
+        [timelineCell.photoTitle setTag:[timelineCell.timeline.timelineContestID intValue]];
+        [timelineCell.photoTitle addTarget:self action:@selector(callContestWeb:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    [timelineCell setLikeLabelText];
+    [timelineCell.profileImage sd_setImageWithURL:[NSURL URLWithString:timelineCell.timeline.timelineUserImage] placeholderImage:nil];
+    [timelineCell.userName setText:timelineCell.timeline.timelineUserName];
+    [timelineCell.photo sd_setImageWithURL:[NSURL URLWithString:timelineCell.timeline.image_fullsize] placeholderImage:nil];
+    [timelineCell.photoDes setText:timelineCell.timeline.timelineDes];
+    
+    
+    NSDate* timeDate = [NSDate dateWithTimeIntervalSince1970:[timelineCell.timeline.dateline integerValue]];
+//    NSLog(@"%@ = %@",timelineCell.timeline.dateline,timeDate);
+//    NSLog(@"%@",[self compareCurrentTime:timeDate]);
+    [timelineCell.photoTime setText:[self compareCurrentTime:timeDate]];
+}
+-(NSString *) compareCurrentTime:(NSDate*) compareDate
+//
+{
+    NSTimeInterval  timeInterval = [compareDate timeIntervalSinceNow];
+    timeInterval = -timeInterval;
+    long temp = 0;
+    NSString *result;
+    if (timeInterval < 60) {
+        result = [NSString stringWithFormat:@"刚刚"];
+    }
+    else if((temp = timeInterval/60) <60){
+        result = [NSString stringWithFormat:@"%ld分前",temp];
+    }
+    
+    else if((temp = temp/60) <24){
+        result = [NSString stringWithFormat:@"%ld小时前",temp];
+    }
+    
+    else if((temp = temp/24) <30){
+        result = [NSString stringWithFormat:@"%ld天前",temp];
+    }
+    
+    else if((temp = temp/30) <12){
+        result = [NSString stringWithFormat:@"%ld月前",temp];
+    }
+    else{
+        temp = temp/12;
+        result = [NSString stringWithFormat:@"%ld年前",temp];
+    }
+    
+    return  result;
+}
+- (void)callContestWeb:(id)sender{
+    UIButton *btn = (UIButton*)sender;
+    KLWebViewController *detail = [[KLWebViewController alloc] init];
+    detail.webURL = [NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Photo/index/contestid/%ld.html",(long)btn.tag];
+    detail.vcTitle =btn.currentTitle;
+    detail.hidesBottomBarWhenPushed = YES;
+    
+    id vc = nil;
+    vc = detail;
+    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+    backItem.title=@"";
+    self.navigationItem.backBarButtonItem=backItem;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    CCPhotoViewController *photo = [[CCPhotoViewController alloc] init];
-    photo.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:photo animated:YES];
+//    CCPhotoViewController *photo = [[CCPhotoViewController alloc] init];
+//    photo.hidesBottomBarWhenPushed = YES;
+//    [self.navigationController pushViewController:photo animated:YES];
 }
 //-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 //
@@ -996,7 +1123,12 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     if (indexPath.section == 0){//(indexPath.section==0&& indexPath.row == 0) {
         return 44;
     }else{
-        return 154+30+CCamViewWidth+44;
+        CCTimeLine *timeLine = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row];
+        if ([timeLine.cNameCN isEqualToString:@""]||[timeLine.cNameCN isEqualToString:@"<null>"]) {
+            return 110+CCamViewWidth+30*[timeLine.comments count];
+        }
+        
+        return 140+CCamViewWidth+30*[timeLine.comments count];
     }
     
     return 0;

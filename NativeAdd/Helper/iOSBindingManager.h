@@ -27,6 +27,10 @@
 - (void)callAnimationControl;
 - (void)removeAnimationControl;
 - (void)setAnimationInfo:(NSString*)info;
+- (void)setHeadDirection:(NSString *)direction;
+
+- (void)cannotAddMoreCharacter;
+- (void)cannotAddDifferentSerieCharacter;
 
 - (void)saveCroppedImageWith:(UIImage *)image;
 - (void)saveImageToAlbum:(UIImage*)image;

@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CCComment.h"
 
 @interface TimelineCommentCell : UITableViewCell
+@property (nonatomic,strong) CCComment *comment;
+@property (nonatomic,strong) UIButton *userName;
+@property (nonatomic,strong) UILabel *commentLabel;
+- (void)layoutCommentCell;
 
 @end

@@ -23,9 +23,10 @@
 #define iOS8 [[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0
 #define iOS9 [[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0
 
-#define CCamTestToken @"siovphrQ0U"//2222
-#define SMSAppKey @"8a2e16d3094a"
-#define SMSAppSecret @"e337bbef0f3cfb18fcfc92c8b5f42148"
+#define CCamMemberID @"1"
+#define CCamTestToken @"1234"//2222
+#define SMSAppKey @"8a2dbed04384"
+#define SMSAppSecret @"67cc96b7048ed6bc91d7dd8090192935"
 
 #define CCamHost @"http://www.c-cam.cc/"
 #define CCamString @"CCAM"
@@ -83,7 +84,19 @@
 #define CCamGetCurrentContestsURL @"http://www.c-cam.cc/index.php/Api/Uploadphoto/get_contests_info.html"
 #define CCamSubmitPhotoURL @"http://www.c-cam.cc/index.php/Api/Uploadphoto/upload.html"
 
-#define  CCamGetTimeLineURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_follow_photos.html"
+#define CCamGetTimeLineURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_follow_photos.html"
+#define CCamGetMoreTimeLineURL @"http://www.c-cam.cc/index.php/Api_new/Index/load_more.html"
+
+#define  CCamDeletePhotoURL @"http://www.c-cam.cc/index.php/First/Work/delete_work.html"
+#define  CCamReportPhotoURL @"http://www.c-cam.cc/index.php/First/Work/report_work.html"
+#define  CCamCancelReportPhotoURL @"http://www.c-cam.cc/index.php/First/Work/cancel_report_work.html"
+
+#define CCamCheckPhoneNumURL @"http://www.c-cam.cc/index.php/Api_new/Login/is_new_number.html"
+
+
+#define CCamLoginURL @"http://www.c-cam.cc/index.php/Api/Login/login.html"
+#define CCamResetPswURL @"http://www.c-cam.cc/index.php/Api/Login/changepwd.html"
+#define CCamLogoutURL @"http://www.c-cam.cc/index.php/First/Member/logout.html"
 
 #define CCamPullUpdate @"下拉列表刷新数据"
 #define CCamReleaseUpdate @"释放列表进行刷新"

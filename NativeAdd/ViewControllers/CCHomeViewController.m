@@ -184,7 +184,7 @@
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSString *token = CCamTestToken;
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
     NSDictionary *parameters = @{@"token" :token};
     
     [manager GET:CCamGetSerieURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
@@ -222,7 +222,7 @@
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSString *token = CCamTestToken;
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
     NSDictionary *parameters = @{@"token" :token};
     [manager GET:CCamGetEventURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSError *error;

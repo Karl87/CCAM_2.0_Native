@@ -28,5 +28,6 @@
 - (void)SetAnimationControlAppear;
 - (void)setAnimationInfo:(NSString*)info;
 - (void)SetAnimationControlDisappear;
+- (void)setHeadDirectionAvilable:(BOOL)avilable X:(CGFloat)x andY:(CGFloat)y;
 @end
 
