@@ -19,6 +19,8 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import <pop/POP.h>
 
+#import <MBProgressHUD/MBProgressHUD.h>
+
 #import "UIColor+FlatColors.h"
 
 @implementation CCamSerieContentCell
@@ -174,7 +176,7 @@
                 [characterCell.stateImage setHidden:NO];
             }
             
-            NSLog(@"%f",characterCell.downloadProgress.progress);
+//            NSLog(@"%f",characterCell.downloadProgress.progress);
 //            [[NSNotificationCenter defaultCenter] addObserver:characterCell selector:@selector(refreshProgress) name:character.characterID object:nil];
             
 //            [characterCell layoutCharacterCell];
@@ -248,8 +250,43 @@
             }
         }
     }else if ([[_characterInfos objectAtIndex:indexPath.row] isKindOfClass:[CCAnimation class]]){
+        
+        
+        
+//
+        
         CCAnimation * cellAnimation = (CCAnimation*)[_characterInfos objectAtIndex:indexPath.row];
         CCCharacter * cellCharacter = [[CoreDataHelper sharedManager] getCharacter:cellAnimation.characterID];
+        NSLog(@"动画名:%@，动画ID:%@,角色名称:%@,角色ID:%@,系列名称:%@,系列ID:%@",cellAnimation.nameCN,cellAnimation.animationID,cellAnimation.character.nameCN,cellAnimation.character.characterID,cellAnimation.character.serie.nameCN,cellAnimation.character.serie.serieID);
+        
+        NSLog(@"系列区域信息:%@",cellAnimation.character.serie.regionInfo);
+        NSLog(@"系列区域类型:%@",cellAnimation.character.serie.regionType);
+        
+        NSLog(@"角色区域类型:%@",cellAnimation.character.regionType);
+        NSLog(@"角色区域信息:%@",cellAnimation.character.regionInfo);
+
+        NSString *region = @"86";//测试
+        NSArray * regionArray = [cellAnimation.character.serie.regionInfo componentsSeparatedByString:@","];
+        
+        if([cellAnimation.character.serie.regionType isEqualToString:@"include"]){
+            
+            if ([regionArray indexOfObject:region]==NSNotFound) {
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.detailsLabelText = @"由于版权原因,该角色无法在您所在的地区使用";
+                [hud hide:YES afterDelay:2.0];
+                return;
+            }
+        }else if ([cellAnimation.character.serie.regionType isEqualToString:@"exclude"]){
+            if ([regionArray indexOfObject:region]!=NSNotFound) {
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.detailsLabelText = @"由于版权原因,该角色无法在您所在的地区使用";
+                [hud hide:YES afterDelay:2.0];
+                return;
+            }
+        }
+        
         
         NSString *mPath = [NSString stringWithFormat:@"file://%@",[[FileHelper sharedManager] getCharacterFilePath:cellCharacter]];
         NSString *mSerieID = cellCharacter.serieID;

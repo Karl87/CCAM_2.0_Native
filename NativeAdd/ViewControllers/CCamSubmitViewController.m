@@ -14,8 +14,9 @@
 #import "AFHTTPSessionManager.h"
 #import <pop/POP.h>
 #import "AFViewShaker.h"
-#import <M13ProgressSuite/M13ProgressHUD.h>
-#import <M13ProgressSuite/M13ProgressViewRing.h>
+//#import <M13ProgressSuite/M13ProgressHUD.h>
+//#import <M13ProgressSuite/M13ProgressViewRing.h>
+#import <MBProgressHUD/MBProgressHUD.h>
 
 @interface CCamSubmitViewController ()<UITableViewDataSource,UITableViewDelegate,UITextViewDelegate>
 
@@ -36,7 +37,7 @@
 @property (nonatomic,strong) UIButton *backButton;
 @property (nonatomic,strong) UILabel *textNumLabel;
 @property (nonatomic,strong) AFViewShaker *viewShaker;
-@property (nonatomic,strong) M13ProgressHUD *submitHud;
+//@property (nonatomic,strong) M13ProgressHUD *submitHud;
 
 @end
 
@@ -147,11 +148,11 @@
     [_submitBG addSubview:_personalButton];
     
     _viewShaker = [[AFViewShaker alloc] initWithView:_submitText];
-    _submitHud = [[M13ProgressHUD alloc] initWithProgressView:[[M13ProgressViewRing alloc] init]];
-    _submitHud.progressViewSize = CGSizeMake(60.0, 60.0);
-    _submitHud.animationPoint = CGPointMake(CCamViewWidth / 2, CCamViewHeight / 2);
+//    _submitHud = [[M13ProgressHUD alloc] initWithProgressView:[[M13ProgressViewRing alloc] init]];
+//    _submitHud.progressViewSize = CGSizeMake(60.0, 60.0);
+//    _submitHud.animationPoint = CGPointMake(CCamViewWidth / 2, CCamViewHeight / 2);
     
-    [self.view addSubview:_submitHud];
+//    [self.view addSubview:_submitHud];
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
@@ -280,8 +281,12 @@
 }
 - (void)uploadPhoto{
 
-    [_submitHud setStatus:@"发布图片中..."];
-    [_submitHud show:YES];
+//    [_submitHud setStatus:@"发布图片中..."];
+//    [_submitHud show:YES];
+
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    hud.mode = MBProgressHUDModeAnnularDeterminate;
+    hud.labelText = @"发布图片中...";
     
     [_submitButton setEnabled:NO];
     NSDictionary *parameters= @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"contestid":@"0",@"description":_submitText.text,@"characterid":@"[0]"};
@@ -298,29 +303,42 @@
 
                       dispatch_async(dispatch_get_main_queue(), ^{
                           NSLog(@"%f",uploadProgress.fractionCompleted);
-                          [_submitHud setProgress:(CGFloat)uploadProgress.fractionCompleted animated:YES];
+//                          [_submitHud setProgress:(CGFloat)uploadProgress.fractionCompleted animated:YES];
+                          hud.progress = (float)uploadProgress.fractionCompleted;
                       });
                   }
                   completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
                       if (error) {
                           NSLog(@"Error: %@", error);
-                          [_submitHud performAction:M13ProgressViewActionFailure animated:YES];
-                          UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"%@",error] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                          [alert show];
+//                          [_submitHud performAction:M13ProgressViewActionFailure animated:YES];
+//                          UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"%@",error] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//                          [alert show];
+                          hud.mode = MBProgressHUDModeText;
+                          hud.labelText = @"发布图片失败!";
+                          [hud hide:YES afterDelay:2.0];
+                          
                           [_submitButton setEnabled:YES];
-                          [_submitHud hide:YES];
-                          UnitySendMessage(UnityController.UTF8String, "CallHomeScene", "");
+//                          [_submitHud hide:YES];
+                          
                       } else {
                           NSLog(@"%@ %@", response, responseObject);
-                          [_submitHud performAction:M13ProgressViewActionSuccess animated:YES];
-                          UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success" message:[NSString stringWithFormat:@"%@\n\n\n%@",response,responseObject] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                          [alert show];
+//                          [_submitHud performAction:M13ProgressViewActionSuccess animated:YES];
+//                          UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success" message:[NSString stringWithFormat:@"%@\n\n\n%@",response,responseObject] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//                          [alert show];
+                          hud.mode = MBProgressHUDModeText;
+                          hud.labelText = @"发布图片成功!";
+                          [hud hide:YES afterDelay:2.0];
                           [_submitButton setEnabled:YES];
-                          [_submitHud hide:YES];
+                          [self performSelector:@selector(goToHomePage) withObject:nil afterDelay:2.0];
+//                          [_submitHud hide:YES];
                       }
                   }];
     
     [uploadTask resume];
+}
+
+- (void)goToHomePage{
+    UnitySendMessage(UnityController.UTF8String, "CallHomeScene", "");
 }
 
 - (void)backToController{

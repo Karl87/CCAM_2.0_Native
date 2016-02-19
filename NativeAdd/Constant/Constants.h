@@ -94,9 +94,11 @@
 #define CCamCheckPhoneNumURL @"http://www.c-cam.cc/index.php/Api_new/Login/is_new_number.html"
 
 
-#define CCamLoginURL @"http://www.c-cam.cc/index.php/Api/Login/login.html"
+#define CCamLoginURL @"http://www.c-cam.cc/index.php/Api_new/Login/login_new.html"
 #define CCamResetPswURL @"http://www.c-cam.cc/index.php/Api/Login/changepwd.html"
 #define CCamLogoutURL @"http://www.c-cam.cc/index.php/First/Member/logout.html"
+
+#define CCamGetUserHomePageURL @"http://www.c-cam.cc/index.php/Api_new/Member/member_home.html"
 
 #define CCamPullUpdate @"下拉列表刷新数据"
 #define CCamReleaseUpdate @"释放列表进行刷新"

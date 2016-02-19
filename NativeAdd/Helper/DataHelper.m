@@ -17,13 +17,15 @@
 #import "CCSticker.h"
 #import "CCStickerSet.h"
 
+#import <MBProgressHUD/MBProgressHUD.h>
 #import <M13ProgressSuite/M13ProgressHUD.h>
 #import <M13ProgressSuite/M13ProgressViewRing.h>
 
-@interface DataHelper (){
+@interface DataHelper ()<UIAlertViewDelegate>{
     M13ProgressHUD *dataHUD;
 }
-
+@property (nonatomic,strong) UIAlertView *updateSeriesAlert;
+@property (nonatomic,strong) MBProgressHUD *updateSeriesHud;
 @end
 
 @implementation DataHelper
@@ -38,7 +40,19 @@
     return _sharedInstance;
 }
 
-
+- (NSString *)getTargetSerie{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"targetserie"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"-1";
+    }
+    
+    return str;
+}
+- (void)setTargetSerie:(NSString *)serieid{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:serieid forKey:@"targetserie"];
+}
 
 - (void)updateStickerSetsInfo{
     
@@ -138,11 +152,27 @@
     NSString *version = [[SettingHelper sharedManager] getSettingAttributeWithKey:CCamSettingTagInfoVersion];
     NSDictionary *parameters = @{@"token" :token,@"version":version};
     
-    [manager POST:CCamGetSeriesURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    if (_ccamVC) {
+        
+        _updateSeriesHud = [MBProgressHUD showHUDAddedTo:_ccamVC.view animated:YES];
+        _updateSeriesHud.labelText = @"更新角色信息...";
+    }
+    
+    [manager POST:CCamGetSeriesURL parameters:parameters progress:^(NSProgress * _Nonnull uploadProgress) {
+        
+        _updateSeriesHud.progress = (float)uploadProgress.fractionCompleted;
+        
+    }success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSLog(@"%lu",(unsigned long)[responseObject length]);
         if ([responseObject length]==1) {
             NSLog(@"\n***Current is updated version***\n");
+            
+            [_updateSeriesHud setMode:MBProgressHUDModeText];
+            [_updateSeriesHud setLabelText:@"当前角色信息已是最新版本!"];
+            
         }else{
+            [_updateSeriesHud setMode:MBProgressHUDModeText];
+            [_updateSeriesHud setLabelText:@"更新角色信息成功!"];
             //Print Series info
             //NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
             
@@ -169,8 +199,38 @@
                     NSDictionary *tempCharacter = [tempCharacters objectAtIndex:j];
                     CCCharacter *character = [NSEntityDescription insertNewObjectForEntityForName:@"CCCharacter" inManagedObjectContext:context];
                     [character initCharacterWith:tempCharacter];
+                    character.serie = serie;
                     NSLog(@"-------->character name is %@",character.nameCN);
                     [theCharacters addObject:character];
+                    
+                    //////修改动画信息覆盖问题
+                    NSEntityDescription *entityObj = [NSEntityDescription entityForName:@"CCAnimation" inManagedObjectContext:context];
+                    
+                    NSPredicate *predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"characterID = %@",character.characterID]];
+                    
+                    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+                    [request setIncludesPropertyValues:NO];
+                    [request setEntity:entityObj];
+                    [request setPredicate:predicate];
+                    
+                    NSArray *datas = [context executeFetchRequest:request error:&error];
+                    NSLog(@"动画数量为%lu",(unsigned long)[datas count]);
+                    if (!error && datas && [datas count])
+                    {
+                        if ([[FileHelper sharedManager] checkCharacterExist:character]) {
+                            [character setAnimations:[[NSOrderedSet alloc] initWithArray:datas]];
+                            for (CCAnimation *obj in datas){
+                                obj.character = character;
+                            }
+                        }else{
+                            for (CCAnimation *obj in datas){
+                                [context deleteObject:obj];
+                            }
+                        }
+                        if (![context save:&error]){
+                            NSLog(@"角色%@关联现有动作失败",character.nameCN);
+                        }
+                    }
                     if (![context save:&error]) {
                         NSLog(@"角色%@保存失败",character.nameCN);
                     }
@@ -190,13 +250,17 @@
         if (_serieVC) {
             [self.serieVC.serieTable.refresh endRefreshing];
         }
+        [_updateSeriesHud hide:YES afterDelay:1.0];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"Request series fail");
+        [_updateSeriesHud setMode:MBProgressHUDModeText];
+        [_updateSeriesHud setLabelText:@"更新角色信息失败!"];
         [self getLocalSeriesInfo];
         self.serieUpdating = NO;
         if (_serieVC) {
             [self.serieVC.serieTable.refresh endRefreshing];
         }
+        [_updateSeriesHud hide:YES afterDelay:1.0];
     }];
 }
 - (void)updateAnimationInfo:(CCCharacter*)character{
@@ -270,12 +334,14 @@
             if (!error) {
                 for (CCCharacter *character in characters) {
                     [character setAnimations:[[NSOrderedSet alloc] initWithArray:animations]];
+                    for (CCAnimation*ani in character.animations) {
+                        NSLog(@"%@",ani.nameCN);
+                        ani.character = character;
+                    }
                     if (![context save:&error]) {
                         NSLog(@"角色动画%@保存失败",character.nameCN);
                     }
-                    for (CCAnimation*ani in character.animations) {
-                        NSLog(@"%@",ani.nameCN);
-                    }
+                    
                     [[DownloadHelper sharedManager] downloadCharacter:character];
                 }
             }
@@ -295,7 +361,11 @@
     NSArray *infos = [context executeFetchRequest:request error:&error];
     if ([infos count] == 0) {
         NSLog(@"本地无数据，需要联网同步数据");
-        [self updateSeriesInfo];
+//        [self updateSeriesInfo];
+        if (_ccamVC) {
+            [self updateSeriesInfo];
+        }
+        
         return;
     }else{
         NSLog(@"本地数据库读取%lu个系列",(unsigned long)infos.count);
@@ -307,18 +377,60 @@
     [self.series removeAllObjects];
     [self.series addObjectsFromArray:[context executeFetchRequest:request error:&error]];
     
-    NSLog(@"=========>本地系列数%lu",(unsigned long)self.series.count);
-    for (CCSerie *serie in self.series) {
-        NSLog(@"=========>系列名称: %@",serie.nameCN);
-        for (CCCharacter *character in serie.characters) {
-            NSLog(@"===>角色名称:%@",character.nameCN);
-            for (CCAnimation*ani in character.animations) {
-                NSLog(@"==>动画类型%@，名称%@",ani.type,ani.nameCN);
+//    NSLog(@"=========>本地系列数%lu",(unsigned long)self.series.count);
+//    for (CCSerie *serie in self.series) {
+//        NSLog(@"=========>系列名称: %@",serie.nameCN);
+//        NSLog(@"===========>开始:%@ || 结束:%@",serie.dateStart,serie.dateEnd);
+//        for (CCCharacter *character in serie.characters) {
+//            NSLog(@"===>角色名称:%@",character.nameCN);
+//            NSLog(@"===========>开始:%@ || 结束:%@",character.dateStart,character.dateEnd);
+//            for (CCAnimation*ani in character.animations) {
+//                NSLog(@"==>动画类型%@，名称%@",ani.type,ani.nameCN);
+//            }
+//        }
+//    }
+    
+    for (int i = 0; i<self.series.count; i++) {
+        CCSerie *serie = [self.series objectAtIndex:i];
+        if (![serie.dateStart isEqualToString:@""]) {
+            if ([self compareDateWithToday:serie.dateStart] == 1) {
+                NSLog(@"%@ 尚未开始！",serie.nameCN);
+                [self.series removeObjectAtIndex:i];
+                continue;
+            }
+        }
+        
+        if (![serie.dateEnd isEqualToString:@""]) {
+            if ([self compareDateWithToday:serie.dateEnd] == -1) {
+                NSLog(@"%@ 已经结束！",serie.nameCN);
+                [self.series removeObjectAtIndex:i];
+                continue;
             }
         }
     }
+    
     [_ccamVC updateSerieCollection];
     [_serieVC reloadSerieData];
+}
+-(int)compareDateWithToday:(NSString*)date{
+    int ci;
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"yyyy-MM-dd"];
+    NSDate *td = [NSDate date];
+    NSDate *dt = [[NSDate alloc] init];
+    dt = [df dateFromString:date];
+    NSComparisonResult result = [td compare:dt];
+    switch (result)
+    {
+            //date02比date01大
+        case NSOrderedAscending: ci=1; break;
+            //date02比date01小
+        case NSOrderedDescending: ci=-1; break;
+            //date02=date01
+        case NSOrderedSame: ci=0; break;
+        default: NSLog(@"erorr dates %@, %@", td, dt); break;
+    }
+    return ci;
 }
 - (void)destroyMutableArray:(NSMutableArray *)array{
     [array removeAllObjects];

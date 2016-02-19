@@ -84,6 +84,8 @@
 
     [self.serieTable setDelegate:self];
     [self.serieTable setDataSource:self];
+    
+    [[DataHelper sharedManager] getLocalSeriesInfo];
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
@@ -164,7 +166,18 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    CCSerie *serie;
     
+    if (_serieOrderType == 0) {
+        serie = (CCSerie*)[_orderSeries objectAtIndex:indexPath.row];
+    }else if (_serieOrderType == 1){
+        serie = (CCSerie*)[_popularSeries objectAtIndex:indexPath.row];
+    }else if (_serieOrderType ==2){
+        serie = (CCSerie*)[_lastestSeries objectAtIndex:indexPath.row];
+    }
+    
+    [[DataHelper sharedManager] setTargetSerie:serie.serieID];
+    UnitySendMessage(UnityController.UTF8String, "LoadEditScene", "");
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

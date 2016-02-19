@@ -10,8 +10,13 @@
 #import "CCComment.h"
 #import "CCLike.h"
 #import "Constants.h"
+#import <UIKit/UIKit.h>
+
+extern const CGFloat contentLabelFontSize;
+extern const CGFloat maxContentLabelHeight;
 
 @implementation CCTimeLine
+@synthesize shouldShowMoreButton = _shouldShowMoreButton;
 
 - (void)initTimelineWith:(NSDictionary *)dic{
     self.dateline = GetValidString([dic objectForKey:@"dateline"]);
@@ -32,5 +37,24 @@
     self.countDown = GetValidString([dic objectForKey:@"countdown"]);
     self.liked = GetValidString([dic objectForKey:@"liked"]);
     self.report = GetValidString([dic objectForKey:@"Report"]);
+}
+- (NSString *)timelineDes{
+    CGFloat contentW = [UIScreen mainScreen].bounds.size.width - 70;
+    CGRect textRect = [self.timelineDes boundingRectWithSize:CGSizeMake(contentW, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName : [UIFont systemFontOfSize:contentLabelFontSize]} context:nil];
+    if (textRect.size.height > maxContentLabelHeight) {
+        _shouldShowMoreButton = YES;
+    } else {
+        _shouldShowMoreButton = NO;
+    }
+    
+    return self.timelineDes;
+}
+- (void)setIsOpening:(BOOL)isOpening
+{
+    if (!_shouldShowMoreButton) {
+        self.isOpening = NO;
+    } else {
+        self.isOpening = isOpening;
+    }
 }
 @end

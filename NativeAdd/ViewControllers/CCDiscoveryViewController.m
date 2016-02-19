@@ -813,6 +813,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     [cell.pictureNote setText:cell.photo.photoDescription];
     [cell.pictureNote setFont:[UIFont systemFontOfSize:11.0]];
     [cell.pictureNote setTextColor:CCamGrayTextColor];
+    [cell.pictureNote setNumberOfLines:0];
     CGRect textRect = [cell.pictureNote.text boundingRectWithSize:CGSizeMake(cell.frame.size.width-10, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:11.0]} context:nil];
     [cell.pictureNote setFrame:CGRectMake(5, cell.frame.size.width + 22 +20, cell.frame.size.width-10, textRect.size.height)];
     

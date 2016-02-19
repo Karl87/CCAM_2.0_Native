@@ -50,7 +50,7 @@
 - (void)setHandlePositionWithLocation:(CGPoint)location
 {
     
-    NSLog(@"%@",[NSValue valueWithCGPoint:location]);
+//    NSLog(@"%@",[NSValue valueWithCGPoint:location]);
     _x = location.x - kRadius;
     _y = -(location.y - kRadius);
     

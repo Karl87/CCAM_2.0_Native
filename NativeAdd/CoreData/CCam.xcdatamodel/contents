@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="14F27" minimumToolsVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="14F27" minimumToolsVersion="Automatic">
     <entity name="CCAnimation" representedClassName="CCAnimation" syncable="YES">
         <attribute name="animationID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="audio" optional="YES" attributeType="String" syncable="YES"/>
@@ -34,8 +34,8 @@
         <attribute name="regionType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="serieID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="version" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="animations" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="CCAnimation" inverseName="character" inverseEntity="CCAnimation" syncable="YES"/>
-        <relationship name="serie" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="CCSerie" inverseName="characters" inverseEntity="CCSerie" syncable="YES"/>
+        <relationship name="animations" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="CCAnimation" inverseName="character" inverseEntity="CCAnimation" syncable="YES"/>
+        <relationship name="serie" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CCSerie" inverseName="characters" inverseEntity="CCSerie" syncable="YES"/>
     </entity>
     <entity name="CCComment" representedClassName="CCComment" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String" syncable="YES"/>
@@ -254,7 +254,7 @@
     </entity>
     <elements>
         <element name="CCAnimation" positionX="-416" positionY="540" width="128" height="283"/>
-        <element name="CCCharacter" positionX="-468" positionY="414" width="126" height="298"/>
+        <element name="CCCharacter" positionX="-468" positionY="414" width="126" height="300"/>
         <element name="CCComment" positionX="-459" positionY="153" width="128" height="180"/>
         <element name="CCEvent" positionX="-108" positionY="9" width="128" height="165"/>
         <element name="CCHotPhoto" positionX="-387" positionY="9" width="128" height="435"/>

@@ -13,8 +13,8 @@
 
 - (void)initStickerSetWith:(NSDictionary *)dic{
     self.image_List = GetValidString([dic objectForKey:@"stickerset_list_image_url"]);
-    self.image_Mini = GetValidString([dic objectForKey:@"stickerset_image_url"]);
-    self.image_Res = GetValidString([dic objectForKey:@"stickerset_mini_image_url"]);
+    self.image_Mini = GetValidString([dic objectForKey:@"stickerset_mini_image_url"]);
+    self.image_Res = GetValidString([dic objectForKey:@"stickerset_image_url"]);
     self.nameCN = GetValidString([dic objectForKey:@"stickerset_name_cn"]);
     self.nameEN = GetValidString([dic objectForKey:@"stickerset_name_en"]);
     self.nameJP = GetValidString([dic objectForKey:@"stickerset_name_jp"]);

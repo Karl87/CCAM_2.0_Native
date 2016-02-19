@@ -180,7 +180,7 @@
 
 - (void)refreshSerie{
     
-    [self setRefreshControlStateWithRefresh:self.serieTable.refresh andState:CCamUpdating];
+//    [self setRefreshControlStateWithRefresh:self.serieTable.refresh andState:CCamUpdating];
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -209,10 +209,10 @@
         [tempSeries removeAllObjects];
         tempSeries = nil;
         
-        [self setRefreshControlStateWithRefresh:self.serieTable.refresh andState:CCamUpdateSuccess];
+//        [self setRefreshControlStateWithRefresh:self.serieTable.refresh andState:CCamUpdateSuccess];
         [self performSelector:@selector(serieRefreshEndAnimation) withObject:nil afterDelay:0.5];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [self setRefreshControlStateWithRefresh:self.serieTable.refresh andState:CCamUpdateFail];
+//        [self setRefreshControlStateWithRefresh:self.serieTable.refresh andState:CCamUpdateFail];
         [self performSelector:@selector(serieRefreshEndAnimation) withObject:nil afterDelay:0.5];
     }];
 }

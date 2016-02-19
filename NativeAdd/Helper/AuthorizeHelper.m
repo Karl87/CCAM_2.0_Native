@@ -41,6 +41,7 @@
     }
     return NO;
 }
+
 - (void)logout{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view animated:YES];
     hud.labelText = @"登出角色相机中";
@@ -56,6 +57,7 @@
         if ([jsonStr isEqualToString:@"1"]) {
             hubMessage = @"登出成功!";
             [self setUserToken:@""];
+            [self setUserID:@""];
         }else{
             hubMessage = @"登出失败!";
         }
@@ -67,6 +69,20 @@
         [hud setLabelText:@"网络故障"];
         [hud hide:YES afterDelay:1.0f];
     }];
+}
+- (NSString *)getUserID{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"userid"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
+- (void)setUserID:(NSString *)userid{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:userid forKey:@"userid"];
+    NSLog(@"%@",[self getUserID]);
 }
 - (NSString *)getUserToken{
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -220,6 +236,7 @@
             
             NSString *stateMessage =[NSString stringWithFormat:@"%@",jsonAry[0]] ;
             NSString *userToken =[NSString stringWithFormat:@"%@",jsonAry[1]];
+            NSString *userID = [NSString stringWithFormat:@"%@",jsonAry[2]];
             
             if ([stateMessage isEqualToString:@"1"] || [stateMessage isEqualToString:@"2"]) {
                 hubMessage = @"登录角色相机成功!";//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
@@ -228,6 +245,8 @@
             }
             NSLog(@"%@",userToken);
             [[AuthorizeHelper sharedManager] setUserToken:userToken];
+            [[AuthorizeHelper sharedManager] setUserID:userID];
+            
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
         }else{
             if ([jsonStr isEqualToString:@"-1"] || [jsonStr isEqualToString:@"-4"]) {
@@ -273,6 +292,7 @@
             NSArray *jsonAry = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
             NSString *stateMessage =[NSString stringWithFormat:@"%@",jsonAry[0]] ;
             NSString *userToken =[NSString stringWithFormat:@"%@",jsonAry[1]];
+            NSString *userID = [NSString stringWithFormat:@"%@",jsonAry[2]];
             
             if ([stateMessage isEqualToString:@"1"] || [stateMessage isEqualToString:@"2"]) {
                 hubMessage = @"登录角色相机成功!";//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
@@ -281,6 +301,7 @@
             }
             NSLog(@"%@",userToken);
             [[AuthorizeHelper sharedManager] setUserToken:userToken];
+            [[AuthorizeHelper sharedManager] setUserID:userID];
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
         }else{
             if ([jsonStr isEqualToString:@"-1"] || [jsonStr isEqualToString:@"-4"]) {

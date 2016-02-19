@@ -18,6 +18,7 @@
 @property (nonatomic,strong) UICollectionView *stickerSetContentCollection;
 @property (nonatomic,strong) UICollectionView *filterCollection;
 
+- (void)scrollToTargetSerie;
 - (void)updateSerieCollection;
 -(void)updateStickerSetCollection;
 - (void)SetLightControlAppear;

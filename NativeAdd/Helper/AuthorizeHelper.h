@@ -16,6 +16,9 @@
 - (NSString *)getUserToken;
 - (void)setUserToken:(NSString *)token;
 
+- (NSString *)getUserID;
+- (void)setUserID:(NSString *)userid;
+
 - (void)callAuthorizeView;
 - (void)dismissAuthorizeView;
 //check token

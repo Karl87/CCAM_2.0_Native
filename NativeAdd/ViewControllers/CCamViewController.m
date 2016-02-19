@@ -102,9 +102,9 @@
     [self setLightControlView];
     [self setAnimationControlView];
     
-    [[DataHelper sharedManager] getLocalSeriesInfo];
-    [[DataHelper sharedManager] getLocalStickerSetsInfo];
+    
 }
+
 - (void)setAnimationControlView{
     if (!_animationControl) {
         _animationControl = [[UIScrollView alloc] init];
@@ -527,6 +527,27 @@
     [super viewDidAppear:animated];
     [self.view setMultipleTouchEnabled:YES];
 //    [self.view setUserInteractionEnabled:NO];
+    
+    NSString *userGroup = @"ug0";//测试
+    NSString *version = [[SettingHelper sharedManager] getSettingAttributeWithKey:CCamSettingTagInfoVersion];
+    NSString *versionGroup = @"";
+    if (![version isEqualToString:@""]) {
+        versionGroup = [[version componentsSeparatedByString:@"_"] objectAtIndex:3];
+    }
+    
+    if ([userGroup isEqualToString:versionGroup]) {
+        if ([DataHelper sharedManager].series.count == 0) {
+            [[DataHelper sharedManager] getLocalSeriesInfo];
+        }
+        if ([DataHelper sharedManager].stickerSets.count == 0) {
+            [[DataHelper sharedManager] getLocalStickerSetsInfo];
+        }
+    }else{
+        [[DataHelper sharedManager] updateSeriesInfo];
+    }
+    
+    
+    
     POPBasicAnimation *ani = [POPBasicAnimation animationWithPropertyNamed:kPOPViewAlpha];
     ani.fromValue = [NSNumber numberWithFloat:1.0];
     ani.toValue = [NSNumber numberWithFloat:0.0];
@@ -585,7 +606,12 @@
     [[iOSBindingManager sharedManager] editRemoveNativeSurface];
 }
 - (void)goToSubmit{
+    UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", "none");
+    [self performSelector:@selector(delayToSubmit) withObject:nil afterDelay:0.1f];
+}
+- (void)delayToSubmit{
     UnitySendMessage(UnityController.UTF8String, "OnClickConfirmToCaptureImage", "");
+    UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", "none");
     CCamSubmitViewController *submit = [[CCamSubmitViewController alloc] init];
     [self.navigationController pushViewController:submit animated:YES];
 }
@@ -727,6 +753,7 @@
                 [segContentCell.callSeriesButton setTintColor:[UIColor whiteColor]];
                 [segContentCell.callSeriesButton setImage:[[UIImage imageNamed:@"plusButton"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
                 [segContentCell.callSeriesButton setFrame:CGRectMake(0, segContentCell.frame.size.height-CCamThinSerieHeight, CCamThinSerieHeight*1.5, CCamThinSerieHeight)];
+                [segContentCell.callSeriesButton addTarget:self action:@selector(updateSeries) forControlEvents:UIControlEventTouchUpInside];
                 [segContentCell.contentView addSubview:segContentCell.callSeriesButton];
             }
             if (segContentCell.serieCollection == nil) {
@@ -751,6 +778,7 @@
                 [segContentCell.callSeriesButton setTintColor:[UIColor whiteColor]];
                 [segContentCell.callSeriesButton setImage:[[UIImage imageNamed:@"plusButton"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
                 [segContentCell.callSeriesButton setFrame:CGRectMake(0, segContentCell.frame.size.height-CCamThinSerieHeight, CCamThinSerieHeight*1.5, CCamThinSerieHeight)];
+                [segContentCell.callSeriesButton addTarget:self action:@selector(updateStickerSets) forControlEvents:UIControlEventTouchUpInside];
                 [segContentCell.contentView addSubview:segContentCell.callSeriesButton];
             }
             if (segContentCell.stickerSetCollection == nil) {
@@ -942,7 +970,7 @@
         CCStickerSetCell *stickerSetCell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifer forIndexPath:indexPath];
         stickerSetCell.stickerSet = [[DataHelper sharedManager].stickerSets objectAtIndex:indexPath.row];
         
-        [stickerSetCell.stickerSetImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",stickerSetCell.stickerSet.image_Mini]] placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType,NSURL *imageURL){
+        [stickerSetCell.stickerSetImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,stickerSetCell.stickerSet.image_Mini]] placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType,NSURL *imageURL){
             POPBasicAnimation *animation = [POPBasicAnimation animationWithPropertyNamed:kPOPViewAlpha];
             animation.fromValue = [NSNumber numberWithFloat:1.0];
             animation.toValue = [NSNumber numberWithFloat:0.0];
@@ -1071,7 +1099,7 @@
     [_serieCollection reloadData];
     [_serieContentCollection reloadData];
 
-    [self performSelector:@selector(scrollToTargetSerie) withObject:nil afterDelay:0.25];
+    [self performSelector:@selector(scrollToTargetSerie) withObject:nil afterDelay:0.1];
 }
 -(void)updateStickerSetCollection{
     
@@ -1086,10 +1114,33 @@
     [self collectionView:_filterCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
 
     if (_allowSelectTargetSerie) {
-        [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionNone];
+        NSInteger serieID = [[[DataHelper sharedManager] getTargetSerie] integerValue];
+        NSLog(@"%ld",serieID);
+        if (serieID == -1) {
+            [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+            [self collectionView:_serieCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+        }else{
+            for (int i = 0; i<[DataHelper sharedManager].series.count; i++) {
+                CCSerie *serie = [[DataHelper sharedManager].series objectAtIndex:i];
+                if (serieID == [serie.serieID integerValue]) {
+                    [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+                    [self collectionView:_serieCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+                    [[DataHelper sharedManager] setTargetSerie:@"-1"];
+                    _allowSelectTargetSerie = NO;
+                    return;
+                }
+            }
+        }
+    }else{
+        [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
         [self collectionView:_serieCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-        _allowSelectTargetSerie = NO;
     }
-    
+}
+#pragma mark - update data
+- (void)updateSeries{
+    [[DataHelper sharedManager] updateSeriesInfo];
+}
+- (void)updateStickerSets{
+    [[DataHelper sharedManager] updateStickerSetsInfo];
 }
 @end

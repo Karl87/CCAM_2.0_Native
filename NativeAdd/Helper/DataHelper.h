@@ -23,9 +23,14 @@
 
 + (DataHelper*)sharedManager;
 
+- (NSString *)getTargetSerie;
+- (void)setTargetSerie:(NSString *)serieid;
+
 - (void)updateSeriesInfo;
 - (void)getLocalSeriesInfo;
 - (void)updateAnimationInfo:(CCCharacter*)character;
 - (void)updateStickerSetsInfo;
 - (void)getLocalStickerSetsInfo;
+
+
 @end

@@ -10,6 +10,7 @@
 #import "CCEvent.h"
 #import "EventCell.h"
 #import <MJRefresh/MJRefresh.h>
+#import "KLWebViewController.h"
 
 @interface CCEventViewController ()<UITableViewDataSource,UITableViewDelegate>
 @property (nonatomic,assign) BOOL needUpdate;
@@ -64,6 +65,7 @@
     NSDictionary *parameters = @{@"token" :token};
     [manager GET:CCamGetEventURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSError *error;
+        NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
         NSArray *receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
         NSMutableArray * tempEvents = [[NSMutableArray alloc] initWithCapacity:0];
         [self.events removeAllObjects];
@@ -114,14 +116,14 @@
         
         EventCell *cell = [[EventCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         
-        
+        [cell.eventImage setContentMode:UIViewContentModeScaleAspectFit];
         [cell.eventImage sd_setImageWithURL:[NSURL URLWithString:event.eventImageURLCn] placeholderImage:[[UIImage alloc] init]];
 
         [cell.eventTitle setTitle:[NSString stringWithFormat:@"  # %@ #    ",event.eventName] forState:UIControlStateNormal];
         [cell.eventTitle sizeToFit];
         [cell.eventTitle setCenter:CGPointMake(cell.eventTitle.frame.size.width/2+5, cell.eventImage.frame.size.height+5+cell.eventTitle.frame.size.height/2)];
         
-        [cell.eventPicNum setTitle:@"2016" forState:UIControlStateNormal];
+        [cell.eventPicNum setTitle:event.eventCount forState:UIControlStateNormal];
         [cell.eventPicNum sizeToFit];
         [cell.eventPicNum setCenter:CGPointMake(cell.bounds.size.width-15-cell.eventPicNum.bounds.size.width/2, cell.eventImage.frame.size.height+5+cell.eventPicNum.frame.size.height/2)];
         
@@ -138,7 +140,18 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    CCEvent* event = (CCEvent*)[self.events objectAtIndex:indexPath.row];
+    KLWebViewController *detail = [[KLWebViewController alloc] init];
+    detail.webURL = event.eventURL;
+    detail.vcTitle = event.eventName;
+    detail.hidesBottomBarWhenPushed = YES;
     
+    id vc = nil;
+    vc = detail;
+    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+    backItem.title=@"";
+    self.navigationItem.backBarButtonItem=backItem;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

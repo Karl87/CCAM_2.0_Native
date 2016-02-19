@@ -65,7 +65,7 @@
         NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
         documentsDirectoryURL = [documentsDirectoryURL URLByAppendingPathComponent:@"CharacterCamera" isDirectory:YES];
         documentsDirectoryURL = [documentsDirectoryURL URLByAppendingPathComponent:@"Sticker" isDirectory:YES];
-        documentsDirectoryURL = [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+        documentsDirectoryURL = [documentsDirectoryURL URLByAppendingPathComponent:[NSString stringWithFormat:@"%@%@",sticker.stickersetID,[response suggestedFilename]]];
         return documentsDirectoryURL;
         
     } completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {

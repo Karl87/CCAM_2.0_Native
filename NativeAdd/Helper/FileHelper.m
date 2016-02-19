@@ -68,7 +68,7 @@
     NSArray *urlArray = [sticker.image_Res componentsSeparatedByString:@"/"];
     NSString *fileName = [urlArray lastObject];
     
-    NSString* filePath = [NSString stringWithFormat:@"%@/%@",[self checkStickDirectory],fileName];
+    NSString* filePath = [NSString stringWithFormat:@"%@/%@%@",[self checkStickDirectory],sticker.stickersetID,fileName];
 
     return filePath;
 }
@@ -78,7 +78,7 @@
     NSArray *urlArray = [sticker.image_Res componentsSeparatedByString:@"/"];
     NSString *fileName = [urlArray lastObject];
     
-    NSString* filePath = [NSString stringWithFormat:@"%@/%@",[self checkStickDirectory],fileName];
+    NSString* filePath = [NSString stringWithFormat:@"%@/%@%@",[self checkStickDirectory],sticker.stickersetID,fileName];
     NSLog(@"贴纸文件检查：%@",filePath);
     if ([_fileManager fileExistsAtPath:filePath isDirectory:NO]) {
         return YES;

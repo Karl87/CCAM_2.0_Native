@@ -13,6 +13,8 @@
 #import "CCDiscoveryViewController.h"
 #import "CCEventViewController.h"
 #import "CCSerieViewController.h"
+#import "CCMeViewController.h"
+
 //test
 #import "TestPostRequestWebViewController.h"
 #import "KLImagePickerViewController.h"
@@ -33,7 +35,7 @@
     CCEventViewController *vc_event = [[CCEventViewController alloc] init];
     CCEventViewController *vc_nil = [[CCEventViewController alloc] init];
     CCSerieViewController *vc_serie = [[CCSerieViewController alloc] init];
-    CCEventViewController *vc_me = [[CCEventViewController alloc] init];
+    CCMeViewController *vc_me = [[CCMeViewController alloc] init];
     
     [DataHelper sharedManager].serieVC = vc_serie;
     

@@ -34,8 +34,8 @@
     self.nameJP = GetValidString([dic objectForKey:@"character_name_jp"]);
     self.nameZH = GetValidString([dic objectForKey:@"character_name_zh"]);
     
-    self.regionInfo = GetValidString([dic objectForKey:@""]);
-    self.regionType = GetValidString([dic objectForKey:@""]);
+    self.regionInfo = GetValidString([dic objectForKey:@"character_access_region"]);
+    self.regionType = GetValidString([dic objectForKey:@"character_access_region_type"]);
     
 }
 @end
