@@ -1,17 +1,15 @@
 //
-//  CCHomeVIewController.h
+//  CCDiscoveryViewController.h
 //  CCamNativeKit
 //
-//  Created by Karl on 2015/11/17.
+//  Created by Karl on 2015/11/19.
 //  Copyright © 2015年 i-craftsmen ltd. All rights reserved.
 //
 
-#import "KLTableViewController.h"
+#import "KLCollectionViewController.h"
+#import "CCamHelper.h"
+@interface CCHomeViewController : KLCollectionViewController
+@property (nonatomic,strong) NSMutableArray *reloadIndexs;
 
-@interface CCHomeViewController : KLTableViewController
-
-@property (nonatomic,strong) UIScrollView* backgroundView;
-@property (nonatomic,strong) KLTableView* serieTable;
-@property (nonatomic,strong) KLTableView* eventTable;
-
+- (void)reloadMessageHeader;
 @end

@@ -25,6 +25,9 @@
 @property (nonatomic, copy) NSString *eventImageURLEn;
 //活动背景图片，繁体中文
 @property (nonatomic, copy) NSString *eventImageURLZh;
+
+@property (nonatomic, copy) NSString *eventDescription;
+
 /**
  由数据初始化Activity
  */

@@ -17,5 +17,6 @@
     self.userID = GetValidString([dic objectForKey:@"memberid"]);
     self.userName = GetValidString([dic objectForKey:@"member_name"]);
     self.dateline = GetValidString([dic objectForKey:@"dateline"]);
+    self.userImage = GetValidString([dic objectForKey:@"member_head"]);
 }
 @end

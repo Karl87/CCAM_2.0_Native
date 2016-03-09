@@ -63,6 +63,13 @@ void _getPoseInformation(const char* _info){
 void _getAnimationInformation(const char* _info){
     [[iOSBindingManager sharedManager] setAnimationInfo:GetStringParam(_info)];
 }
+
+void _getAddedCharacterList(const char *_info){
+    [[iOSBindingManager sharedManager] setSubmitCharactersList:GetStringParam(_info)];
+}
+void _getAddedCharacterSerieID(const char *_info){
+    [[iOSBindingManager sharedManager] setContestSerieID:GetStringParam(_info)];
+}
 void  _submitPhoto(const char* _contestid,const char* _description,const char* _characterid,const char*_sharelist){
    
 }

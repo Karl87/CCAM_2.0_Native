@@ -132,8 +132,10 @@ bool	_supportsMSAA			= false;
 	// - When you change allowed orientations if you end up forbidding current one
 	//     exception will be thrown
 	// Anyway this is intersected with values provided from UIViewController, so we are good
-	return   (1 << UIInterfaceOrientationPortrait) | (1 << UIInterfaceOrientationPortraitUpsideDown)
-		   | (1 << UIInterfaceOrientationLandscapeRight) | (1 << UIInterfaceOrientationLandscapeLeft);
+//	return   (1 << UIInterfaceOrientationPortrait) | (1 << UIInterfaceOrientationPortraitUpsideDown)
+//		   | (1 << UIInterfaceOrientationLandscapeRight) | (1 << UIInterfaceOrientationLandscapeLeft);
+
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)application:(UIApplication*)application didReceiveLocalNotification:(UILocalNotification*)notification

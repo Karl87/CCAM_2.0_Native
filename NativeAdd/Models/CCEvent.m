@@ -10,7 +10,7 @@
 @implementation CCEvent
 
 -(void)initEventWithData:(NSDictionary *)dic{
-    
+    self.eventDescription = [self withoutNull:[dic objectForKey:@"description"]];
     self.eventCountDown =[self withoutNull:[dic objectForKey:@"count_down"]];
     self.eventImageURLCn =[self withoutNull:[dic objectForKey:@"image_url"]];
     self.eventName =[self withoutNull:[dic objectForKey:@"name"]];

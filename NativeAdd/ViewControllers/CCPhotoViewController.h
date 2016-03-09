@@ -7,7 +7,10 @@
 //
 
 #import "KLViewController.h"
+#import "CCTimeLine.h"
 
 @interface CCPhotoViewController : KLViewController
+@property (nonatomic,copy) NSString *photoID;
+@property (nonatomic,strong) NSMutableArray *reloadIndexs;
 
 @end

@@ -18,6 +18,15 @@
 
 //新浪微博SDK头文件
 #import "WeiboSDK.h"
+
+#import "ShareViewController.h"
+
+@interface ShareHelper ()
+@property (nonatomic,strong) UIWindow * shareWindow;
+@property (nonatomic,strong) ShareViewController *shareView;
+
+@end
+
 @implementation ShareHelper
 + (ShareHelper*)sharedManager
 {
@@ -33,8 +42,7 @@
     [ShareSDK registerApp:@"76f976b22c31"
      
           activePlatforms:@[@(SSDKPlatformTypeSinaWeibo),
-                            @(SSDKPlatformSubTypeWechatSession),
-                            @(SSDKPlatformSubTypeWechatTimeline),
+                            @(SSDKPlatformTypeWechat),
                             @(SSDKPlatformSubTypeQQFriend),
                             @(SSDKPlatformTypeFacebook)]
                  onImport:^(SSDKPlatformType platformType)
@@ -84,5 +92,34 @@
                  break;
          }
      }];
+}
+- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine *)timeline indexPath:(NSIndexPath *)indexPath{
+    if (!_shareWindow) {
+        _shareWindow = [[UIWindow alloc] initWithFrame:[UIApplication sharedApplication].keyWindow.bounds];
+        [_shareWindow setUserInteractionEnabled:YES];
+        [_shareWindow setWindowLevel:UIWindowLevelNormal +1];
+        
+        ShareViewController * ani = [[ShareViewController alloc] init];
+        ani.myself = myself;
+        ani.delegate = delegate;
+        ani.timeline = timeline;
+        ani.indexPath = indexPath;
+        _shareView = ani;
+        [_shareWindow setRootViewController:_shareView];
+    }
+    [_shareWindow makeKeyAndVisible];
+}
+
+- (void)dismissShareView{
+    [_shareWindow setHidden:YES];
+    [_shareWindow removeFromSuperview];
+//    [_shareWindow resignKeyWindow];
+    _shareView = nil;
+    _shareWindow = nil;
+    NSLog(@"1st round window count = %lu",(unsigned long)[UIApplication sharedApplication].windows.count);
+    [[UIApplication sharedApplication].windows[0] makeKeyAndVisible];
+    [[UIApplication sharedApplication].windows[0] setUserInteractionEnabled:YES];
+    NSLog(@"2nd round window count = %lu",(unsigned long)[UIApplication sharedApplication].windows.count);
+
 }
 @end

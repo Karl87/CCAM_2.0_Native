@@ -13,7 +13,6 @@
 #import "CCSerie.h"
 #import "CCamCharacterCell.h"
 #import "CCStickerCell.h"
-#import <M13ProgressSuite/M13ProgressViewBorderedBar.h>
 #import "CCamSerieContentSurfaceView.h"
 
 @implementation DownloadHelper

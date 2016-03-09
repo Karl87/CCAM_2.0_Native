@@ -20,22 +20,18 @@
         [selectedBG setBackgroundColor:CCamExLightGrayColor];
         
         self.selectedBackgroundView = selectedBG;
-        
+        if (!_stickerSetImage) {
+            _stickerSetImage = [[UIImageView alloc] initWithFrame:CGRectMake(2, 2, self.bounds.size.width-4, self.bounds.size.height-4)];
+            [_stickerSetImage setBackgroundColor:[UIColor clearColor]];
+            [_stickerSetImage setContentMode:UIViewContentModeScaleAspectFit];
+            [_stickerSetImage setClipsToBounds:YES];
+            [self.contentView addSubview:_stickerSetImage];
+        }
     }
     return self;
 }
 - (void)layoutSubviews{
     [super layoutSubviews];
-    if (_stickerSetImage == nil) {
-        [self stickerSetImage];
-    }
-}
-- (UIImageView *)stickerSetImage{
-    _stickerSetImage = [[UIImageView alloc] initWithFrame:CGRectMake(2, 2, self.bounds.size.width-4, self.bounds.size.height-4)];
-    [_stickerSetImage setBackgroundColor:[UIColor clearColor]];
-    [_stickerSetImage setContentMode:UIViewContentModeScaleAspectFit];
-    [_stickerSetImage setClipsToBounds:YES];
-    [self.contentView addSubview:_stickerSetImage];
-    return _stickerSetImage;
+    
 }
 @end

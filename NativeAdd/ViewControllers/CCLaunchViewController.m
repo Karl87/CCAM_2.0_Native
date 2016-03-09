@@ -354,6 +354,7 @@
     [_launchSquare.layer setCornerRadius:10.];
     [_launchSquare.layer setMasksToBounds:YES];
     [self.view addSubview:_launchSquare];
+//    [_launchSquare setHidden:YES];
     
     _mobileBG = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 44, _launchSquare.bounds.size.width, _launchSquare.bounds.size.height-44-109*1.2)];
     [_mobileBG setContentSize:CGSizeMake(2*_mobileBG.bounds.size.width, _mobileBG.bounds
@@ -592,6 +593,9 @@
     [_closeBtn setFrame:CGRectMake(5, 5, 30, 30)];
     [_closeBtn addTarget:self action:@selector(hideBouncesAnimation:) forControlEvents:UIControlEventTouchUpInside];
     [_launchSquare addSubview:_closeBtn];
+    
+    [_launchSquare setFrame:CGRectMake(_launchSquare.frame.origin.x, -_launchSquare.frame.size.height, _launchSquare.frame.size.width, _launchSquare.frame.size.height)];
+    
 }
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -615,7 +619,6 @@
     anBasic.beginTime = CACurrentMediaTime();
     anBasic.duration = 0.25f;
     [_launchPopBG pop_addAnimation:anBasic forKey:@"fade"];
-    
     
     POPSpringAnimation *anSpring = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerPositionY];
     anSpring.fromValue = @(-CCamViewWidth);
@@ -644,11 +647,12 @@
     anBasic.duration = 0.25f;
     [_launchPopBG pop_addAnimation:anBasic forKey:@"fade"];
     
-    POPSpringAnimation *anSpring = [POPSpringAnimation animationWithPropertyNamed:kPOPLayerPositionY];
+    POPBasicAnimation *anSpring = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerPositionY];
     anSpring.fromValue = @(self.view.center.y);
     anSpring.toValue = @(CCamViewHeight+CCamViewWidth);
     anSpring.beginTime = CACurrentMediaTime();
-    anSpring.springBounciness = 10.0f;
+//    anSpring.springBounciness = 10.0f;
+    anSpring.duration = 0.25f;
     [anSpring setCompletionBlock:^(POPAnimation *anim,BOOL finish){
         if(finish) {
             NSLog(@"!");

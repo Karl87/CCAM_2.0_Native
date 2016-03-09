@@ -7,8 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ShareViewController.h"
+#import "CCTimeLine.h"
 
 @interface ShareHelper : NSObject
 + (ShareHelper*)sharedManager;
 - (void)initShareSDK;
+
+- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine*)timeline indexPath:(NSIndexPath*)indexPath;
+- (void)dismissShareView;
 @end

@@ -42,6 +42,44 @@
     self.redirectURL = GetValidString([dic objectForKey:@"serie_redirect_url"]);
     
     self.serieID = GetValidString([dic objectForKey:@"serie_id"]);
+    
+    NSString *addThread = GetValidString([dic objectForKey:@"addThread"]);
+    if ([addThread isEqualToString:@""]) {
+        self.addThread = @"0.5";
+    }else{
+        self.addThread = addThread;
+    }
+    NSString *hdrAdd = GetValidString([dic objectForKey:@"hdrAdd"]);
+    if ([hdrAdd isEqualToString:@""]) {
+        self.hdrAdd = @"1.6";
+    }else{
+        self.hdrAdd = hdrAdd;
+    }
+    NSString *environmentMin = GetValidString([dic objectForKey:@"environmentMin"]);
+    if ([environmentMin isEqualToString:@""]) {
+        self.environmentMin = @"0";
+    }else{
+        self.environmentMin = environmentMin;
+    }
+    NSString *environmentMax = GetValidString([dic objectForKey:@"environmentMax"]);
+    if ([environmentMax isEqualToString:@""]) {
+        self.environmentMax = @"1";
+    }else{
+        self.environmentMax = environmentMax;
+    }
+    NSString *mainLightMin = GetValidString([dic objectForKey:@"mainLightMin"]);
+    if ([mainLightMin isEqualToString:@""]) {
+        self.mainLightMin = @"0";
+    }else{
+        self.mainLightMin = mainLightMin;
+    }
+    NSString *mainLightMax = GetValidString([dic objectForKey:@"mainLightMax"]);
+    if ([mainLightMax isEqualToString:@""]) {
+        self.mainLightMax = @"0";
+    }else{
+        self.mainLightMax = mainLightMax;
+    }
+    
 }
 - (NSComparisonResult)compareSerieWithPopular:(CCSerie*)serie{
     NSComparisonResult result = [[NSNumber numberWithInt:[serie.indexPopular intValue]] compare:[NSNumber numberWithInt:[self.indexPopular intValue]]];

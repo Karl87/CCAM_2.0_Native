@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "CCSerie.h"
 #import "CCObject.h"
-#import <M13ProgressSuite/M13ProgressViewImage.h>
+//#import <M13ProgressSuite/M13ProgressViewImage.h>
 #import "CCamSerieContentSurfaceView.h"
 @interface CCamSerieContentCell : UICollectionViewCell<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UIScrollViewDelegate>
 @property (nonatomic,strong) CCSerie *serie;

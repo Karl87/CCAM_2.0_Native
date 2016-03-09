@@ -10,6 +10,7 @@
 #import "CCSticker.h"
 #import <M13ProgressSuite/M13ProgressViewBorderedBar.h>
 
+
 @interface CCStickerCell : UICollectionViewCell
 @property (nonatomic,strong) CCSticker *sticker;
 @property (nonatomic,strong) UIImageView *stickerImage;

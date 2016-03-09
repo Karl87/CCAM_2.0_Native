@@ -24,6 +24,8 @@
     return self;
 }
 - (void)layoutFilterCell{
+    
+    
     if (_filterImage == nil) {
         _filterImage = [[UIImageView alloc] initWithFrame:self.bounds];
         [_filterImage setBackgroundColor:[UIColor clearColor]];
@@ -31,6 +33,7 @@
         [_filterImage setClipsToBounds:YES];
         [self.contentView addSubview:_filterImage];
     }
+    
     if (_filterLabel == nil) {
         _filterLabel = [[UILabel alloc] initWithFrame:self.bounds];
         [_filterLabel setTextColor:CCamGrayTextColor];

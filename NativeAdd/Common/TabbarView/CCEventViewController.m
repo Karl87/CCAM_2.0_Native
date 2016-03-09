@@ -34,6 +34,8 @@
                                scrollIndicatorInsets:CCamScrollInset
                                           parentView:self.view];
 
+    [_eventTable setSeparatorColor:CCamViewBackgroundColor];
+    
     MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshEvent)];
     header.automaticallyChangeAlpha = YES;
     header.lastUpdatedTimeLabel.hidden = YES;
@@ -45,6 +47,21 @@
     
     self.events = [[NSMutableArray alloc] initWithCapacity:0];
     [self.events addObjectsFromArray:[[CoreDataHelper sharedManager] showStoreInfoWithEntity:@"CCEvent"]];
+
+    UIBarButtonItem *test = [[UIBarButtonItem alloc] initWithTitle:@"测试" style:UIBarButtonItemStylePlain target:self action:@selector(testWeb)];
+    [self.navigationItem setLeftBarButtonItem:test];
+}
+- (void)testWeb{
+    KLWebViewController *detail = [[KLWebViewController alloc] init];
+    detail.webURL = @"http://cc1.c-cam.cc:8001/index.php/Api_new/Index/test_interface.html";
+    detail.hidesBottomBarWhenPushed = YES;
+    
+    id vc = nil;
+    vc = detail;
+    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+    backItem.title=@"";
+    self.navigationItem.backBarButtonItem=backItem;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
@@ -127,7 +144,7 @@
         [cell.eventPicNum sizeToFit];
         [cell.eventPicNum setCenter:CGPointMake(cell.bounds.size.width-15-cell.eventPicNum.bounds.size.width/2, cell.eventImage.frame.size.height+5+cell.eventPicNum.frame.size.height/2)];
         
-        [cell.eventDescriptrion setText:@"奖品拉杆箱，倒计时10天"];
+        [cell.eventDescriptrion setText:event.eventDescription];
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         

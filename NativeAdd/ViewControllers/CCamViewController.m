@@ -528,7 +528,7 @@
     [self.view setMultipleTouchEnabled:YES];
 //    [self.view setUserInteractionEnabled:NO];
     
-    NSString *userGroup = @"ug0";//测试
+    NSString *userGroup = [NSString stringWithFormat:@"ug%@",[[AuthorizeHelper sharedManager] getUserGroup]];//测试
     NSString *version = [[SettingHelper sharedManager] getSettingAttributeWithKey:CCamSettingTagInfoVersion];
     NSString *versionGroup = @"";
     if (![version isEqualToString:@""]) {
@@ -827,21 +827,32 @@
                 [segContentCell.eraseView setBackgroundColor:CCamBackgoundGrayColor];
                 [segContentCell.contentView addSubview:segContentCell.eraseView];
                 
-                segContentCell.eraseTranLabel = [[UILabel alloc] init];
-                [segContentCell.eraseTranLabel setText:@"半透明"];
-                [segContentCell.eraseTranLabel setBackgroundColor:CCamBackgoundGrayColor];
-                [segContentCell.eraseTranLabel setTextColor:CCamGrayTextColor];
-                [segContentCell.eraseTranLabel setFont:[UIFont systemFontOfSize:14.0]];
-                [segContentCell.eraseTranLabel sizeToFit];
-                [segContentCell.eraseTranLabel setCenter:CGPointMake(30+segContentCell.eraseTranLabel.frame.size.width/2, segContentCell.eraseView.frame.size.height/2)];
-                [segContentCell.eraseView addSubview:segContentCell.eraseTranLabel];
+                segContentCell.eraserResetButton = [UIButton buttonWithType:UIButtonTypeCustom];
+                [segContentCell.eraserResetButton setBackgroundColor:CCamRedColor];
+                [segContentCell.eraserResetButton setTitle:@"重置" forState:UIControlStateNormal];
+                [segContentCell.eraserResetButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
+                [segContentCell.eraserResetButton setFrame:CGRectMake(15, 15, 50, 30)];
+                [segContentCell.eraserResetButton setCenter:CGPointMake(40, segContentCell.eraseView.frame.size.height/2)];
+                [segContentCell.eraserResetButton.layer setCornerRadius:15];
+                [segContentCell.eraserResetButton.layer setMasksToBounds:YES];
+                [segContentCell.eraserResetButton addTarget:self action:@selector(resetEraseImage) forControlEvents:UIControlEventTouchUpInside];
+                [segContentCell.eraseView addSubview:segContentCell.eraserResetButton];
                 
-                segContentCell.eraseTranSwitch = [[UISwitch alloc] init];
-                [segContentCell.eraseTranSwitch sizeToFit];
-                [segContentCell.eraseTranSwitch setCenter:CGPointMake(40+segContentCell.eraseTranLabel.frame.size.width+segContentCell.eraseTranSwitch.frame.size.width/2, segContentCell.eraseView.frame.size.height/2)];
-                [segContentCell.eraseTranSwitch setOnTintColor:CCamRedColor];
-                [segContentCell.eraseTranSwitch addTarget:self action:@selector(getEraseTranAppear:) forControlEvents:UIControlEventValueChanged];
-                [segContentCell.eraseView addSubview:segContentCell.eraseTranSwitch];
+//                segContentCell.eraseTranLabel = [[UILabel alloc] init];
+//                [segContentCell.eraseTranLabel setText:@"半透明"];
+//                [segContentCell.eraseTranLabel setBackgroundColor:CCamBackgoundGrayColor];
+//                [segContentCell.eraseTranLabel setTextColor:CCamGrayTextColor];
+//                [segContentCell.eraseTranLabel setFont:[UIFont systemFontOfSize:14.0]];
+//                [segContentCell.eraseTranLabel sizeToFit];
+//                [segContentCell.eraseTranLabel setCenter:CGPointMake(30+segContentCell.eraseTranLabel.frame.size.width/2, segContentCell.eraseView.frame.size.height/2)];
+//                [segContentCell.eraseView addSubview:segContentCell.eraseTranLabel];
+//                
+//                segContentCell.eraseTranSwitch = [[UISwitch alloc] init];
+//                [segContentCell.eraseTranSwitch sizeToFit];
+//                [segContentCell.eraseTranSwitch setCenter:CGPointMake(40+segContentCell.eraseTranLabel.frame.size.width+segContentCell.eraseTranSwitch.frame.size.width/2, segContentCell.eraseView.frame.size.height/2)];
+//                [segContentCell.eraseTranSwitch setOnTintColor:CCamRedColor];
+//                [segContentCell.eraseTranSwitch addTarget:self action:@selector(getEraseTranAppear:) forControlEvents:UIControlEventValueChanged];
+//                [segContentCell.eraseView addSubview:segContentCell.eraseTranSwitch];
                 
                 segContentCell.eraseZoneSwitch = [[UISwitch alloc] init];
                 [segContentCell.eraseZoneSwitch sizeToFit];
@@ -875,15 +886,7 @@
                 
                 [seg addTarget:self action:@selector(didClicksegmentedControlAction:)forControlEvents:UIControlEventValueChanged];
                 
-                segContentCell.eraserResetButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                [segContentCell.eraserResetButton setBackgroundColor:CCamRedColor];
-                [segContentCell.eraserResetButton setTitle:@"重置" forState:UIControlStateNormal];
-                [segContentCell.eraserResetButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
-                [segContentCell.eraserResetButton setFrame:CGRectMake(15, 15, 50, 30)];
-                [segContentCell.eraserResetButton.layer setCornerRadius:15];
-                [segContentCell.eraserResetButton.layer setMasksToBounds:YES];
-                [segContentCell.eraserResetButton addTarget:self action:@selector(resetEraseImage) forControlEvents:UIControlEventTouchUpInside];
-                [segContentCell.contentView addSubview:segContentCell.eraserResetButton];
+                
                 
                 UIView *sliderBG = [[UIView alloc] initWithFrame:CGRectMake(0, 0, segContentCell.bounds.size.width/2-30, 2)];
                 [sliderBG setBackgroundColor:CCamSwitchNormalColor];
@@ -949,6 +952,18 @@
             [serieContentCell.surfaceView setHidden:NO];
             [serieContentCell.surfaceView.surfaceBG sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Inner]] placeholderImage:nil];
             [serieContentCell.surfaceView.surfaceImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Mini]] placeholderImage:nil];
+            SDWebImageManager *manager = [SDWebImageManager sharedManager];
+            [manager downloadImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Mini]]
+                                  options:0
+                                 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+                                     // progression tracking code
+                                 }
+                                completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                                    if (image) {
+                                        [serieContentCell.surfaceView.surfaceButton setImage:image forState:UIControlStateNormal];
+//                                        [serieContentCell.surfaceView.surfaceButton sizeToFit];
+                                    }
+                                }];
             if ([[DownloadHelper sharedManager].downloadInfos objectForKey:[NSString stringWithFormat:@"Character%@",character.characterID]]) {
                 NSString *progress =[[DownloadHelper sharedManager].downloadInfos objectForKey:[NSString stringWithFormat:@"Character%@",character.characterID]];
                 [serieContentCell.surfaceView.surfaceProgress setProgress:[progress floatValue] animated:NO];
@@ -993,6 +1008,7 @@
         CCamFilterCell *filterCell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifer forIndexPath:indexPath];
         [filterCell layoutFilterCell];
         [filterCell.filterLabel setText:[_filters objectAtIndex:indexPath.row]];
+        [filterCell.filterImage setImage:[UIImage imageNamed:[NSString stringWithFormat:@"%@",[_filters objectAtIndex:indexPath.row]]]];
         return filterCell;
     }
 
@@ -1117,8 +1133,8 @@
         NSInteger serieID = [[[DataHelper sharedManager] getTargetSerie] integerValue];
         NSLog(@"%ld",serieID);
         if (serieID == -1) {
-            [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
-            [self collectionView:_serieCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+//            [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+//            [self collectionView:_serieCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
         }else{
             for (int i = 0; i<[DataHelper sharedManager].series.count; i++) {
                 CCSerie *serie = [[DataHelper sharedManager].series objectAtIndex:i];
@@ -1132,8 +1148,8 @@
             }
         }
     }else{
-        [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
-        [self collectionView:_serieCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+//        [_serieCollection selectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+//        [self collectionView:_serieCollection didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
     }
 }
 #pragma mark - update data

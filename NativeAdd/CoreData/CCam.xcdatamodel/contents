@@ -51,6 +51,7 @@
     <entity name="CCEvent" syncable="YES">
         <attribute name="eventCount" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventCountDown" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventImageURLCn" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventImageURLEn" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventImageURLZh" optional="YES" attributeType="String" syncable="YES"/>
@@ -90,8 +91,24 @@
         <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userImage" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="timeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CCTimeLine" inverseName="likes" inverseEntity="CCTimeLine" syncable="YES"/>
+    </entity>
+    <entity name="CCMessage" representedClassName="CCMessage" syncable="YES">
+        <attribute name="contestID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="creatTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ifRead" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ifTop" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="message" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messageID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messagePhoto" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messageType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messageUserImage" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messageUserName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyUserID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="CCNewPhoto" syncable="YES">
         <attribute name="big_img" optional="YES" attributeType="String" syncable="YES"/>
@@ -150,12 +167,16 @@
         <attribute name="workid" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="CCSerie" representedClassName="CCSerie" syncable="YES">
+        <attribute name="addThread" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="allFilter" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="allowErase" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="allowMultiple" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="allowSticker" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateEnd" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateStart" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="environmentMax" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="environmentMin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="hdrAdd" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id_Sticker" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_Inner" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_List" optional="YES" attributeType="String" syncable="YES"/>
@@ -164,6 +185,8 @@
         <attribute name="indexLastest" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="indexPopular" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="indexRecommend" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mainLightMax" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mainLightMin" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="nameCN" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="nameEN" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="nameJP" optional="YES" attributeType="String" syncable="YES"/>
@@ -202,8 +225,11 @@
         <attribute name="cNameCN" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="cNameEN" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="cNameZH" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="commentCount" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="countDown" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateEnd" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateStart" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_contest" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_fullsize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_share" optional="YES" attributeType="String" syncable="YES"/>
@@ -211,6 +237,9 @@
         <attribute name="liked" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="ranking" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="report" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareSubTitle" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareTitle" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineContestID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineDes" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineID" optional="YES" attributeType="String" syncable="YES"/>
@@ -256,15 +285,16 @@
         <element name="CCAnimation" positionX="-416" positionY="540" width="128" height="283"/>
         <element name="CCCharacter" positionX="-468" positionY="414" width="126" height="300"/>
         <element name="CCComment" positionX="-459" positionY="153" width="128" height="180"/>
-        <element name="CCEvent" positionX="-108" positionY="9" width="128" height="165"/>
+        <element name="CCEvent" positionX="-108" positionY="9" width="128" height="180"/>
         <element name="CCHotPhoto" positionX="-387" positionY="9" width="128" height="435"/>
-        <element name="CCLike" positionX="-450" positionY="162" width="128" height="120"/>
+        <element name="CCLike" positionX="-450" positionY="162" width="128" height="135"/>
+        <element name="CCMessage" positionX="-450" positionY="162" width="128" height="240"/>
         <element name="CCNewPhoto" positionX="-522" positionY="9" width="128" height="435"/>
         <element name="CCSelectionPhoto" positionX="-252" positionY="9" width="128" height="435"/>
-        <element name="CCSerie" positionX="-659" positionY="9" width="128" height="388"/>
+        <element name="CCSerie" positionX="-659" positionY="9" width="128" height="480"/>
         <element name="CCSticker" positionX="-450" positionY="162" width="128" height="210"/>
         <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
-        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="345"/>
+        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="435"/>
         <element name="CCUser" positionX="-108" positionY="180" width="128" height="495"/>
     </elements>
 </model>

@@ -13,6 +13,12 @@
 
 @implementation CCSerie (CoreDataProperties)
 
+@dynamic environmentMax;
+@dynamic environmentMin;
+@dynamic mainLightMax;
+@dynamic mainLightMin;
+@dynamic hdrAdd;
+@dynamic addThread;
 @dynamic indexRecommend;
 @dynamic indexPopular;
 @dynamic indexLastest;

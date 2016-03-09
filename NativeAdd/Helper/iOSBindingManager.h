@@ -18,6 +18,11 @@
 - (void)editAddNativeSurface;
 - (void)editRemoveNativeSurface;
 
+- (void)setSubmitCharactersList:(NSString*)info;
+- (void)setContestSerieID:(NSString *)info;
+- (NSString*)getSubmitCharactersList;
+- (NSString*)getContestSerieID;
+
 - (void)callLightControl;
 - (void)removeLightControl;
 - (void)setLightStrength:(NSString*)strength;

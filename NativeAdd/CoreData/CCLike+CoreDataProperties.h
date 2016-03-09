@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, retain) NSString *photoID;
 @property (nullable, nonatomic, retain) NSString *userID;
 @property (nullable, nonatomic, retain) NSString *userName;
+@property (nullable, nonatomic, retain) NSString *userImage;
 @property (nullable, nonatomic, retain) NSString *dateline;
 @property (nullable, nonatomic, retain) CCTimeLine *timeline;
 

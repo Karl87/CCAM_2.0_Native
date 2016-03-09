@@ -14,8 +14,9 @@
 #import "AFHTTPSessionManager.h"
 #import <pop/POP.h>
 #import "AFViewShaker.h"
-//#import <M13ProgressSuite/M13ProgressHUD.h>
-//#import <M13ProgressSuite/M13ProgressViewRing.h>
+#import "CCamHelper.h"
+
+
 #import <MBProgressHUD/MBProgressHUD.h>
 
 @interface CCamSubmitViewController ()<UITableViewDataSource,UITableViewDelegate,UITextViewDelegate>
@@ -37,16 +38,23 @@
 @property (nonatomic,strong) UIButton *backButton;
 @property (nonatomic,strong) UILabel *textNumLabel;
 @property (nonatomic,strong) AFViewShaker *viewShaker;
-//@property (nonatomic,strong) M13ProgressHUD *submitHud;
+
+@property (nonatomic,strong) NSString *currentContestID;
 
 @end
 
 @implementation CCamSubmitViewController
-
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
+    UnitySendMessage(UnityController.UTF8String, "GetAllCharacterList", "");
+    
+    _currentContestID = @"";
     _contests = [[NSMutableArray alloc] initWithCapacity:0];
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
@@ -148,11 +156,7 @@
     [_submitBG addSubview:_personalButton];
     
     _viewShaker = [[AFViewShaker alloc] initWithView:_submitText];
-//    _submitHud = [[M13ProgressHUD alloc] initWithProgressView:[[M13ProgressViewRing alloc] init]];
-//    _submitHud.progressViewSize = CGSizeMake(60.0, 60.0);
-//    _submitHud.animationPoint = CGPointMake(CCamViewWidth / 2, CCamViewHeight / 2);
-    
-//    [self.view addSubview:_submitHud];
+
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
@@ -247,9 +251,13 @@
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSDictionary *parameters = @{@"serieid":@"0"};
+    NSString *serieID = [[iOSBindingManager sharedManager] getContestSerieID];
+    NSDictionary *parameters = @{@"serieid":serieID};
     
     [manager GET:CCamGetCurrentContestsURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        
+        NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
+        
         NSError *error;
         NSArray *receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
         NSMutableArray * tempContests = [[NSMutableArray alloc] initWithCapacity:0];
@@ -281,16 +289,15 @@
 }
 - (void)uploadPhoto{
 
-//    [_submitHud setStatus:@"发布图片中..."];
-//    [_submitHud show:YES];
+
 
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     hud.mode = MBProgressHUDModeAnnularDeterminate;
     hud.labelText = @"发布图片中...";
     
     [_submitButton setEnabled:NO];
-    NSDictionary *parameters= @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"contestid":@"0",@"description":_submitText.text,@"characterid":@"[0]"};
-    NSData *imageData = UIImageJPEGRepresentation(_submitImage.image, 1.0);
+    NSDictionary *parameters= @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"contestid":_currentContestID,@"description":_submitText.text,@"characterid":[[iOSBindingManager sharedManager] getSubmitCharactersList]};
+    NSData *imageData = UIImageJPEGRepresentation(_submitImage.image, 0.4);
     
     NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:CCamSubmitPhotoURL parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:imageData name:@"photo" fileName:@"submit.jpg" mimeType:@"image/jpeg"];
@@ -303,41 +310,53 @@
 
                       dispatch_async(dispatch_get_main_queue(), ^{
                           NSLog(@"%f",uploadProgress.fractionCompleted);
-//                          [_submitHud setProgress:(CGFloat)uploadProgress.fractionCompleted animated:YES];
                           hud.progress = (float)uploadProgress.fractionCompleted;
                       });
                   }
                   completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
                       if (error) {
                           NSLog(@"Error: %@", error);
-//                          [_submitHud performAction:M13ProgressViewActionFailure animated:YES];
-//                          UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"%@",error] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-//                          [alert show];
+
                           hud.mode = MBProgressHUDModeText;
                           hud.labelText = @"发布图片失败!";
                           [hud hide:YES afterDelay:2.0];
                           
                           [_submitButton setEnabled:YES];
-//                          [_submitHud hide:YES];
                           
                       } else {
                           NSLog(@"%@ %@", response, responseObject);
-//                          [_submitHud performAction:M13ProgressViewActionSuccess animated:YES];
-//                          UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success" message:[NSString stringWithFormat:@"%@\n\n\n%@",response,responseObject] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-//                          [alert show];
+
                           hud.mode = MBProgressHUDModeText;
                           hud.labelText = @"发布图片成功!";
-                          [hud hide:YES afterDelay:2.0];
-                          [_submitButton setEnabled:YES];
-                          [self performSelector:@selector(goToHomePage) withObject:nil afterDelay:2.0];
-//                          [_submitHud hide:YES];
+//                          [hud hide:YES afterDelay:2.0];
+//                          [_submitButton setEnabled:YES];
+                          [self performSelector:@selector(savePhoto) withObject:nil afterDelay:1.0];
                       }
                   }];
     
     [uploadTask resume];
 }
+- (void)savePhoto{
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
+    hud.mode = MBProgressHUDModeIndeterminate;
+    hud.labelText =@"保存图片中...";
+     UIImageWriteToSavedPhotosAlbum(_submitImage.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+}
+- (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo{
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
+    hud.mode = MBProgressHUDModeText;
+    if (error) {
+        hud.labelText = @"图片保存失败";
 
+    }else{
+        hud.labelText = @"图片已保存";
+
+    }
+    [hud hide:YES afterDelay:1.0];
+    [self performSelector:@selector(goToHomePage) withObject:nil afterDelay:1.0];
+}
 - (void)goToHomePage{
+    [self.navigationController popToRootViewControllerAnimated:NO];
     UnitySendMessage(UnityController.UTF8String, "CallHomeScene", "");
 }
 
@@ -355,7 +374,7 @@
     return [_contests count];
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+    _currentContestID = [[_contests objectAtIndex:indexPath.row] objectForKey:@"contestid"];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     CCamSubmitContestCell *cell;

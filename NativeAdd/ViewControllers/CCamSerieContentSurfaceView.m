@@ -43,10 +43,13 @@
             _surfaceButton = [UIButton buttonWithType:UIButtonTypeCustom];
             [_surfaceButton setBackgroundColor:CCamRedColor];
             [_surfaceButton setTitle:@"免费下载" forState:UIControlStateNormal];
-            [_surfaceButton.titleLabel setFont:[UIFont systemFontOfSize:14.0]];
-            [_surfaceButton setFrame:CGRectMake(self.bounds.size.width/2+10, self.bounds.size.height/2 - 15, 100, 30)];
+            [_surfaceButton.titleLabel setFont:[UIFont boldSystemFontOfSize:17.0]];
+//            [_surfaceButton setFrame:CGRectMake(self.bounds.size.width/2+10, self.bounds.size.height/2 - 15, 100, 30)];
+            [_surfaceButton setFrame:CGRectMake(0,0, 200, 44)];
+            [_surfaceButton setCenter:CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2)];
+            [_surfaceButton.imageView setContentMode:UIViewContentModeScaleAspectFit];
             [_surfaceButton.layer setMasksToBounds:YES];
-            [_surfaceButton.layer setCornerRadius:15];
+            [_surfaceButton.layer setCornerRadius:8.0];
             [self addSubview:_surfaceButton];
             [_surfaceButton setHidden:YES];
         }

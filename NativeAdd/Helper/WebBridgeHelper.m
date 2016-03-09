@@ -21,10 +21,7 @@
     return _sharedInstance;
 }
 - (WebViewJavascriptBridge*)returnNewWebBridgeWithWebView:(UIWebView*)webview{
-    WebViewJavascriptBridge *bridge = [WebViewJavascriptBridge bridgeForWebView:webview webViewDelegate:webview.delegate handler:^(id data, WVJBResponseCallback responseCallback) {
-        NSLog(@"Received message from javascript: %@", data);
-//        responseCallback(@"");
-    }];
+    WebViewJavascriptBridge *bridge ;//= [WebViewJavascriptBridge bridgeForWebView:webview];
     return bridge;
 }
 

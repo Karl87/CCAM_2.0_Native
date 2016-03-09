@@ -83,8 +83,32 @@ UIViewController *UnityGetGLViewController();
     _editSurface =nil;
     [self editAddNativeSurface];
 }
-
-
+- (void)setSubmitCharactersList:(NSString *)info{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:info forKey:@"submitcharacterlist"];
+}
+- (NSString*)getSubmitCharactersList{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"submitcharacterlist"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
+- (void)setContestSerieID:(NSString *)info{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:info forKey:@"contestserieid"];
+}
+- (NSString*)getContestSerieID{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"contestserieid"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
 - (void)callLightControl{
     [[DataHelper sharedManager].ccamVC SetLightControlAppear];
 }

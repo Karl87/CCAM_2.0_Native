@@ -98,6 +98,64 @@
     [userDefaults setObject:token forKey:@"usertoken"];
     NSLog(@"%@",[self getUserToken]);
 }
+- (NSString *)getUserName{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"username"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
+- (void)setUserName:(NSString *)name{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:name forKey:@"username"];
+    NSLog(@"%@",[self getUserName]);
+    
+}
+- (NSString *)getUserImage{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"userimage"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
+- (void)setUserImage:(NSString *)image{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:image forKey:@"userimage"];
+    NSLog(@"%@",[self getUserImage]);
+    
+}
+- (NSString *)getUserGroup{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"usergroup"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
+- (void)setUserGroup:(NSString *)group{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:group forKey:@"usergroup"];
+    NSLog(@"%@",[self getUserGroup]);
+}
+- (NSString *)getUserZone{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"userzone"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
+- (void)setUserZone:(NSString *)zone{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:zone forKey:@"userzone"];
+    NSLog(@"%@",[self getUserZone]);
+}
 - (void)callAuthorizeView{
     if (_authorizeWindow == nil) {
         _authorizeWindow = [[UIWindow alloc] initWithFrame:[UIApplication sharedApplication].keyWindow.bounds];
@@ -121,7 +179,7 @@
 - (void)getSocialPlatformInfoWithTypeID:(NSString*)typeID shareType:(SSDKPlatformType)type isLogin:(BOOL)isLogin{
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_authorizeView.view animated:YES];
-    hud.labelText = @"获取信息";
+//    hud.labelText = @"获取信息";
     NSString *platForm = @"";
     switch (type) {
         case SSDKPlatformTypeWechat:
@@ -144,7 +202,7 @@
            onStateChanged:^(SSDKResponseState state, SSDKUser *user, NSError *error){
                if (state == SSDKResponseStateSuccess){
                    NSLog(@"%@",user);
-                   hud.labelText = [NSString stringWithFormat:@"%@登录成功",platForm];
+//                   hud.labelText = [NSString stringWithFormat:@"%@登录成功",platForm];
                    [hud hide:YES];
                    [self loginWithTypeID:typeID shareType:type userInfo:user isLogin:YES];
                }else{
@@ -232,11 +290,17 @@
         
         if (jsonStr.length>3) {
             NSError *error;
-            NSArray *jsonAry = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
+            NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
             
-            NSString *stateMessage =[NSString stringWithFormat:@"%@",jsonAry[0]] ;
-            NSString *userToken =[NSString stringWithFormat:@"%@",jsonAry[1]];
-            NSString *userID = [NSString stringWithFormat:@"%@",jsonAry[2]];
+            NSString *stateMessage =[jsonDic objectForKey:@"status"] ;
+            NSString *userToken =[jsonDic objectForKey:@"token"];
+            NSString *userID = [jsonDic objectForKey:@"memberid"];
+            NSString *groupID = [jsonDic objectForKey:@"groupid"];
+            NSString *userZone = [jsonDic objectForKey:@"country"];
+            NSString *userName = [jsonDic objectForKey:@"membername"];
+            NSString *userImage = [jsonDic objectForKey:@"head_img"];
+            
+            NSLog(@"用户登录信息:\n--->登录状态:%@\n--->TOKEN:%@\n--->ID:%@\n--->GROUP:%@\n--->COUNTRY:%@",stateMessage,userToken,userID,groupID,userZone);
             
             if ([stateMessage isEqualToString:@"1"] || [stateMessage isEqualToString:@"2"]) {
                 hubMessage = @"登录角色相机成功!";//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
@@ -246,6 +310,11 @@
             NSLog(@"%@",userToken);
             [[AuthorizeHelper sharedManager] setUserToken:userToken];
             [[AuthorizeHelper sharedManager] setUserID:userID];
+            [[AuthorizeHelper sharedManager] setUserGroup:groupID];
+            [[AuthorizeHelper sharedManager] setUserZone:userZone];
+            [[AuthorizeHelper sharedManager] setUserName:userName];
+            [[AuthorizeHelper sharedManager] setUserImage:userImage];
+
             
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
         }else{
@@ -288,11 +357,19 @@
         NSString *hubMessage = @"";
         
         if (jsonStr.length>3) {
+            
             NSError *error;
-            NSArray *jsonAry = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
-            NSString *stateMessage =[NSString stringWithFormat:@"%@",jsonAry[0]] ;
-            NSString *userToken =[NSString stringWithFormat:@"%@",jsonAry[1]];
-            NSString *userID = [NSString stringWithFormat:@"%@",jsonAry[2]];
+            NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
+            
+            NSString *stateMessage =[jsonDic objectForKey:@"status"] ;
+            NSString *userToken =[jsonDic objectForKey:@"token"];
+            NSString *userID = [jsonDic objectForKey:@"memberid"];
+            NSString *groupID = [jsonDic objectForKey:@"groupid"];
+            NSString *userZone = [jsonDic objectForKey:@"country"];
+            NSString *userName = [jsonDic objectForKey:@"membername"];
+            NSString *userImage = [jsonDic objectForKey:@"head_img"];
+            
+            NSLog(@"用户登录信息:\n--->登录状态:%@\n--->TOKEN:%@\n--->ID:%@\n--->GROUP:%@\n--->COUNTRY:%@\n--->Name:%@\n--->Image:%@",stateMessage,userToken,userID,groupID,userZone,userName,userImage);
             
             if ([stateMessage isEqualToString:@"1"] || [stateMessage isEqualToString:@"2"]) {
                 hubMessage = @"登录角色相机成功!";//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
@@ -302,7 +379,14 @@
             NSLog(@"%@",userToken);
             [[AuthorizeHelper sharedManager] setUserToken:userToken];
             [[AuthorizeHelper sharedManager] setUserID:userID];
+            [[AuthorizeHelper sharedManager] setUserGroup:groupID];
+            [[AuthorizeHelper sharedManager] setUserZone:userZone];
+            [[AuthorizeHelper sharedManager] setUserName:userName];
+            [[AuthorizeHelper sharedManager] setUserImage:userImage];
+            
+            
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
+           
         }else{
             if ([jsonStr isEqualToString:@"-1"] || [jsonStr isEqualToString:@"-4"]) {
                 hubMessage = @"登录失败!";

@@ -19,6 +19,8 @@
 #import "CCamViewController.h"
 
 #import "CCamHelper.h"
+#import <MBProgressHUD/MBProgressHUD.h>
+
 
 @interface KLImagePickerViewController ()<UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate,FastttCameraDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UICollectionViewDataSource>{
     BOOL captureRunning;
@@ -91,13 +93,14 @@
         [self.fastCamera setCameraFlashMode:FastttCameraFlashModeOff];
         [self.fastCamera setCameraTorchMode:FastttCameraTorchModeOff];
         
-//        if (_captureShup == nil) {
-//            _captureShup = [[UIImageView alloc] initWithFrame:self.albumImgBG.frame];
-//            [_captureShup setImage:[UIImage imageNamed:@"captureShup"]];
-//            [_captureShup setBackgroundColor:[UIColor clearColor]];
-//            [_captureShup setUserInteractionEnabled:NO];
-//            [self.view addSubview:_captureShup];
-//        }
+        if (!_captureShup) {
+            _captureShup = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _fastCamera.view.frame.size.width, _fastCamera.view.frame.size.height)];
+            [_captureShup setImage:[UIImage imageNamed:@"captureShup"]];
+            [_captureShup setBackgroundColor:[UIColor clearColor]];
+            [_captureShup setUserInteractionEnabled:NO];
+            [_fastCamera.view addSubview:_captureShup];
+            
+        }
         
     }else{
         
@@ -108,15 +111,31 @@
     }
 }
 - (void)setCaptureShupState{
-    if (_captureShup == nil) {
+    if (_captureShup) {
         _captureShup.hidden = !_captureShup.hidden;
     }
 }
 - (void)cameraController:(id<FastttCameraInterface>)cameraController didFinishCapturingImage:(FastttCapturedImage *)capturedImage
 {
     NSLog(@"A photo was taken!");
-    [[iOSBindingManager sharedManager] saveImageToAlbum:capturedImage.rotatedPreviewImage];
-    [self backToAlbum];
+    [self.fastCamera stopRunning];
+    UIImageWriteToSavedPhotosAlbum(capturedImage.rotatedPreviewImage, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+//    [[iOSBindingManager sharedManager] saveImageToAlbum:capturedImage.rotatedPreviewImage];
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
+    hud.labelText = @"保存照片中...";
+}
+- (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo{
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:[UIApplication sharedApplication].keyWindow];
+    hud.mode = MBProgressHUDModeText;
+    if (error) {
+        hud.labelText = @"照片保存失败";
+        [hud hide:YES afterDelay:1.0];
+        [self.fastCamera startRunning];
+    }else{
+        hud.labelText = @"照片已保存";
+        [hud hide:YES afterDelay:1.0];
+        [self backToAlbum];
+    }
 }
 - (void)getAlbumsData{
     [self.albums removeAllObjects];
@@ -563,8 +582,6 @@
     }
 }
 - (void)backToAlbum{
-    
-    [self.fastCamera stopRunning];
     
     POPSpringAnimation *anim = [POPSpringAnimation animationWithPropertyNamed:kPOPViewFrame];
     anim.fromValue =[NSValue valueWithCGRect:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];

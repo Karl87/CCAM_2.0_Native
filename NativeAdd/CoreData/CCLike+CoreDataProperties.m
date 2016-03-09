@@ -16,6 +16,7 @@
 @dynamic photoID;
 @dynamic userID;
 @dynamic userName;
+@dynamic userImage;
 @dynamic dateline;
 @dynamic timeline;
 

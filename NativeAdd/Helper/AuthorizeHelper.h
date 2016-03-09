@@ -19,6 +19,18 @@
 - (NSString *)getUserID;
 - (void)setUserID:(NSString *)userid;
 
+- (NSString *)getUserGroup;
+- (void)setUserGroup:(NSString *)group;
+
+- (NSString *)getUserZone;
+- (void)setUserZone:(NSString *)zone;
+
+- (NSString *)getUserName;
+- (void)setUserName:(NSString *)name;
+
+- (NSString *)getUserImage;
+- (void)setUserImage:(NSString *)image;
+
 - (void)callAuthorizeView;
 - (void)dismissAuthorizeView;
 //check token

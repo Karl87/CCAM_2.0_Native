@@ -12,7 +12,7 @@
 #import "CCamHelper.h"
 #import <pop/POP.h>
 
-@interface CCSerieViewController ()<UITableViewDataSource,UITableViewDelegate>
+@interface CCSerieViewController ()<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate>
 @property (nonatomic,assign) BOOL needUpdate;
 @property (nonatomic,assign) NSInteger serieOrderType;
 @property (nonatomic,strong) NSMutableArray *orderSeries;
@@ -21,6 +21,7 @@
 @property (nonatomic,strong) UIView *segmentView;
 @property (nonatomic,strong) NSMutableArray *segmegtItems;
 @property (nonatomic,strong) UIView *segmentSlider;
+@property (nonatomic,strong) UIAlertView *openCameraAlert;
 @end
 
 @implementation CCSerieViewController
@@ -34,7 +35,7 @@
     _popularSeries = [[NSMutableArray alloc] initWithCapacity:0];
     _lastestSeries = [[NSMutableArray alloc] initWithCapacity:0];
     
-    NSArray* segArray = @[@"Best",@"Hot",@"New"];
+    NSArray* segArray = @[@"推荐",@"热门",@"最新"];
     _segmegtItems = [[NSMutableArray alloc] initWithCapacity:0];
     
     _segmentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamSegItemWidth*segArray.count, CCamSegItemHeight)];
@@ -59,7 +60,7 @@
         [_segmegtItems addObject:segButton];
     }
     
-    _segmentSlider = [[UIView alloc] initWithFrame:CGRectMake(0, CCamSegItemHeight-CCamSegSliderHeight, CCamSegItemWidth, CCamSegSliderHeight)];
+    _segmentSlider = [[UIView alloc] initWithFrame:CGRectMake(0, CCamSegItemHeight-CCamSegSliderHeight-5, CCamSegItemWidth, CCamSegSliderHeight)];
     [_segmentSlider setBackgroundColor:[UIColor clearColor]];
     UIView *segmentSlider = [[UIView alloc] initWithFrame:CGRectMake((CCamSegItemWidth-CCamSegSliderWidth)/2, 0, CCamSegSliderWidth, CCamSegSliderHeight)];
     [segmentSlider setBackgroundColor:[UIColor whiteColor]];
@@ -75,6 +76,8 @@
                                         contentInset:CCamScrollInset
                                scrollIndicatorInsets:CCamScrollInset
                                           parentView:self.view];
+    
+    [_serieTable setSeparatorColor:CCamViewBackgroundColor];
     
     MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshSerie)];
     header.automaticallyChangeAlpha = YES;
@@ -166,6 +169,12 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if (![[AuthorizeHelper sharedManager] checkToken]) {
+        [[AuthorizeHelper sharedManager] callAuthorizeView];
+        return;
+    }
+    
     CCSerie *serie;
     
     if (_serieOrderType == 0) {
@@ -177,9 +186,22 @@
     }
     
     [[DataHelper sharedManager] setTargetSerie:serie.serieID];
-    UnitySendMessage(UnityController.UTF8String, "LoadEditScene", "");
+    
+    NSString *str = [NSString stringWithFormat:@"是否前往制作页面，\n使用%@制作照片？",serie.nameCN];
+    _openCameraAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:str delegate:self cancelButtonTitle:@"暂时不要" otherButtonTitles:@"前往制作", nil];
+    [_openCameraAlert show];
+    
+    
 }
-
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (alertView==_openCameraAlert) {
+        if (buttonIndex==1) {
+            UnitySendMessage(UnityController.UTF8String, "LoadEditScene", "");
+        }else{
+           [[DataHelper sharedManager] setTargetSerie:@""];
+        }
+    }
+}
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 
 {

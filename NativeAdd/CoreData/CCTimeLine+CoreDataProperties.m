@@ -12,7 +12,12 @@
 #import "CCTimeLine+CoreDataProperties.h"
 
 @implementation CCTimeLine (CoreDataProperties)
+@dynamic shareSubTitle;
+@dynamic shareTitle;
+@dynamic shareURL;
 @dynamic dateline;
+@dynamic dateEnd;
+@dynamic dateStart;
 @dynamic cNameCN;
 @dynamic cNameEN;
 @dynamic cNameZH;
@@ -21,6 +26,7 @@
 @dynamic image_fullsize;
 @dynamic image_share;
 @dynamic likeCount;
+@dynamic commentCount;
 @dynamic liked;
 @dynamic ranking;
 @dynamic report;

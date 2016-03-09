@@ -25,6 +25,9 @@
 
 #define CCamMemberID @"1"
 #define CCamTestToken @"1234"//2222
+
+#define CCamAppStoreID @"1015887314"
+
 #define SMSAppKey @"8a2dbed04384"
 #define SMSAppSecret @"67cc96b7048ed6bc91d7dd8090192935"
 
@@ -71,34 +74,61 @@
 #define CCamPhotoSegLightGray [UIColor colorWithRed:199.0/255.0 green:197.0/255.0 blue:197.0/255.0 alpha:1.0]
 
 
+#define CCamRealTimeHost @"http://cc1.c-cam.cc:8001/"
+#define CCamAsyHost @"http://www.c-cam.cc/"
+
 #define CCamGetSeriesURL @"http://www.c-cam.cc/index.php/Api_new/Getmemberxml/get_series_json.html"
 #define CCamGetAnimationURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_animations_json.html"
 #define CCamGetStickersURL @"http://www.c-cam.cc/index.php/Api_new/Getsticker/get_sticker_json.html"
 
-#define CCamGetSerieURL @"http://www.c-cam.cc/index.php/Api/Index/get_series_list.html"
-#define CCamGetEventURL @"http://www.c-cam.cc/index.php/Api/Index/get_index.html"
+#define CCamGetSerieURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_series_list.html"
+#define CCamGetEventURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_index.html"
 #define CCamGetDiscoveryURL @"http://www.c-cam.cc/index.php/Api/Discover/index.html"
 #define CCamGetDiscoveryMoreURL @"http://www.c-cam.cc/index.php/Api/Discover/load_work.html"
-#define CCamLikePhotoURL @"http://www.c-cam.cc/index.php/Api/Index/like_work.html"
+#define CCamLikePhotoURL @"http://www.c-cam.cc/index.php/Api_new/Index/like_work.html"
 
-#define CCamGetCurrentContestsURL @"http://www.c-cam.cc/index.php/Api/Uploadphoto/get_contests_info.html"
-#define CCamSubmitPhotoURL @"http://www.c-cam.cc/index.php/Api/Uploadphoto/upload.html"
+#define CCamGetCurrentContestsURL @"http://www.c-cam.cc/index.php/Api_new/Uploadphoto/get_contests_info.html"
+#define CCamSubmitPhotoURL @"http://www.c-cam.cc/index.php/Api_new/Uploadphoto/upload.html"
 
 #define CCamGetTimeLineURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_follow_photos.html"
 #define CCamGetMoreTimeLineURL @"http://www.c-cam.cc/index.php/Api_new/Index/load_more.html"
-
-#define  CCamDeletePhotoURL @"http://www.c-cam.cc/index.php/First/Work/delete_work.html"
-#define  CCamReportPhotoURL @"http://www.c-cam.cc/index.php/First/Work/report_work.html"
-#define  CCamCancelReportPhotoURL @"http://www.c-cam.cc/index.php/First/Work/cancel_report_work.html"
+#define CCamGetMoreUserTimeLineURL @"http://www.c-cam.cc/index.php/Api_new/Index/load_more_member_photo.html"
+#define CCamDeletePhotoURL @"http://www.c-cam.cc/index.php/First/Work/delete_work.html"
+#define CCamReportPhotoURL @"http://www.c-cam.cc/index.php/First/Work/report_work.html"
+#define CCamCancelReportPhotoURL @"http://www.c-cam.cc/index.php/First/Work/cancel_report_work.html"
 
 #define CCamCheckPhoneNumURL @"http://www.c-cam.cc/index.php/Api_new/Login/is_new_number.html"
 
 
 #define CCamLoginURL @"http://www.c-cam.cc/index.php/Api_new/Login/login_new.html"
-#define CCamResetPswURL @"http://www.c-cam.cc/index.php/Api/Login/changepwd.html"
+#define CCamResetPswURL @"http://www.c-cam.cc/index.php/Api_new/Login/changepwd.html"
 #define CCamLogoutURL @"http://www.c-cam.cc/index.php/First/Member/logout.html"
 
 #define CCamGetUserHomePageURL @"http://www.c-cam.cc/index.php/Api_new/Member/member_home.html"
+#define CCamGetPhotoPageURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_photo_info.html"
+
+#define CCamGetCommentURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_comment.html"
+#define CCamSendCommentURL @"http://www.c-cam.cc/index.php/Api_new/Index/send_comment.html"
+
+#define CCamGetFollowURL @"http://www.c-cam.cc/index.php/Api_new/Member/get_follow_members.html"
+#define CCamGetFollowerURL @"http://www.c-cam.cc/index.php/Api_new/Member/get_fans_members.html"
+#define CCamFollowURL @"http://www.c-cam.cc/index.php/Api_new/Member/follow.html"
+#define CCamDeleteFollowURL @"http://www.c-cam.cc/index.php/Api_new/Member/delete_follow.html"
+
+#define CCamGetUserInfoURL @"http://www.c-cam.cc/index.php/Api_new/Register/get_info.html"
+#define CCamEditUserInfoURL @"http://www.c-cam.cc/index.php/Api_new/Register/change_info.html"
+#define CCamUploadProfileImageURL @"http://www.c-cam.cc/index.php/Api_new/Member/head_img.html"
+
+#define CCamGetUserMessageURL @"http://www.c-cam.cc/index.php/Api_new/Member/member_message.html"
+#define CCamGetMoreUserMessageURL @"http://www.c-cam.cc/index.php/Api_new/Member/load_more_message.html"
+#define CCamGetUserMessageCountURL @"http://www.c-cam.cc/index.php/Api_new/Member/no_read_message_count.html"
+
+#define CCamFeedbackURL @"http://www.c-cam.cc/index.php/Api_new/Index/send_suggest.html"
+#define CCamAgreementURL @"http://www.c-cam.cc/page/useragreement.html"
+#define CCamHomepageURL @"http://www.c-cam.cc/"
+#define CCamLicensesURL @""
+
+#define CCamPrivacyURL @"http://www.c-cam.cc/index.php/Api_new/Uploadphoto/change_contestid.html"
 
 #define CCamPullUpdate @"下拉列表刷新数据"
 #define CCamReleaseUpdate @"释放列表进行刷新"

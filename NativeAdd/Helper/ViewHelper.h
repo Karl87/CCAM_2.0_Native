@@ -9,9 +9,8 @@
 #import <Foundation/Foundation.h>
 
 #import "CCHomeViewController.h"
-#import "CCDiscoveryViewController.h"
 #import "CCMessageViewController.h"
-#import "CCMeViewController.h"
+#import "CCUserViewController.h"
 
 @interface ViewHelper : NSObject
 

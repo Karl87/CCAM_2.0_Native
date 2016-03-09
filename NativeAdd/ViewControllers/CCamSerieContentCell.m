@@ -265,7 +265,7 @@
         NSLog(@"角色区域类型:%@",cellAnimation.character.regionType);
         NSLog(@"角色区域信息:%@",cellAnimation.character.regionInfo);
 
-        NSString *region = @"86";//测试
+        NSString *region = [[AuthorizeHelper sharedManager] getUserZone];
         NSArray * regionArray = [cellAnimation.character.serie.regionInfo componentsSeparatedByString:@","];
         
         if([cellAnimation.character.serie.regionType isEqualToString:@"include"]){

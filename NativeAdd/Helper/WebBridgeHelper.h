@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+//#import <WebViewJavascriptBridge/WebViewJavascriptBridge.h>
 #import "WebViewJavascriptBridge.h"
-
 @interface WebBridgeHelper : NSObject
 
 + (WebBridgeHelper*)sharedManager;

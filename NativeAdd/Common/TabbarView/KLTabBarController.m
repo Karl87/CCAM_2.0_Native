@@ -10,10 +10,10 @@
 #import "KLNavigationController.h"
 
 #import "CCamHelper.h"
-#import "CCDiscoveryViewController.h"
+#import "CCHomeViewController.h"
 #import "CCEventViewController.h"
 #import "CCSerieViewController.h"
-#import "CCMeViewController.h"
+#import "CCUserViewController.h"
 
 //test
 #import "TestPostRequestWebViewController.h"
@@ -27,15 +27,27 @@
 
 @implementation KLTabBarController
 
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+}
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    [MessageHelper sharedManager].tabVC = self;
+}
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [MessageHelper sharedManager].tabVC = nil;
+}
 - (void)viewDidLoad{
     
     [super viewDidLoad];
-    
-    CCDiscoveryViewController *vc_home = [[CCDiscoveryViewController alloc] init];
+        
+    CCHomeViewController *vc_home = [[CCHomeViewController alloc] init];
     CCEventViewController *vc_event = [[CCEventViewController alloc] init];
     CCEventViewController *vc_nil = [[CCEventViewController alloc] init];
     CCSerieViewController *vc_serie = [[CCSerieViewController alloc] init];
-    CCMeViewController *vc_me = [[CCMeViewController alloc] init];
+    CCUserViewController *vc_me = [[CCUserViewController alloc] init];
+    vc_me.showSetting = YES;
     
     [DataHelper sharedManager].serieVC = vc_serie;
     

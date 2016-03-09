@@ -14,6 +14,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CCTimeLine (CoreDataProperties)
+@property (nullable, nonatomic, retain) NSString *shareURL;
+@property (nullable, nonatomic, retain) NSString *shareTitle;
+@property (nullable, nonatomic, retain) NSString *shareSubTitle;
+@property (nullable, nonatomic, retain) NSString *dateEnd;
+@property (nullable, nonatomic, retain) NSString *dateStart;
 @property (nullable, nonatomic, retain) NSString *dateline;
 @property (nullable, nonatomic, retain) NSString *cNameZH;
 @property (nullable, nonatomic, retain) NSString *cNameCN;
@@ -23,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, retain) NSString *image_fullsize;
 @property (nullable, nonatomic, retain) NSString *image_share;
 @property (nullable, nonatomic, retain) NSString *likeCount;
+@property (nullable, nonatomic, retain) NSString *commentCount;
 @property (nullable, nonatomic, retain) NSString *liked;
 @property (nullable, nonatomic, retain) NSString *ranking;
 @property (nullable, nonatomic, retain) NSString *report;

@@ -18,12 +18,9 @@
 #import "CCStickerSet.h"
 
 #import <MBProgressHUD/MBProgressHUD.h>
-#import <M13ProgressSuite/M13ProgressHUD.h>
-#import <M13ProgressSuite/M13ProgressViewRing.h>
 
-@interface DataHelper ()<UIAlertViewDelegate>{
-    M13ProgressHUD *dataHUD;
-}
+
+@interface DataHelper ()<UIAlertViewDelegate>
 @property (nonatomic,strong) UIAlertView *updateSeriesAlert;
 @property (nonatomic,strong) MBProgressHUD *updateSeriesHud;
 @end
@@ -164,6 +161,7 @@
         
     }success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSLog(@"%lu",(unsigned long)[responseObject length]);
+        NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
         if ([responseObject length]==1) {
             NSLog(@"\n***Current is updated version***\n");
             

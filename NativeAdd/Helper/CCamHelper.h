@@ -19,4 +19,6 @@
 #import "DataHelper.h"
 #import "SettingHelper.h"
 #import "FileHelper.h"
+#import "MessageHelper.h"
+
 #endif /* CCamHelper_h */
