@@ -152,7 +152,7 @@
     if (_ccamVC) {
         
         _updateSeriesHud = [MBProgressHUD showHUDAddedTo:_ccamVC.view animated:YES];
-        _updateSeriesHud.labelText = @"更新角色信息...";
+        _updateSeriesHud.labelText = Babel(@"更新角色信息中");
     }
     
     [manager POST:CCamGetSeriesURL parameters:parameters progress:^(NSProgress * _Nonnull uploadProgress) {
@@ -166,11 +166,11 @@
             NSLog(@"\n***Current is updated version***\n");
             
             [_updateSeriesHud setMode:MBProgressHUDModeText];
-            [_updateSeriesHud setLabelText:@"当前角色信息已是最新版本!"];
+            [_updateSeriesHud setLabelText:Babel(@"当前角色信息已是最新版本")];
             
         }else{
             [_updateSeriesHud setMode:MBProgressHUDModeText];
-            [_updateSeriesHud setLabelText:@"更新角色信息成功!"];
+            [_updateSeriesHud setLabelText:Babel(@"更新角色信息成功")];
             //Print Series info
             //NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
             
@@ -252,7 +252,7 @@
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"Request series fail");
         [_updateSeriesHud setMode:MBProgressHUDModeText];
-        [_updateSeriesHud setLabelText:@"更新角色信息失败!"];
+        [_updateSeriesHud setLabelText:Babel(@"更新角色信息失败")];
         [self getLocalSeriesInfo];
         self.serieUpdating = NO;
         if (_serieVC) {
@@ -350,6 +350,17 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     }];
 }
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (alertView == _updateSeriesAlert) {
+        if (_ccamVC) {
+            if (buttonIndex == 0) {
+                [_ccamVC.navigationController popViewControllerAnimated:YES];
+            }else if (buttonIndex == 1){
+                [self updateSeriesInfo];
+            }
+        }
+    }
+}
 - (void)getLocalSeriesInfo{
     NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -361,7 +372,10 @@
         NSLog(@"本地无数据，需要联网同步数据");
 //        [self updateSeriesInfo];
         if (_ccamVC) {
-            [self updateSeriesInfo];
+//            [self updateSeriesInfo];
+            _updateSeriesAlert = [[UIAlertView alloc] initWithTitle:Babel(@"提示") message:Babel(@"由于网络故障，获取角色列表信息失败") delegate:self cancelButtonTitle:Babel(@"返回上一页") otherButtonTitles:Babel(@"重新下载"), nil];
+            [_updateSeriesAlert show];
+        
         }
         
         return;

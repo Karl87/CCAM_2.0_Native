@@ -9,5 +9,7 @@
 #import "KLViewController.h"
 
 @interface CCLaunchViewController : KLViewController
+@property (nonatomic,strong) NSString *dismissType;
+- (void)smsTimerCount:(NSInteger)second;
 
 @end

@@ -12,7 +12,10 @@
 
 @property (nonatomic,strong) KLTableView *serieTable;
 
+- (void)reloadInfo;
 - (void)reloadSerieData;
+- (void)returnTopPosition;
+
 //- (void)setRefreshControlStateWithRefresh:(UIRefreshControl*)refresh andState:(NSString*)state;
 //- (void)serieRefreshEndAnimation;
 

@@ -22,7 +22,6 @@
 @property (nonatomic,strong) UIView *sharePop;
 @property (nonatomic,strong) UIScrollView *shareView;
 @property (nonatomic,strong) UIPageControl *sharePageControl;
-@property (nonatomic,assign) BOOL isShareImage;
 @property (nonatomic,strong) NSMutableArray *optionBtns;
 @property (nonatomic,strong) NSMutableArray *optionLabs;
 @end
@@ -33,7 +32,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _isShareImage = NO;
+    if (!_isShareImage) {
+        _isShareImage = NO;
+    }
     
     _optionBtns = [NSMutableArray new];
     _optionLabs = [NSMutableArray new];
@@ -45,7 +46,7 @@
     [self.view addSubview:_optionPop];
     
     UIButton *optionClose = [UIButton new];
-    [optionClose setTitle:@"取消" forState:UIControlStateNormal];
+    [optionClose setTitle:Babel(@"取消") forState:UIControlStateNormal];
     [optionClose setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
     [optionClose.titleLabel setFont:[UIFont systemFontOfSize:17.0]];
     [optionClose setFrame:CGRectMake(0,190-40, CCamViewWidth, 40)];
@@ -102,25 +103,25 @@
     if ([WXApi isWXAppSupportApi]&&[WXApi isWXAppInstalled]) {
         [images addObject:@"sheetWechat"];
         [images addObject:@"sheetTimeline"];
-        [titles addObject:@"微信"];
-        [titles addObject:@"朋友圈"];
+        [titles addObject:Babel(@"微信")];
+        [titles addObject:Babel(@"朋友圈")];
     }
     
     [images addObject:@"sheetSinaWeibo"];
-    [titles addObject:@"新浪微博"];
+    [titles addObject:Babel(@"新浪微博")];
     
     if ([QQApiInterface isQQInstalled]&&[QQApiInterface isQQSupportApi]){
         [images addObject:@"sheetQQ"];
-        [titles addObject:@"QQ"];
+        [titles addObject:Babel(@"QQ")];
         [images addObject:@"sheetQZone"];
-        [titles addObject:@"QQ空间"];
+        [titles addObject:Babel(@"QQ空间")];
     }
     
     [images addObject:@"sheetFacebook"];
-    [titles addObject:@"Facebook"];
+    [titles addObject:Babel(@"Facebook")];
     
     [images addObject:@"sheetCopyURL"];
-    [titles addObject:@"复制链接"];
+    [titles addObject:Babel(@"复制链接")];
 
     if (titles.count>4) {
         [_shareView setFrame:CGRectMake((CCamViewWidth-320)/2, (206-160)/2-10, 320, 160)];
@@ -189,11 +190,16 @@
         
         [images addObjectsFromArray:@[@"sheetShareURL",@"sheetShareImage",@"sheetMyself",@"sheetDelete",@"sheetSave"]];
         
-        [titles addObjectsFromArray: @[@"分享拉赞",@"分享照片",@"仅自己可见",@"删除照片",@"下载照片"]];
+        [titles addObjectsFromArray: @[Babel(@"分享拉赞"),Babel(@"分享照片"),Babel(@"仅自己可见"),Babel(@"删除照片"),Babel(@"下载照片")]];
+        
+        if ([_timeline.timelineContestID isEqualToString:@"-1"]) {
+            [images replaceObjectAtIndex:2 withObject:@"sheetOpen"];
+            [titles replaceObjectAtIndex:2 withObject:Babel(@"全部人可见")];
+        }
         
         if ([[[AuthorizeHelper sharedManager] getUserGroup] isEqualToString:@"0"]) {
             [images addObject:@"sheetAdmin"];
-            [titles addObject:@"管理员工具"];
+            [titles addObject:Babel(@"管理员工具")];
         }
         
         
@@ -214,8 +220,23 @@
             [self returnOptionBtnViewWithFrame:CGRectMake(0, 0, 80, 90) center:CGPointMake(40+i*80, _optionView.bounds.size.height/2) image:[UIImage imageNamed:[images objectAtIndex:i]] title:[titles objectAtIndex:i]];
         }
     }else{
-        NSArray *images = @[@"sheetShareURL",@"sheetShareImage",@"sheetReport",@"sheetSave"];
-        NSArray *titles = @[@"分享拉赞",@"分享照片",@"举报照片",@"下载照片"];
+        
+        NSMutableArray *images = [NSMutableArray new];
+        NSMutableArray *titles = [NSMutableArray new];
+        
+        [images addObjectsFromArray:@[@"sheetShareURL",@"sheetShareImage",@"sheetReport",@"sheetSave"]];
+        
+        [titles addObjectsFromArray: @[Babel(@"分享拉赞"),Babel(@"分享照片"),Babel(@"举报照片"),Babel(@"下载照片")]];
+        
+        if ([_timeline.report isEqualToString:@"1"]) {
+            [images replaceObjectAtIndex:2 withObject:@"sheetCancelReport"];
+            [titles replaceObjectAtIndex:2 withObject:Babel(@"取消举报")];
+        }
+        
+        if ([[[AuthorizeHelper sharedManager] getUserGroup] isEqualToString:@"0"]) {
+            [images addObject:@"sheetAdmin"];
+            [titles addObject:Babel(@"管理员工具")];
+        }
         
         if ([titles count]>4) {
             [_optionView setFrame:CGRectMake((CCamViewWidth-4*80)/2, 0, 320, 138)];
@@ -258,19 +279,19 @@
     
     UIButton* btn = (UIButton *)sender;
     [delegate shareViewBtnClickWithType:@"Option" andTitle:btn.currentTitle isShareImage:_isShareImage];
-    if([btn.currentTitle isEqualToString:@"分享拉赞"]){
+    if([btn.currentTitle isEqualToString:Babel(@"分享拉赞")]){
         _isShareImage = NO;
         [self showSharePop];
-    }else if ([btn.currentTitle isEqualToString:@"分享照片"]){
+    }else if ([btn.currentTitle isEqualToString:Babel(@"分享照片")]){
         _isShareImage = YES;
         [self showSharePop];
-    }else if ([btn.currentTitle isEqualToString:@"仅自己可见"]){
+    }else if ([btn.currentTitle isEqualToString:Babel(@"仅自己可见")]){
         [self setPrivacy:sender state:YES];
-    }else if ([btn.currentTitle isEqualToString:@"全部人可见"]){
+    }else if ([btn.currentTitle isEqualToString:Babel(@"全部人可见")]){
         [self setPrivacy:sender state:NO];
-    }else if ([btn.currentTitle isEqualToString:@"举报照片"]){
+    }else if ([btn.currentTitle isEqualToString:Babel(@"举报照片")]){
         [self setReportPhoto:sender state:YES];
-    }else if ([btn.currentTitle isEqualToString:@"取消举报照片"]){
+    }else if ([btn.currentTitle isEqualToString:Babel(@"取消举报")]){
         [self setReportPhoto:sender state:NO];
     }
     else{
@@ -296,13 +317,13 @@
         UILabel *lab = (UILabel*)[_optionLabs objectAtIndex:[_optionBtns indexOfObject:btn]];
         if (state) {
             _timeline.report = @"1";
-            [btn setTitle:@"取消举报照片" forState:UIControlStateNormal];
-            [lab setText:@"取消举报照片"];
+            [btn setTitle:Babel(@"取消举报") forState:UIControlStateNormal];
+            [lab setText:Babel(@"取消举报")];
             [btn setBackgroundImage:[UIImage imageNamed:@"sheetCancelReport"] forState:UIControlStateNormal];
         }else{
             _timeline.report = @"0";
-            [btn setTitle:@"举报照片" forState:UIControlStateNormal];
-            [lab setText:@"举报照片"];
+            [btn setTitle:Babel(@"举报照片") forState:UIControlStateNormal];
+            [lab setText:Babel(@"举报照片")];
             [btn setBackgroundImage:[UIImage imageNamed:@"sheetReport"] forState:UIControlStateNormal];
         }
         
@@ -312,7 +333,12 @@
 }
 - (void)setPrivacy:(id)sender state:(BOOL)state{
     
-    if(![_timeline.timelineContestID isEqualToString:@""]||![_timeline.timelineContestID isEqualToString:@"0"]||![_timeline.timelineContestID isEqualToString:@"-1"]){
+    if (_timeline.timelineContestID) {
+        NSLog(@"*****%@",_timeline.timelineContestID);
+    }
+    //修改
+    if(![_timeline.timelineContestID isEqualToString:@""]&&![_timeline.timelineContestID isEqualToString:@"0"]&&![_timeline.timelineContestID isEqualToString:@"-1"]&&![_timeline.timelineContestID isEqualToString:@"<null>"]&&![_timeline.timelineContestID isEqualToString:@"null"]){
+        
         NSString *message = [NSString stringWithFormat:@"您的照片已经参加了比赛'%@', 无法设为仅自己可见, 敬请谅解",_timeline.cNameCN];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:@"我知道了" otherButtonTitles:nil];
         [alert show];
@@ -337,13 +363,13 @@
         UILabel *lab = (UILabel*)[_optionLabs objectAtIndex:[_optionBtns indexOfObject:btn]];
         if (state) {
             _timeline.timelineContestID = @"-1";
-            [btn setTitle:@"全部人可见" forState:UIControlStateNormal];
-            [lab setText:@"全部人可见"];
+            [btn setTitle:Babel(@"全部人可见") forState:UIControlStateNormal];
+            [lab setText:Babel(@"全部人可见")];
             [btn setBackgroundImage:[UIImage imageNamed:@"sheetOpen"] forState:UIControlStateNormal];
         }else{
             _timeline.timelineContestID = @"0";
-            [btn setTitle:@"仅自己可见" forState:UIControlStateNormal];
-            [lab setText:@"仅自己可见"];
+            [btn setTitle:Babel(@"仅自己可见") forState:UIControlStateNormal];
+            [lab setText:Babel(@"仅自己可见")];
             [btn setBackgroundImage:[UIImage imageNamed:@"sheetMyself"] forState:UIControlStateNormal];
         }
         
@@ -385,7 +411,11 @@
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    [self showOptionPop];
+    if (_onlyShare) {
+        [self showSharePop];
+    }else{
+        [self showOptionPop];
+    }
 }
 - (void)showSharePop{
     
@@ -435,7 +465,9 @@
     [anSpring setCompletionBlock:^(POPAnimation *anim,BOOL finish){
         if(finish) {
             NSLog(@"!");
-            [delegate dissmisShareViewWith:_indexPath];
+            if (_indexPath) {
+                [delegate dissmisShareViewWith:_indexPath];
+            }
             [self.view setBackgroundColor:[UIColor clearColor]];
             [[ShareHelper sharedManager] dismissShareView];
         }

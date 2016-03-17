@@ -26,5 +26,5 @@
 @dynamic messageUserName;
 @dynamic messageUserImage;
 @dynamic messagePhoto;
-
+@dynamic messageURL;
 @end

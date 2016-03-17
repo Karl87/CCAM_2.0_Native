@@ -11,4 +11,8 @@
 @interface CCamAnimationCell : UICollectionViewCell
 @property (nonatomic,strong) CCAnimation *animation;
 @property (nonatomic,strong) UIImageView *animationImage;
+@property (nonatomic,strong) UIView *mask;
+@property (nonatomic,strong) UIActivityIndicatorView *loading;
+
+- (void)UILoadingCharacter;
 @end

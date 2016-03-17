@@ -113,7 +113,7 @@
         if (!receiveAry || ![receiveAry count]) {
             MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
             hud.mode = MBProgressHUDModeText;
-            hud.labelText = @"您还没有收到过消息..";
+            hud.labelText = Babel(@"您还没有收到过消息");
             [hud hide:YES afterDelay:2.0];
             [_message.mj_header endRefreshing];
             return ;
@@ -204,29 +204,41 @@
     return [_message cellHeightForIndexPath:indexPath model:message keyPath:@"message" cellClass:[MessageCell class] contentViewWidth:CCamViewWidth];
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    //修改
     CCMessage *message = [_messages objectAtIndex:indexPath.row];
     if ([message.messageType isEqualToString:@"4"]) {
         KLWebViewController *detail = [[KLWebViewController alloc] init];
-        detail.webURL = [NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Contest/rule/contestid/%@.html",message.contestID];
-        detail.vcTitle = @"活动详情";
+        detail.webURL = [NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Contest/rule/contestid/%@/app/1.html",message.contestID];
+        detail.vcTitle = Babel(@"活动详情");
         detail.hidesBottomBarWhenPushed = YES;
-        
-        id vc = nil;
-        vc = detail;
         UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
         backItem.title=@"";
         self.navigationItem.backBarButtonItem=backItem;
-        [self.navigationController pushViewController:vc animated:YES];
-    }else{
-        CCPhotoViewController *photoView = [[CCPhotoViewController alloc] init];
-        photoView.photoID = message.photoID;
-        photoView.vcTitle = @"照片详情";
-        photoView.hidesBottomBarWhenPushed = YES;
-        UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
-        backItem.title=@"";
-        self.navigationItem.backBarButtonItem=backItem;
-        [self.navigationController pushViewController:photoView animated:YES];
+        [self.navigationController pushViewController:detail animated:YES];
+        return;
+    }else if ([message.messageType isEqualToString:@"6"]){
+        if (![message.messageURL isEqualToString:@""]) {
+            KLWebViewController *detail = [[KLWebViewController alloc] init];
+            detail.webURL = message.messageURL;
+            detail.vcTitle = @"";
+            detail.hidesBottomBarWhenPushed = YES;
+            UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+            backItem.title=@"";
+            self.navigationItem.backBarButtonItem=backItem;
+            [self.navigationController pushViewController:detail animated:YES];
+            return;
+        }
     }
+    CCPhotoViewController *photoView = [[CCPhotoViewController alloc] init];
+    photoView.photoID = message.photoID;
+    photoView.vcTitle = Babel(@"照片详情");
+    photoView.hidesBottomBarWhenPushed = YES;
+    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+    backItem.title=@"";
+    self.navigationItem.backBarButtonItem=backItem;
+    [self.navigationController pushViewController:photoView animated:YES];
+    return;
 }
 - (void)callOtherVC:(id)vc{
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];

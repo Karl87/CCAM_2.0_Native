@@ -73,8 +73,8 @@
         }
         return;
     }
-    NSString *phoneNum = [NSString stringWithFormat:@"%@%@",_regZone.currentTitle,_regPhone.text];
-    NSString *psw = _regPsw.text;
+    NSString *phoneNum = [NSString stringWithFormat:@"%@%@",_regZone.currentTitle,_loginPhone.text];
+    NSString *psw = _loginPsw.text;
     [[AuthorizeHelper sharedManager] mobileLoginWithPhone:phoneNum password:psw isLogin:YES];
 }
 - (NSString *)returnCorrectZone:(NSString *)str{
@@ -159,7 +159,7 @@
     }
 
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"校验信息中";
+    hud.labelText = Babel(@"校验信息中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -218,7 +218,16 @@
     [_mobileBG setContentOffset:CGPointMake(_mobileBG.bounds.size.width*sender.currentPage, _mobileBG.contentOffset.y) animated:NO];
 }
 - (void)callZone{
-    _zoneActionSheet = [[UIActionSheet alloc] initWithTitle:@"区域选择" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"+86 中国大陆",@"+852 中国香港",@"+853 中国澳门",@"+886 中国台湾", @"+1 美国",@"+81 日本",@"+82 韩国",nil];
+    
+    NSString *china = [NSString stringWithFormat:@"+86 %@",Babel(@"中国")];
+    NSString *hk = [NSString stringWithFormat:@"+852 %@",Babel(@"中国香港")];
+    NSString *mc = [NSString stringWithFormat:@"+853 %@",Babel(@"中国澳门")];
+    NSString *tw = [NSString stringWithFormat:@"+886 %@",Babel(@"中国台湾")];
+    NSString *us = [NSString stringWithFormat:@"+1 %@",Babel(@"美国")];
+    NSString *jp = [NSString stringWithFormat:@"+81 %@",Babel(@"日本")];
+    NSString *kr = [NSString stringWithFormat:@"+82 %@",Babel(@"韩国")];
+    
+    _zoneActionSheet = [[UIActionSheet alloc] initWithTitle:Babel(@"区域选择") delegate:self cancelButtonTitle:Babel(@"取消") destructiveButtonTitle:nil otherButtonTitles:china,hk,mc,tw, us,jp,kr,nil];
     [_zoneActionSheet showInView:self.view];
 }
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
@@ -260,14 +269,14 @@
     }
 }
 - (void)callResetPassword{
-    NSString *message = [NSString stringWithFormat:@"%@ %@已注册\n是否重置密码？",_regZone.currentTitle,_regPhone.text];
-    _pswAlert = [[UIAlertView alloc] initWithTitle:@"确认手机号码" message:message delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定",nil];
+    NSString *message = [NSString stringWithFormat:@"%@ %@%@,\n%@?",_regZone.currentTitle,_regPhone.text,Babel(@"已注册"),Babel(@"是否重置密码")];
+    _pswAlert = [[UIAlertView alloc] initWithTitle:Babel(@"确认手机号码") message:message delegate:self cancelButtonTitle:Babel(@"取消") otherButtonTitles:Babel(@"确定"),nil];
     [_pswAlert show];
 }
 - (void)callSMS{
     
-    NSString *message = [NSString stringWithFormat:@"我们会将验证码发送至:\n%@ %@",_regZone.currentTitle,_regPhone.text];
-    _regAlert = [[UIAlertView alloc] initWithTitle:@"确认手机号码" message:message delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定",nil];
+    NSString *message = [NSString stringWithFormat:@"%@:\n%@ %@",Babel(@"我们会将验证码发送至"),_regZone.currentTitle,_regPhone.text];
+    _regAlert = [[UIAlertView alloc] initWithTitle:Babel(@"确认手机号码") message:message delegate:self cancelButtonTitle:Babel(@"取消") otherButtonTitles:Babel(@"确定"),nil];
     [_regAlert show];
 }
 - (void)verifiSMSCode{
@@ -285,20 +294,20 @@
         return;
     }
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"验证信息中";
+    hud.labelText = Babel(@"验证信息中");
 
     [SMSSDK commitVerificationCode:_regCode.text phoneNumber:_regPhone.text zone:_regZone.currentTitle result:^(NSError *error) {
         if (!error) {
-            hud.labelText = @"验证成功";
+            hud.labelText = Babel(@"验证成功");
             NSLog(@"验证成功");
-            if ([_regBtn.currentTitle isEqualToString:@"注册"]) {
-                [[AuthorizeHelper sharedManager] mobileLoginWithPhone:[NSString stringWithFormat:@"%@%@",_regZone.currentTitle,_regPhone.text] password:_regPsw.text isLogin:NO];
-            }else if([_regBtn.currentTitle isEqualToString:@"修改密码"]){
+            if ([_regBtn.currentTitle isEqualToString:Babel(@"注册")]) {
+                [[AuthorizeHelper sharedManager] mobileLoginWithPhone:[NSString stringWithFormat:@"%@%@",_regZone.currentTitle,[_regPhone.text copy]] password:[_regPsw.text copy] isLogin:NO];
+            }else if([_regBtn.currentTitle isEqualToString:Babel(@"修改密码")]){
                 [[AuthorizeHelper sharedManager] mobileResetPasswordWithPhone:[NSString stringWithFormat:@"%@%@",_regZone.currentTitle,_regPhone.text] password:_regPsw.text];
             }
             [hud hide:YES];
         }else{
-            hud.labelText = @"验证失败";
+            hud.labelText = Babel(@"验证失败");
             NSLog(@"错误信息:%@",error);
             [hud hide:YES afterDelay:1.0f];
         }
@@ -308,24 +317,51 @@
     if (alertView == _regAlert) {
         if (buttonIndex == 1) {
             [self getVerificationCode];
-            [_regBtn setTitle:@"注册" forState:UIControlStateNormal];
+            [_regBtn setTitle:Babel(@"注册") forState:UIControlStateNormal];
+            
         }
     }else if (alertView == _pswAlert){
         if (buttonIndex == 1) {
             [self getVerificationCode];
-            [_regBtn setTitle:@"修改密码" forState:UIControlStateNormal];
+            [_regBtn setTitle:Babel(@"修改密码") forState:UIControlStateNormal];
         }
     }
 }
+
+- (void)smsTimerCount:(NSInteger)second{
+    if (second>0) {
+        [_regCodeBtn setEnabled:NO];
+        [_regCodeBtn setBackgroundColor:CCamViewBackgroundColor];
+        [_regCodeBtn setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
+        [_regCodeBtn.titleLabel setText:[NSString stringWithFormat:@"%ld%@",second,Babel(@"秒")]];
+        [_regCodeBtn setTitle:[NSString stringWithFormat:@"%ld%@",second,Babel(@"秒")] forState:UIControlStateNormal];
+    }else{
+        [_regCodeBtn setEnabled:YES];
+        [_regCodeBtn setBackgroundColor:CCamYellowColor];
+        [_regCodeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_regCodeBtn.titleLabel setText:Babel(@"获取验证码")];
+        [_regCodeBtn setTitle:Babel(@"获取验证码") forState:UIControlStateNormal];
+    }
+}
+
+
 - (void)getVerificationCode{
+    
+    [[AuthorizeHelper sharedManager] startSmsTimer];
+    [_regCodeBtn setEnabled:NO];
+    [_regCodeBtn setBackgroundColor:CCamViewBackgroundColor];
+    [_regCodeBtn setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
+    [_regCodeBtn.titleLabel setText:[NSString stringWithFormat:@"30%@",Babel(@"秒")]];
+    [_regCodeBtn setTitle:[NSString stringWithFormat:@"30%@",Babel(@"秒")] forState:UIControlStateNormal];
+
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"获取验证码中";
+    hud.labelText =Babel(@"获取验证码中");
     [SMSSDK getVerificationCodeByMethod:SMSGetCodeMethodSMS phoneNumber:_regPhone.text zone:[self returnCorrectZone:_regZone.currentTitle] customIdentifier:nil result:^(NSError *error) {
         if (!error) {
-            hud.labelText = @"获取验证码成功";
+            hud.labelText = Babel(@"获取验证码成功");
             NSLog(@"获取验证码成功");
         } else {
-            hud.labelText = @"获取验证码失败";
+            hud.labelText = Babel(@"获取验证码失败");
             NSLog(@"错误信息：%@",error);
         }
         [hud hide:YES afterDelay:1.0f];
@@ -364,7 +400,7 @@
     [_mobileBG setShowsHorizontalScrollIndicator:NO];
     [_launchSquare addSubview:_mobileBG];
     
-    NSArray* segArray = @[@"登录",@"注册"];
+    NSArray* segArray = @[Babel(@"登录"),Babel(@"注册")];
     _segmegtItems = [[NSMutableArray alloc] initWithCapacity:0];
     
     _segmentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamSegItemWidth*segArray.count, CCamSegItemHeight)];
@@ -400,7 +436,7 @@
     
     
     _loginPhone = [[UITextField alloc] initWithFrame:CGRectMake(_launchSquare.bounds.size.width/8, 8, _launchSquare.bounds.size.width*3/4, 40)];
-    [_loginPhone setPlaceholder:@"请输入用户名"];
+    [_loginPhone setPlaceholder:Babel(@"请输入手机号码")];
     [_loginPhone setFont:[UIFont systemFontOfSize:14.0]];
     [_loginPhone setClearButtonMode:UITextFieldViewModeWhileEditing];
     [_loginPhone setBackgroundColor:CCamViewBackgroundColor];
@@ -420,7 +456,7 @@
     _loginPhoneShaker = [[AFViewShaker alloc] initWithView:_loginPhone];
     
     _loginPsw = [[UITextField alloc] initWithFrame:CGRectMake(_launchSquare.bounds.size.width/8, 40+8*2, _launchSquare.bounds.size.width*3/4, 40)];
-    [_loginPsw setPlaceholder:@"请输入密码"];
+    [_loginPsw setPlaceholder:Babel(@"请输入密码")];
     [_loginPsw setFont:[UIFont systemFontOfSize:14.0]];
     [_loginPsw setClearButtonMode:UITextFieldViewModeWhileEditing];
     [_loginPsw setBackgroundColor:CCamViewBackgroundColor];
@@ -434,7 +470,7 @@
     _loginPswShaker = [[AFViewShaker alloc] initWithView:_loginPsw];
     
     _loginBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_loginBtn setTitle:@"登录" forState:UIControlStateNormal];
+    [_loginBtn setTitle:Babel(@"登录") forState:UIControlStateNormal];
     [_loginBtn setBackgroundColor:CCamRedColor];
     [_loginBtn setFrame:CGRectMake(_launchSquare.bounds.size.width/8, 40*2+8*3, _launchSquare.bounds.size.width*3/4, 40)];
     [_loginBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:17.0]];
@@ -444,7 +480,7 @@
     [_mobileBG addSubview:_loginBtn];
     
     _regPhone = [[UITextField alloc] initWithFrame:CGRectMake(_launchSquare.bounds.size.width*9/8, 8, _launchSquare.bounds.size.width*3/4, 40)];
-    [_regPhone setPlaceholder:@"请输入用户名"];
+    [_regPhone setPlaceholder:Babel(@"请输入手机号码")];
     [_regPhone setFont:[UIFont systemFontOfSize:14.0]];
     [_regPhone setClearButtonMode:UITextFieldViewModeWhileEditing];
     [_regPhone setKeyboardType:UIKeyboardTypePhonePad];
@@ -466,7 +502,7 @@
     
     
     _regPsw = [[UITextField alloc] initWithFrame:CGRectMake(_launchSquare.bounds.size.width*9/8, 40+8*2, _launchSquare.bounds.size.width*3/4, 40)];
-    [_regPsw setPlaceholder:@"请输入密码"];
+    [_regPsw setPlaceholder:Babel(@"请输入密码")];
     [_regPsw setFont:[UIFont systemFontOfSize:14.0]];
     [_regPsw setClearButtonMode:UITextFieldViewModeWhileEditing];
     [_regPsw setBackgroundColor:CCamViewBackgroundColor];
@@ -481,7 +517,7 @@
 
     
     _regCode = [[UITextField alloc] initWithFrame:CGRectMake(_launchSquare.bounds.size.width*9/8, 40*2+8*3, _launchSquare.bounds.size.width*3/8-5, 40)];
-    [_regCode setPlaceholder:@"请输入验证码"];
+    [_regCode setPlaceholder:Babel(@"请输入验证码")];
     [_regCode setFont:[UIFont systemFontOfSize:14.0]];
     [_regCode setClearButtonMode:UITextFieldViewModeWhileEditing];
     [_regCode setBackgroundColor:CCamViewBackgroundColor];
@@ -495,7 +531,7 @@
     _regCodeShaker = [[AFViewShaker alloc] initWithView:_regCode];
 
     _regCodeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_regCodeBtn setTitle:@"获取验证码" forState:UIControlStateNormal];
+    [_regCodeBtn setTitle:Babel(@"获取验证码") forState:UIControlStateNormal];
     [_regCodeBtn setBackgroundColor:CCamYellowColor];
     [_regCodeBtn setFrame:CGRectMake(_launchSquare.bounds.size.width*12/8+5, 40*2+8*3, _launchSquare.bounds.size.width*3/8-5, 40)];
     [_regCodeBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
@@ -505,7 +541,7 @@
     [_mobileBG addSubview:_regCodeBtn];
     
     _regBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_regBtn setTitle:@"注册" forState:UIControlStateNormal];
+    [_regBtn setTitle:Babel(@"注册") forState:UIControlStateNormal];
     [_regBtn setBackgroundColor:CCamRedColor];
     [_regBtn setFrame:CGRectMake(_launchSquare.bounds.size.width*9/8, 40*3+8*4, _launchSquare.bounds.size.width*3/4, 40)];
     [_regBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:17.0]];
@@ -528,7 +564,7 @@
     [_launchSquare addSubview:_pageControl];
     
     UILabel *paltformTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 5, _platformsBG.bounds.size.width, 20)];
-    [paltformTitle setText:@"社交平台账号登录"];
+    [paltformTitle setText:Babel(@"社交平台账户登录")];
     [paltformTitle setTextAlignment:NSTextAlignmentCenter];
     [paltformTitle setFont:[UIFont boldSystemFontOfSize:11.0]];
     [paltformTitle setTextColor:[UIColor whiteColor]];
@@ -578,12 +614,13 @@
     [_facebookBtn addTarget:self action:@selector(facebookLogin) forControlEvents:UIControlEventTouchUpInside];
     
     _agreementBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_agreementBtn setTitle:@"我同意《角色相机使用协议》" forState:UIControlStateNormal];
+    [_agreementBtn setTitle:Babel(@"我同意《角色相机使用协议》") forState:UIControlStateNormal];
     [_agreementBtn.titleLabel setFont:[UIFont systemFontOfSize:11.]];
     [_agreementBtn sizeToFit];
     [_agreementBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2, _platformsBG.bounds.size.height-_agreementBtn.bounds.size.height/2)];
     [_agreementBtn setBackgroundColor:[UIColor clearColor]];
-    [_agreementBtn setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
+    [_agreementBtn addTarget:self action:@selector(hideBouncesAnimation:) forControlEvents:UIControlEventTouchUpInside];
+    [_agreementBtn setTitleColor:CCamViewBackgroundColor forState:UIControlStateNormal];
     [_platformsBG addSubview:_agreementBtn];
 
     _closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -634,6 +671,14 @@
 }
 - (void)hideBouncesAnimation:(id)sender{
     NSLog(@"hide animation");
+    if (sender) {
+        UIButton *btn = (UIButton*)sender;
+        if (btn == _agreementBtn) {
+            _dismissType = @"agreement";
+        }
+    }
+    
+    
     POPBasicAnimation *anBasic = [POPBasicAnimation animationWithPropertyNamed:kPOPViewAlpha];
     
 //    if (iOS8) {

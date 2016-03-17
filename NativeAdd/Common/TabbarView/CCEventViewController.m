@@ -20,7 +20,12 @@
 @end
 
 @implementation CCEventViewController
-
+- (void)reloadInfo{
+    [_eventTable.mj_header beginRefreshing];
+}
+- (void)returnTopPosition{
+    [_eventTable scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -45,8 +50,8 @@
     [self.eventTable setDelegate:self];
     [self.eventTable setDataSource:self];
     
-    self.events = [[NSMutableArray alloc] initWithCapacity:0];
-    [self.events addObjectsFromArray:[[CoreDataHelper sharedManager] showStoreInfoWithEntity:@"CCEvent"]];
+    self.events = [NSMutableArray new];
+    [self getLocalEventsInfo];
 
     UIBarButtonItem *test = [[UIBarButtonItem alloc] initWithTitle:@"测试" style:UIBarButtonItemStylePlain target:self action:@selector(testWeb)];
     [self.navigationItem setLeftBarButtonItem:test];
@@ -74,6 +79,24 @@
     [_eventTable.mj_header beginRefreshing];
     self.needUpdate = NO;
 }
+- (void)getLocalEventsInfo{
+    [_events removeAllObjects];
+    NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"CCEvent" inManagedObjectContext:context];
+    [request setEntity:entity];
+    NSError *error;
+    NSArray *infos = [context executeFetchRequest:request error:&error];
+    if ([infos count] == 0) {
+        NSLog(@"本地无活动数据，需要联网同步数据");
+        return;
+    }else{
+        NSLog(@"本地数据库读取%lu个活动",(unsigned long)infos.count);
+    }
+    
+    [_events addObjectsFromArray:infos];
+    [_eventTable reloadData];
+}
 - (void)refreshEvent{
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -84,27 +107,22 @@
         NSError *error;
         NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
         NSArray *receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
-        NSMutableArray * tempEvents = [[NSMutableArray alloc] initWithCapacity:0];
-        [self.events removeAllObjects];
+        
+        NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
+        [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCEvent"];
         
         for (int i = 0; i < receiveArray.count; i++) {
             NSDictionary* eventDic = [receiveArray objectAtIndex:i];
-            CCEvent *event = [[CCEvent alloc] init];
-            [event initEventWithData:eventDic];
-            [tempEvents addObject:event];
+            CCEvent *event = [NSEntityDescription insertNewObjectForEntityForName:@"CCEvent" inManagedObjectContext:context];
+            [event initEventWith:eventDic];
+            if (![context save:&error]) {
+//                NSLog(@"角色%@保存失败",event.eventName);
+            }
         }
-        [self.events addObjectsFromArray:tempEvents];
-        [self.eventTable reloadData];
         
         NSLog(@"%ld",(unsigned long)[_events count]);
         
-        [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCEvent"];
-        [[CoreDataHelper sharedManager] insertCoreDataWithType:@"CCEvent" andArray:tempEvents];
-        
-        receiveArray = nil;
-        [tempEvents removeAllObjects];
-        tempEvents = nil;
-        
+        [self getLocalEventsInfo];
         [_eventTable.refresh endRefreshing];
 
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
@@ -161,6 +179,7 @@
     KLWebViewController *detail = [[KLWebViewController alloc] init];
     detail.webURL = event.eventURL;
     detail.vcTitle = event.eventName;
+    detail.event = event;
     detail.hidesBottomBarWhenPushed = YES;
     
     id vc = nil;

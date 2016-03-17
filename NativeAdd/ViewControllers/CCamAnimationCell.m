@@ -20,4 +20,21 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
 }
+- (void)UILoadingCharacter{
+    if (_mask) {
+        [_mask setHidden:NO];
+        if (_loading) {
+            [_loading startAnimating];
+        }
+    }
+    [self performSelector:@selector(UIEndLoading) withObject:nil afterDelay:0.5];
+}
+- (void)UIEndLoading{
+    if (_mask) {
+        [_mask setHidden:YES];
+        if (_loading) {
+            [_loading stopAnimating];
+        }
+    }
+}
 @end

@@ -48,12 +48,12 @@
         _stateImage = [[UIImageView alloc] init];
         [_stateImage setFrame:CGRectMake(0, 0, 16, 16)];
         [_stateImage setBackgroundColor:[UIColor clearColor]];
-        [_stateImage setCenter:CGPointMake(self.bounds.size.width-13, self.bounds.size.height-13)];
+        [_stateImage setCenter:CGPointMake(self.bounds.size.width-self.bounds.size.height/8-13, self.bounds.size.height-self.bounds.size.height/8-13)];
         [self.contentView addSubview:_stateImage];
     }
     
     if (!_downloadProgress) {
-        _downloadProgress  = [[M13ProgressViewBorderedBar alloc] initWithFrame:CGRectMake(5, self.bounds.size.height-15, self.bounds.size.width-10, 10)];
+        _downloadProgress  = [[M13ProgressViewBorderedBar alloc] initWithFrame:CGRectMake(self.bounds.size.width/8, self.bounds.size.width*7/8+2, self.bounds.size.width*3/4, self.bounds.size.width/8-4)];
         [_downloadProgress setProgressDirection:M13ProgressViewBorderedBarProgressDirectionLeftToRight];
         [_downloadProgress setCornerType:M13ProgressViewBorderedBarCornerTypeCircle];
         [_downloadProgress setPrimaryColor:CCamRedColor];

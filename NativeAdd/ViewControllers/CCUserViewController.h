@@ -12,4 +12,7 @@
 @property (nonatomic,strong) NSString *userID;
 @property (nonatomic,assign) BOOL showSetting;
 @property (nonatomic,strong) NSMutableArray *reloadIndexs;
+@property (nonatomic,assign) BOOL needUpdate;
+- (void)returnTopPosition;
+- (void)reloadInfo;
 @end

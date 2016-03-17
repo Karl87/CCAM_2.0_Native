@@ -7,6 +7,7 @@
 //
 
 #define profileSize 36.0
+#define likeviewSize 44.0
 
 #import "TimelineCell.h"
 #import "TimelineCommentCell.h"
@@ -31,15 +32,17 @@
 
 #import "ShareViewController.h"
 
-@interface TimelineCell ()<UIGestureRecognizerDelegate,UIActionSheetDelegate,ShareViewDelegate>
-
+@interface TimelineCell ()<UIGestureRecognizerDelegate,UIActionSheetDelegate,ShareViewDelegate,UIAlertViewDelegate>
+@property (nonatomic,strong) UIAlertView *deleteAlert;
 @end
 
 @implementation TimelineCell
 
 - (void)setUpTimelineCell{
     
-//    [self addObserver:self forKeyPath:@"timeline" options:NSKeyValueObservingOptionNew context:nil];
+    _comments = [NSMutableArray new];
+
+    _likes = [NSMutableArray new];
     
     _cellBG = [UIView new];
     [_cellBG setBackgroundColor:[UIColor whiteColor]];
@@ -70,6 +73,18 @@
     
     _photo = [UIImageView new];
     
+    _photoLomo = [UIImageView new];
+    [_photoLomo setBackgroundColor:[UIColor clearColor]];
+    [_photoLomo setContentMode:UIViewContentModeScaleToFill];
+    [_photoLomo setImage:[UIImage imageNamed:@"timelineLomo"]];
+    [_photoLomo setHidden:YES];
+    
+    _photoSpotlight  = [UIImageView new];
+    [_photoSpotlight setBackgroundColor:[UIColor clearColor]];
+    [_photoSpotlight setContentMode:UIViewContentModeCenter];
+    [_photoSpotlight setImage:[UIImage imageNamed:@"timelineSpotlight"]];
+    [_photoSpotlight setHidden:YES];
+    
     _photoTitle = [UIButton new];
     [_photoTitle setBackgroundColor:[UIColor whiteColor]];
     [_photoTitle setImage:[UIImage imageNamed:@"joinEventIcon"] forState:UIControlStateNormal];
@@ -77,7 +92,7 @@
     [_photoTitle setBackgroundImage:[[[UIImage imageNamed:@"eventTitleBG"] stretchableImageWithLeftCapWidth:30.0 topCapHeight:0.0] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_photoTitle setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_photoTitle setTintColor:CCamRedColor];
-    [_photoTitle.titleLabel setFont:[UIFont systemFontOfSize:14.0]];
+    [_photoTitle.titleLabel setFont:[UIFont systemFontOfSize:13.0]];
     
     _contestDes = [UILabel new];
     [_contestDes setBackgroundColor:[UIColor whiteColor]];
@@ -89,22 +104,20 @@
     _likeBorder = [UIView new];
     [_likeBorder setBackgroundColor:CCamViewBackgroundColor];
     _likeView = [UIView new];
-//    _likeView.backgroundColor = [UIColor grayColor];
     _likesButton = [UIButton new];
     [_likesButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
     [_likesButton setImage:[[UIImage imageNamed:@"littleLikeIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_likesButton setTintColor:CCamRedColor];
     [_likesButton setTitleColor:CCamRedColor forState:UIControlStateNormal];
-    [_likesButton.titleLabel setFont:[UIFont boldSystemFontOfSize:12.0]];
+    [_likesButton.titleLabel setFont:[UIFont systemFontOfSize:13.0]];
     [_likeView addSubview:_likesButton];
     
     _photoDes = [UILabel new];
     [_photoDes setBackgroundColor:[UIColor whiteColor]];
-    [_photoDes setFont:[UIFont systemFontOfSize:12.0]];
+    [_photoDes setFont:[UIFont systemFontOfSize:13.0]];
     [_photoDes setNumberOfLines:0];
     [_photoDes setTextColor:CCamGrayTextColor];
     [_photoDes setTextAlignment:NSTextAlignmentLeft];
-//    [_photoDes setBackgroundColor:[UIColor yellowColor]];
     
     _photoInput = [UIButton new];
     [_photoInput addTarget:self action:@selector(callCommentPage:) forControlEvents:UIControlEventTouchUpInside];
@@ -128,112 +141,18 @@
     _commentTable = [UITableView new];
     [_commentTable setBounces:NO];
     [_commentTable setSeparatorStyle:UITableViewCellSeparatorStyleNone];
-    [_commentTable setBackgroundColor:[UIColor blueColor]];
+    [_commentTable setBackgroundColor:[UIColor whiteColor]];
     
-    NSArray *views = @[_cellBG,_profileImage,_userName,_userButton,_photoTime,_privacySign,_photo,_photoInput,_photoLike,_photoMore,_likeBorder,_likeView,_contestDes,_photoTitle,_commentBorder,_photoDes,_commentTable];
+    NSArray *views = @[_cellBG,_profileImage,_userName,_userButton,_photoTime,_privacySign,_photo,_photoLomo,_photoSpotlight,_photoInput,_photoLike,_photoMore,_likeBorder,_likeView,_contestDes,_photoTitle,_commentBorder,_photoDes,_commentTable];
     [views enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.contentView addSubview:obj];
     }];
-    UIView *contentView = self.contentView;
+//    UIView *contentView = self.contentView;
     
-    _profileImage.sd_layout
-    .leftSpaceToView(contentView,15)
-    .topSpaceToView(contentView,15)
-    .heightIs(profileSize)
-    .widthIs(profileSize);
     
-    _userName.sd_layout
-    .leftSpaceToView(_profileImage,10)
-    .topEqualToView(_profileImage)
-    .widthIs(200)
-    .heightIs(profileSize/2);
-    
-    _photoTime.sd_layout
-    .leftEqualToView(_userName)
-    .bottomEqualToView(_profileImage)
-    .widthIs(200)
-    .heightIs(15);
-    
-    _userButton.sd_layout
-    .leftEqualToView(_profileImage)
-    .rightEqualToView(_userName)
-    .topEqualToView(_profileImage)
-    .heightIs(profileSize);
-    
-    _privacySign.sd_layout
-    .rightSpaceToView(contentView,20)
-    .centerYEqualToView(_profileImage)
-    .widthIs(10)
-    .heightIs(15);
-    
-    _photoTitle.sd_layout
-    .leftSpaceToView(contentView,15)
-    .topSpaceToView(_profileImage,10)
-    .heightIs(20);
-    
-    _contestDes.sd_layout
-    .leftSpaceToView(_photoTitle,10)
-    .rightSpaceToView(contentView,10)
-    .bottomEqualToView(_photoTitle)
-    .heightIs(20);
-    
-    _photo.sd_layout
-    .leftSpaceToView(contentView,5)
-    .rightSpaceToView(contentView,5)
-    .topSpaceToView(_photoTitle,10)
-    .heightEqualToWidth();
-    
-    _photoLike.sd_layout
-    .leftSpaceToView(contentView,10)
-    .topSpaceToView(_photo,5)
-    .heightIs(profileSize)
-    .widthIs(profileSize);
-    
-    _photoInput.sd_layout
-    .leftSpaceToView(_photoLike,10)
-    .topEqualToView(_photoLike)
-    .heightIs(profileSize)
-    .widthIs(profileSize);
-    
-    _photoMore.sd_layout
-    .rightSpaceToView(contentView,10)
-    .topEqualToView(_photoLike)
-    .heightIs(profileSize)
-    .widthIs(profileSize);
-    
-    _likeBorder.sd_layout
-    .leftSpaceToView(contentView,15)
-    .rightSpaceToView(contentView,10)
-    .topSpaceToView(_photoLike,0)
-    .heightIs(0.5);
-    
-    _likeView.sd_layout
-    .leftSpaceToView(contentView,20)
-    .rightSpaceToView(contentView,10)
-    .topSpaceToView(_likeBorder,0)
-    .heightIs(0);
-    
-    _commentBorder.sd_layout
-    .leftSpaceToView(contentView,15)
-    .rightSpaceToView(contentView,10)
-    .topSpaceToView(_likeView,0)
-    .heightIs(0.5);
-    
-    _photoDes.sd_layout
-    .leftSpaceToView(contentView,20)
-    .rightSpaceToView(contentView,20)
-    .topSpaceToView(_commentBorder,10)
-    .autoHeightRatio(0);
-    
-    _commentTable.sd_layout
-    .leftSpaceToView(contentView,10)
-    .rightSpaceToView(contentView,10)
-    .topSpaceToView(_photoDes,5)
-    .heightIs(5);
 
-//    [self setupAutoHeightWithBottomViewsArray:@[_photoLike,_likeView,_photoTitle,_photoDes,_commentTable] bottomMargin:15];
-    [self setupAutoHeightWithBottomView:_commentTable bottomMargin:25];
-
+//    [self setupAutoHeightWithBottomViewsArray:@[_photoLike,_likeView,_photoTitle,_photoDes,_commentTable] bottomMargin:25];
+//    [self setupAutoHeightWithBottomView:_commentTable bottomMargin:25];
 }
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
@@ -313,7 +232,7 @@
     CommentViewController *commentPage = [[CommentViewController alloc] init];
     commentPage.photoID = _timeline.timelineID;
     commentPage.timeline = _timeline;
-    commentPage.title = @"照片评论";
+    commentPage.title = Babel(@"照片评论");
     commentPage.hidesBottomBarWhenPushed = YES;
     [self callOtherVC:commentPage];
 }
@@ -327,11 +246,157 @@
     
 }
 - (void)setTimeline:(CCTimeLine *)timeline{
+    
     _timeline = timeline;
+    UIView *contentView = self.contentView;
+    
+    if (_timeline == nil) {
+        
+        _profileImage.sd_layout
+        .leftSpaceToView(contentView,20)
+        .topSpaceToView(contentView,20)
+        .heightIs(30)
+        .widthIs(30);
+        
+        _userName.sd_layout
+        .leftSpaceToView(_profileImage,10)
+        .topEqualToView(_profileImage)
+        .widthIs(200)
+        .heightIs(30);
+        
+        [_userName setText:@"照片不存在，已被作者删除"];
+        
+        [self setupAutoHeightWithBottomView:_profileImage bottomMargin:20];
+        
+        return;
+    }
+    
+    _profileImage.sd_layout
+    .leftSpaceToView(contentView,15)
+    .topSpaceToView(contentView,15)
+    .heightIs(profileSize)
+    .widthIs(profileSize);
+    
+    _userName.sd_layout
+    .leftSpaceToView(_profileImage,10)
+    .topEqualToView(_profileImage)
+    .widthIs(200)
+    .heightIs(profileSize/2);
+    
+    _photoTime.sd_layout
+    .leftEqualToView(_userName)
+    .bottomEqualToView(_profileImage)
+    .widthIs(200)
+    .heightIs(15);
+    
+    _userButton.sd_layout
+    .leftEqualToView(_profileImage)
+    .rightEqualToView(_userName)
+    .topEqualToView(_profileImage)
+    .heightIs(profileSize);
+    
+    _privacySign.sd_layout
+    .rightSpaceToView(contentView,20)
+    .centerYEqualToView(_profileImage)
+    .widthIs(10)
+    .heightIs(15);
+    
+    _photoTitle.sd_layout
+    .leftSpaceToView(contentView,15)
+    .topSpaceToView(_profileImage,5);
+    
+    _contestDes.sd_layout
+    .leftSpaceToView(_photoTitle,10)
+    .rightSpaceToView(contentView,10)
+    .bottomEqualToView(_photoTitle);
+    
+    _photo.sd_layout
+    .leftSpaceToView(contentView,5)
+    .rightSpaceToView(contentView,5)
+    .topSpaceToView(_photoTitle,5)
+    .heightEqualToWidth();
+    
+    _photoLomo.sd_layout
+    .leftEqualToView(_photo)
+    .rightEqualToView(_photo)
+    .bottomEqualToView(_photo)
+    .heightIs(90);
+    
+    _photoSpotlight.sd_layout
+    .rightEqualToView(_photo)
+    .bottomEqualToView(_photo)
+    .widthIs(122).heightIs(72);
+    
+    _photoLike.sd_layout
+    .leftSpaceToView(contentView,15)
+    .topSpaceToView(_photo,5)
+    .heightIs(44)
+    .widthIs(44);
+    
+    _photoInput.sd_layout
+    .leftSpaceToView(_photoLike,10)
+    .topEqualToView(_photoLike)
+    .heightIs(44)
+    .widthIs(44);
+    
+    _photoMore.sd_layout
+    .rightSpaceToView(contentView,15)
+    .topEqualToView(_photoLike)
+    .heightIs(44)
+    .widthIs(44);
+    
+    _likeBorder.sd_layout
+    .leftSpaceToView(contentView,15)
+    .rightSpaceToView(contentView,15)
+    .topSpaceToView(_photoLike,0)
+    .heightIs(0.5);
+    
+    _likeView.sd_layout
+    .leftSpaceToView(contentView,30)
+    .rightSpaceToView(contentView,15)
+    .topSpaceToView(_likeBorder,0);
+    
+    _commentBorder.sd_layout
+    .leftSpaceToView(contentView,15)
+    .rightSpaceToView(contentView,15)
+    .topSpaceToView(_likeView,0)
+    .heightIs(0.5);
+    
+    _photoDes.sd_layout
+    .leftSpaceToView(contentView,25)
+    .rightSpaceToView(contentView,25)
+    .topSpaceToView(_commentBorder,10)
+    .autoHeightRatio(0);
+    
+    _commentTable.sd_layout
+    .leftSpaceToView(contentView,15)
+    .rightSpaceToView(contentView,15)
+    .topSpaceToView(_photoDes,5);
+    
+    [_profileImage sd_setImageWithURL:[NSURL URLWithString:_timeline.timelineUserImage] placeholderImage:nil];
+    
+    [_userName setText:_timeline.timelineUserName];
+    
+    [_photo sd_setImageWithURL:[NSURL URLWithString:_timeline.image_fullsize] placeholderImage:nil];
+    
+    NSDate* timeDate = [NSDate dateWithTimeIntervalSince1970:[_timeline.dateline integerValue]];
+    [_photoTime setText:[self compareCurrentTime:timeDate]];
     
     [_userButton addTarget:self action:@selector(callUserPage:) forControlEvents:UIControlEventTouchUpInside];
     
+    if (![_timeline.timelineContestID isEqualToString:@"-1"]) {
+        [_privacySign setHidden:YES];
+    }
+    
+    if ([_timeline.checked isEqualToString:@"3"]) {
+        _photoLomo.hidden = NO;
+        _photoSpotlight.hidden = NO;
+    }
+    
     if (![_timeline.cNameCN isEqualToString:@""]&&![_timeline.cNameCN isEqualToString:@"<null>"]) {
+        
+        _contestDes.hidden = YES;
+
         [_photoTitle setTitle:[NSString stringWithFormat:@"%@",_timeline.cNameCN] forState:UIControlStateNormal];
         [_photoTitle sizeToFit];
         [_photoTitle setTag:[_timeline.timelineContestID intValue]];
@@ -339,42 +404,14 @@
         _photoTitle.sd_layout.widthIs(_photoTitle.bounds.size.width+24);
         _photoTitle.sd_layout.heightIs(_photoTitle.bounds.size.height+4);
         
-//        NSString *endTime = [_timeline.dateEnd stringByReplacingOccurrencesOfString:@"-" withString:@"."];
-//        
-//        if ([_timeline.countDown isEqualToString:@"-1"]) {
-//            [_contestDes setText:[NSString stringWithFormat:@"* 比赛已结束，结果于%@日公布",endTime]];
-//        }else if([_timeline.countDown intValue]>0){
-//            [_contestDes setText:[NSString stringWithFormat:@"* 比赛还有%@天结束，结果于%@日公布",_timeline.countDown,endTime]];
-//        }else if([_timeline.countDown intValue]==0){
-//            [_contestDes setText:[NSString stringWithFormat:@"* 比赛即将结束，结果于%@日公布",endTime]];
-//        }else{
-//            [_contestDes setText:@""];
-//        }
-//        
-//        [_contestDes sizeToFit];
-//        _contestDes.sd_layout.bottomEqualToView(_photoTitle);
-        
     }else{
-        _photoTitle.sd_layout.heightIs(0);
-        _photoTitle.hidden = YES;
         
-        _contestDes.sd_layout.heightIs(0);
+        _photoTitle.hidden = YES;
         _contestDes.hidden = YES;
         
-        _photo.sd_layout
-        .topSpaceToView(_profileImage,10);
+        _photoTitle.sd_layout.heightIs(0).topSpaceToView(_profileImage,0);
+        _photo.sd_layout.topSpaceToView(_photoTitle,5);
     }
-    
-    if (![_timeline.timelineContestID isEqualToString:@"-1"]) {
-        [_privacySign setHidden:YES];
-    }
-    
-    [_profileImage sd_setImageWithURL:[NSURL URLWithString:_timeline.timelineUserImage] placeholderImage:nil];
-    [_userName setText:_timeline.timelineUserName];
-    [_photo sd_setImageWithURL:[NSURL URLWithString:_timeline.image_fullsize] placeholderImage:nil];
-    NSDate* timeDate = [NSDate dateWithTimeIntervalSince1970:[_timeline.dateline integerValue]];
-    [_photoTime setText:[self compareCurrentTime:timeDate]];
-    
 
     if ([_timeline.liked isEqualToString:@"1"]) {
         [_photoLike setTintColor:CCamRedColor];
@@ -382,55 +419,49 @@
         [_photoLike setTintColor:[UIColor lightGrayColor]];
     }
     
-    if(!_likes){
-        _likes = [NSMutableArray new];
-    }
-    [_likes removeAllObjects];
-    for (CCLike * like in _timeline.likes) {
-        [_likes addObject:like];
-    }
-    [self reloadLikes];
     
-    if ([_likes count] == 0||[_timeline.likeCount intValue]==0) {
-        _likeBorder.sd_layout
-        .heightIs(0);
-        _likeView.sd_layout
-        .heightIs(0);
-        _likeBorder.hidden = YES;
-        _likeView.hidden = YES;
-    }else{
+    if (_timeline.likes && [_timeline.likes count]&& [_timeline.likes count]>0 && [_timeline.likeCount intValue] !=0) {
+        [_likes removeAllObjects];
+        for (CCLike * like in _timeline.likes) {
+            [_likes addObject:like];
+        }
         _likeBorder.sd_layout
         .heightIs(0.5);
         _likeView.sd_layout
-        .heightIs(60);
+        .heightIs(likeviewSize);
+    }else{
+        _likeBorder.hidden = YES;
+        _likeView.hidden = YES;
+        
+        _likeBorder.sd_layout.heightIs(0);
+        _likeView.sd_layout.heightIs(0);
+        _commentBorder.sd_layout.topSpaceToView(_likeView,0);
     }
     
     if (![_timeline.timelineDes isEqualToString:@""]) {
         
         NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@   %@",_timeline.timelineUserName,_timeline.timelineDes]];
         [str addAttribute:NSForegroundColorAttributeName value:CCamRedColor range:NSMakeRange(0,_timeline.timelineUserName.length)];
-        [str addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12.0] range:NSMakeRange(0,_timeline.timelineUserName.length)];
+        [str addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:13.0] range:NSMakeRange(0,_timeline.timelineUserName.length)];
         [_photoDes setAttributedText:str];
         [_photoDes setAttributedText:str];
-        _photoDes.sd_layout.maxHeightIs(MAXFLOAT).minHeightIs(15);
+        _photoDes.sd_layout.maxHeightIs(MAXFLOAT);//.minHeightIs(15);
     }else{
-        _photoDes.sd_layout.topSpaceToView(_commentBorder,0).maxHeightIs(0).minHeightIs(0);
         _photoDes.hidden = YES;
+        _photoDes.sd_layout.topSpaceToView(_commentBorder,0).maxHeightIs(0).minHeightIs(0);
+        _commentTable.sd_layout.topSpaceToView(_photoDes,10);
     }
     
     if (_timeline.comments && [_timeline.comments count]&& [_timeline.comments count]>0 && [_timeline.commentCount intValue] !=0) {
-//        _commentTable.sd_layout
-//        .topSpaceToView(_photoDes,0)
-//        .heightIs(0);
-    }else{
-        [_commentTable setHidden:YES];
-    }
-    
-    [self reloadComments];
-    
-    if ([_comments count]==0) {
-        _commentTable.sd_layout.heightIs(0).topSpaceToView(_photoDes,0);
-    }else{
+        
+        [_comments removeAllObjects];
+        for (CCComment * comment in _timeline.comments) {
+            [_comments insertObject:comment atIndex:0];
+        }
+        [_commentTable setDataSource:self];
+        [_commentTable setDelegate:self];
+        [_commentTable reloadData];
+        
         if ([_timeline.commentCount intValue]>5) {
             
             CGFloat tableHeight = 0.0;
@@ -438,7 +469,6 @@
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:1];
                 id comment = [_comments objectAtIndex:indexPath.row];
                 CGFloat cellHeight = [_commentTable cellHeightForIndexPath:indexPath model:comment keyPath:@"comment" cellClass:[TimelineCommentCell class] contentViewWidth:CCamViewWidth];
-//                NSLog(@"%f",cellHeight);
                 tableHeight += cellHeight;
             }
             tableHeight+=30.0;
@@ -450,25 +480,100 @@
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:0];
                 id comment = [_comments objectAtIndex:indexPath.row];
                 CGFloat cellHeight = [_commentTable cellHeightForIndexPath:indexPath model:comment keyPath:@"comment" cellClass:[TimelineCommentCell class] contentViewWidth:CCamViewWidth];
-//                NSLog(@"%f",cellHeight);
                 tableHeight += cellHeight;
             }
             _commentTable.sd_layout.heightIs(tableHeight);
         }
-
+        
+    }else{
+        [_commentTable setHidden:YES];
+        _commentTable.sd_layout.heightIs(0).topSpaceToView(_photoDes,0);
     }
     
-    if (_photoTitle.hidden && _photoDes.hidden && _commentTable.hidden) {
+    if ( _photoDes.hidden && _commentTable.hidden) {
         _commentBorder.hidden = YES;
         _commentBorder.sd_layout.topSpaceToView(_likeView,0);
         
+        
     }
+    
+//    if (_photoTitle.hidden&&_photoDes.hidden&&_likeView.hidden&&_commentTable.hidden) {
+//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+//    }
+////    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:40];
+////    }
+//    else if (_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+//    }else if (!_photoTitle.hidden&&_photoDes.hidden&&_likeView.hidden&&_commentTable.hidden) {
+//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+//    }
+////    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:20];
+////    }
+////    else if (_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+////    }
+////    else if (_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+////    }
+//    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+//    }else if (!_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+//    }else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+//    }
+//    else{
+//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+//    }
+
+    
+    UIView *bottomView;
+    bottomView = _commentTable;
+
+    if (_commentTable.hidden) {
+        _commentTable.fixedHeight = @0;
+        if (_photoDes.hidden) {
+            _photoDes.fixedHeight = @0;
+            if (_likeView.hidden) {
+                _likeView.fixedHeight = @0;
+                if (_photoTitle.hidden) {
+                    _photoTitle.fixedHeight = @0;
+                }else{
+//                    _photoTitle.fixedHeight = nil;
+                }
+            }else{
+//                _likeView.fixedHeight = nil;
+            }
+        }else{
+//            _photoDes.fixedHeight = nil;
+        }
+    }else{
+//        _commentTable.fixedHeight = nil;
+    }
+    
+    [self setupAutoHeightWithBottomView:bottomView bottomMargin:15];
+
     
     _cellBG.sd_layout
     .topSpaceToView(self.contentView,5)
     .leftSpaceToView(self.contentView,5)
     .rightSpaceToView(self.contentView,5)
     .bottomSpaceToView(self.contentView,5);
+    
+    [self reloadLikes];
+    
+//    NSLog(@"%@---%@--%@--%@--%@",_timeline.timelineID,[self retureBool: _photoTitle.hidden ],[self retureBool: _photoDes.hidden ],[self retureBool: _likeView.hidden ],[self retureBool: _commentTable.hidden ]);
+
+    
+}
+- (NSString *)retureBool:(BOOL)state{
+    if (state) {
+        return @"YES";
+    }else{
+        return @"NO";
+    }
 }
 -(NSString *) compareCurrentTime:(NSDate*) compareDate{
     NSTimeInterval  timeInterval = [compareDate timeIntervalSinceNow];
@@ -476,13 +581,13 @@
     long temp = 0;
     NSString *result;
     if (timeInterval < 60) {
-        result = [NSString stringWithFormat:@"刚刚"];
+        result = [NSString stringWithFormat:Babel(@"刚刚")];
     }else if((temp = timeInterval/60) <60){
-        result = [NSString stringWithFormat:@"%ld分钟前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"分钟前")];
     }else if((temp = temp/60) <24){
-        result = [NSString stringWithFormat:@"%ld小时前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"小时前")];
     }else if((temp = temp/24) <7){
-        result = [NSString stringWithFormat:@"%ld天前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"天前")];
     }
 //    else if((temp = temp/30) <12){
 //        result = [NSString stringWithFormat:@"%ld月前",temp];
@@ -512,7 +617,6 @@
 
 - (void)reloadComments{
     if(!_comments){
-        _comments = [[NSMutableArray alloc] initWithCapacity:0];
     }
     [_comments removeAllObjects];
     for (CCComment * comment in _timeline.comments) {
@@ -526,29 +630,29 @@
 - (void)reloadLikes{
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_likesButton setTitle:[NSString stringWithFormat:@" %@ 个人赞过",_timeline.likeCount] forState:UIControlStateNormal];
+        [_likesButton setTitle:[NSString stringWithFormat:@" %@",_timeline.likeCount] forState:UIControlStateNormal];
         [_likesButton sizeToFit];
-        [_likesButton setFrame:CGRectMake(0, 0, _likesButton.frame.size.width+2, 60)];
+        [_likesButton setFrame:CGRectMake(0, 0, _likesButton.frame.size.width+2, likeviewSize)];
         
         
         for (int likeIndex = 0; likeIndex<_likes.count; likeIndex++) {
             
+            CGFloat size = likeviewSize-18;
+            
             UIImageView *likeImage = [UIImageView new];
             [likeImage setBackgroundColor:CCamViewBackgroundColor];
-            [likeImage setFrame:CGRectMake(0, 0, 36, 36)];
+            [likeImage setFrame:CGRectMake(0, 0, size, size)];
             [likeImage.layer setMasksToBounds:YES];
-            [likeImage.layer setCornerRadius:18.0];
+            [likeImage.layer setCornerRadius:size/2];
             [_likeView addSubview:likeImage];
-            [likeImage setCenter:CGPointMake(_likesButton.center.x+_likesButton.frame.size.width/2+(likeIndex+1)*10+(likeIndex*2+1)*18, _likesButton.center.y)];
+            [likeImage setCenter:CGPointMake(_likesButton.center.x+_likesButton.frame.size.width/2+(likeIndex+1)*10+(likeIndex*2+1)*size/2, _likesButton.center.y)];
             
             UIButton *likeBtn = [UIButton new];
             [likeBtn setBackgroundColor:[UIColor clearColor]];
             
-            [likeBtn setFrame:CGRectMake(0, 0, 36, 36)];
-//            [likeBtn.layer setMasksToBounds:YES];
-//            [likeBtn.layer setCornerRadius:18.0];
+            [likeBtn setFrame:CGRectMake(0, 0, size, size)];
             [_likeView addSubview:likeBtn];
-            [likeBtn setCenter:CGPointMake(_likesButton.center.x+_likesButton.frame.size.width/2+(likeIndex+1)*10+(likeIndex*2+1)*18, _likesButton.center.y)];
+            [likeBtn setCenter:CGPointMake(_likesButton.center.x+_likesButton.frame.size.width/2+(likeIndex+1)*10+(likeIndex*2+1)*size/2, _likesButton.center.y)];
             CCLike *like = (CCLike*)[_likes objectAtIndex:likeIndex];
             
             [likeImage sd_setImageWithURL:[NSURL URLWithString:like.userImage]];
@@ -585,10 +689,18 @@
     if ([_timeline.commentCount intValue]>5 && indexPath.section == 0 &&indexPath.row ==0) {
         static NSString *identifier = @"ShowAllCommentCell";
         UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-        [cell.textLabel setFont:[UIFont boldSystemFontOfSize:12.0]];
+        [cell.textLabel setTextAlignment:NSTextAlignmentLeft];
+        [cell.textLabel setFont:[UIFont boldSystemFontOfSize:13.0]];
         [cell.textLabel setTextColor:[UIColor lightGrayColor]];
-        [cell.textLabel setText:[NSString stringWithFormat:@"所有%@条评论",_timeline.commentCount]];
+        [cell.textLabel setText:[NSString stringWithFormat:@"%@%@%@",Babel(@"全部"),_timeline.commentCount,Babel(@"条评论")]];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
+
+        cell.textLabel.sd_layout
+        .leftSpaceToView(cell.contentView,10)
+        .rightSpaceToView(cell.contentView,10)
+        .centerYEqualToView(cell.contentView)
+        .heightIs(30);
+        
         return cell;
     }
     
@@ -643,9 +755,9 @@
     }
     
     if ([[[AuthorizeHelper sharedManager] getUserID]isEqualToString:_timeline.timelineUserID]) {
-        [[ShareHelper sharedManager] callShareViewIsMyself:YES delegate:self timeline:_timeline indexPath:_indexPath];
+        [[ShareHelper sharedManager] callShareViewIsMyself:YES delegate:self timeline:_timeline indexPath:_indexPath onlyShare:NO shareImage:NO];
     }else{
-        [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline indexPath:_indexPath];
+        [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline indexPath:_indexPath onlyShare:NO shareImage:NO];
     }
     
     return;
@@ -657,19 +769,19 @@
     NSLog(@"%@:%@",type,title);
     if ([type isEqualToString:@"Option"]) {
 
-        if ([title isEqualToString:@"删除照片"]){
+        if ([title isEqualToString:Babel(@"删除照片")]){
             [self deletePhoto];
-        }else if ([title isEqualToString:@"下载照片"]){
+        }else if ([title isEqualToString:Babel(@"下载照片")]){
             [self savePhoto];
         }
     }else if ([type isEqualToString:@"Share"]){
         
-        if ([title isEqualToString:@"复制链接"]){
+        if ([title isEqualToString:Babel(@"复制链接")]){
             UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
             pasteboard.string = _timeline.shareURL;
             MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_parent.navigationController.view animated:YES];
             hud.mode = MBProgressHUDModeText;
-            hud.labelText = @"已复制链接到粘贴版";
+            hud.labelText = Babel(@"已复制链接到粘贴板");
             [hud hide:YES afterDelay:1.0];
             return;
         }
@@ -681,10 +793,10 @@
             _timeline.shareURL = @"http://www.c-cam.cc";
         }
         if ([_timeline.shareTitle isEqualToString:@""]) {
-            _timeline.shareTitle = @"角色相机";
+            _timeline.shareTitle = Babel(@"角色相机");
         }
         if ([_timeline.shareSubTitle isEqualToString:@""]) {
-            _timeline.shareSubTitle = [NSString stringWithFormat:@"请为%@的照片点赞",_timeline.timelineUserName];
+//            _timeline.shareSubTitle = [NSString stringWithFormat:@"请为%@的照片点赞",_timeline.timelineUserName];
         }
         
         if (isShare) {
@@ -704,11 +816,11 @@
         
         SSDKPlatformType shareType;
         
-        if ([title isEqualToString:@"微信"]){
+        if ([title isEqualToString:Babel(@"微信")]){
            shareType = SSDKPlatformSubTypeWechatSession;
-        }else if ([title isEqualToString:@"朋友圈"]){
+        }else if ([title isEqualToString:Babel(@"朋友圈")]){
             shareType = SSDKPlatformSubTypeWechatTimeline;
-        }else if ([title isEqualToString:@"新浪微博"]){
+        }else if ([title isEqualToString:Babel(@"新浪微博")]){
             shareType = SSDKPlatformTypeSinaWeibo;
             [ShareSDK showShareEditor:shareType otherPlatformTypes:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
                 if (!error) {
@@ -733,11 +845,11 @@
                 }
             }];
             return;
-        }else if ([title isEqualToString:@"QQ"]){
+        }else if ([title isEqualToString:Babel(@"QQ")]){
             shareType = SSDKPlatformSubTypeQQFriend;
-        }else if ([title isEqualToString:@"QQ空间"]){
+        }else if ([title isEqualToString:Babel(@"QQ空间")]){
             shareType = SSDKPlatformSubTypeQZone;
-        }else if ([title isEqualToString:@"Facebook"]){
+        }else if ([title isEqualToString:Babel(@"Facebook")]){
            shareType = SSDKPlatformTypeFacebook;
         }
         [ShareSDK share:shareType parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
@@ -765,18 +877,44 @@
     }
 }
 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (alertView == _deleteAlert) {
+        if (buttonIndex == 1) {
+            AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+            manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+            NSString *photoID = _timeline.timelineID;
+            NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
+            NSDictionary *parameters = @{@"workid" :photoID,@"token":token};
+            [manager POST:CCamDeletePhotoURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+                NSString *result = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+                NSLog(@"---->%@",result);
+                if ([result isEqualToString:@"1"]) {
+                    
+                    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
+                    hud.mode = MBProgressHUDModeText;
+                    hud.labelText = Babel(@"照片删除成功");
+                    [hud hide:YES afterDelay:1.0];
+                    
+                    if (self.deleteBlock) {
+                        self.deleteBlock(self.indexPath);
+                    }
+                }
+                
+            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.labelText = Babel(@"网络故障");
+                [hud hide:YES afterDelay:1.0];
+            }];
+        }
+    }
+}
 - (void)deletePhoto{
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSString *photoID = _timeline.timelineID;
-    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
-    NSDictionary *parameters = @{@"workid" :photoID,@"token":token};
-    [manager POST:CCamDeletePhotoURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        NSString *result = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-        NSLog(@"---->%@",result);
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        
-    }];
+    
+    _deleteAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"照片删除之后将无法恢复，请您三思，如果您不希望其他人看到这张照片，可以将照片设为仅自己可以见" delegate:self cancelButtonTitle:@"我再想想" otherButtonTitles:@"删除照片", nil];
+    [_deleteAlert show];
+    
+    
 }
 - (void)reportPhoto{
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -809,7 +947,7 @@
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_parent.navigationController.view animated:YES];
     hud.mode = MBProgressHUDModeAnnularDeterminate;
-    hud.labelText = @"下载图片中...";
+    hud.labelText =Babel(@"下载照片中");
     
     SDWebImageDownloader *downloader = [SDWebImageDownloader sharedDownloader];
     [downloader downloadImageWithURL:[NSURL URLWithString:_timeline.image_fullsize]
@@ -820,13 +958,13 @@
                            completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
                                if (error) {
                                    hud.mode = MBProgressHUDModeText;
-                                   hud.labelText = @"照片下载失败";
+                                   hud.labelText = Babel(@"照片下载失败");
                                    [hud hide:YES afterDelay:1.0];
                                }
                                
                                if (image && finished) {
                                    hud.mode = MBProgressHUDModeIndeterminate;
-                                   hud.labelText = @"保存图片中...";
+                                   hud.labelText = Babel(@"保存照片至系统相册");
                                    UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
                                }
                            }];
@@ -835,10 +973,10 @@
     MBProgressHUD *hud = [MBProgressHUD HUDForView:_parent.navigationController.view];
     hud.mode = MBProgressHUDModeText;
     if (error) {
-        hud.labelText = @"照片保存失败";
+        hud.labelText = Babel(@"保存照片失败");
         [hud hide:YES afterDelay:1.0];
     }else{
-        hud.labelText = @"照片已保存";
+        hud.labelText = Babel(@"保存照片成功");
         [hud hide:YES afterDelay:1.0];
     }
 }

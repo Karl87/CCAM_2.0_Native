@@ -25,6 +25,9 @@
 @end
 
 @implementation CCSerieViewController
+- (void)returnTopPosition{
+    [_serieTable scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -35,7 +38,7 @@
     _popularSeries = [[NSMutableArray alloc] initWithCapacity:0];
     _lastestSeries = [[NSMutableArray alloc] initWithCapacity:0];
     
-    NSArray* segArray = @[@"推荐",@"热门",@"最新"];
+    NSArray* segArray = @[Babel(@"推荐"),Babel(@"热门"),Babel(@"最新")];
     _segmegtItems = [[NSMutableArray alloc] initWithCapacity:0];
     
     _segmentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamSegItemWidth*segArray.count, CCamSegItemHeight)];
@@ -103,6 +106,9 @@
 }
 - (void)refreshSerie{
     [[DataHelper sharedManager] updateSeriesInfo];
+}
+- (void)reloadInfo{
+    [_serieTable.mj_header beginRefreshing];
 }
 - (void)reloadSerieData{
     
@@ -187,8 +193,8 @@
     
     [[DataHelper sharedManager] setTargetSerie:serie.serieID];
     
-    NSString *str = [NSString stringWithFormat:@"是否前往制作页面，\n使用%@制作照片？",serie.nameCN];
-    _openCameraAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:str delegate:self cancelButtonTitle:@"暂时不要" otherButtonTitles:@"前往制作", nil];
+    NSString *str = [NSString stringWithFormat:@"%@，\n%@%@%@？",Babel(@"是否前往制作页面"),Babel(@"使用"),serie.nameCN,Babel(@"制作照片")];
+    _openCameraAlert = [[UIAlertView alloc] initWithTitle:Babel(@"提示") message:str delegate:self cancelButtonTitle:Babel(@"暂时不要") otherButtonTitles:Babel(@"前往制作"), nil];
     [_openCameraAlert show];
     
     

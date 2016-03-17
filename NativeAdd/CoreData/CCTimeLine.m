@@ -19,6 +19,7 @@ extern const CGFloat maxContentLabelHeight;
 @synthesize shouldShowMoreButton = _shouldShowMoreButton;
 
 - (void)initTimelineWith:(NSDictionary *)dic{
+    self.checked = GetValidString([dic objectForKey:@"checked"]);
     self.shareURL = GetValidString([dic objectForKey:@"shareurl"]);
     self.shareTitle = GetValidString([dic objectForKey:@"sharetitle"]);
     self.shareSubTitle = GetValidString([dic objectForKey:@"sharesubtitle"]);

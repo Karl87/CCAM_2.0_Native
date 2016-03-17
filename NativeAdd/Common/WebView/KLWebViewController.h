@@ -7,8 +7,9 @@
 //
 
 #import "KLViewController.h"
-
+#import "CCEvent.h"
 @interface KLWebViewController : KLViewController
 
 @property (nonatomic,copy) NSString * webURL;
+@property (nonatomic,strong) CCEvent *event;
 @end

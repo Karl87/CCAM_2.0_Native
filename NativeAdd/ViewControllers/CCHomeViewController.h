@@ -12,4 +12,6 @@
 @property (nonatomic,strong) NSMutableArray *reloadIndexs;
 
 - (void)reloadMessageHeader;
+- (void)returnTopPosition;
+- (void)reloadInfo;
 @end

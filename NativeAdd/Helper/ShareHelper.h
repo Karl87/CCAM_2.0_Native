@@ -14,6 +14,6 @@
 + (ShareHelper*)sharedManager;
 - (void)initShareSDK;
 
-- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine*)timeline indexPath:(NSIndexPath*)indexPath;
+- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine*)timeline indexPath:(NSIndexPath*)indexPath onlyShare:(BOOL)onlyShare shareImage:(BOOL)shareImage;
 - (void)dismissShareView;
 @end

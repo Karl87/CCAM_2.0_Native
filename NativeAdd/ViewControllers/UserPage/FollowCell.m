@@ -79,7 +79,7 @@
 }
 - (void)initFuncButton{
     if ( _ifFollow== 0) {
-        [_funcBtn setTitle:@"关注" forState:UIControlStateNormal];
+        [_funcBtn setTitle:Babel(@"关注") forState:UIControlStateNormal];
         [_funcBtn setBackgroundColor:[UIColor whiteColor]];
         [_funcBtn setTitleColor:CCamRedColor forState:UIControlStateNormal];
         [_funcBtn.layer setBorderColor:CCamRedColor.CGColor];
@@ -87,7 +87,7 @@
     }else if (_ifFollow == -1){
         [_funcBtn setHidden:YES];
     }else{
-        [_funcBtn setTitle:@"已关注" forState:UIControlStateNormal];
+        [_funcBtn setTitle:Babel(@"已关注") forState:UIControlStateNormal];
         [_funcBtn setBackgroundColor:CCamYellowColor];
         [_funcBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_funcBtn.layer setBorderColor:CCamYellowColor.CGColor];
@@ -95,11 +95,11 @@
     }
 }
 - (void)followBtnOnClick{
-    if ([_funcBtn.currentTitle isEqualToString:@"关注"]) {
+    if ([_funcBtn.currentTitle isEqualToString:Babel(@"关注")]) {
         [self followUser];
-    }else if ([_funcBtn.currentTitle isEqualToString:@"已关注"]){
-        NSString *alertMsg = [NSString stringWithFormat:@"是否取消对%@的关注？",[_user objectForKey:@"name"]];
-        _deleteFollowAlert = [[UIAlertView alloc] initWithTitle:@"提醒" message:alertMsg delegate:self cancelButtonTitle:@"保持关注" otherButtonTitles:@"取消关注", nil];
+    }else if ([_funcBtn.currentTitle isEqualToString:Babel(@"已关注")]){
+        NSString *alertMsg = [NSString stringWithFormat:@"%@%@%@？",Babel(@"是否取消对"),[_user objectForKey:@"name"],Babel(@"的关注")];
+        _deleteFollowAlert = [[UIAlertView alloc] initWithTitle:@"提醒" message:alertMsg delegate:self cancelButtonTitle:Babel(@"保持关注") otherButtonTitles:Babel(@"取消关注"), nil];
         [_deleteFollowAlert show];
     }
 }
@@ -110,7 +110,7 @@
 }
 - (void)followUser{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_parent.view animated:YES];
-    hud.labelText = @"关注用户...";
+    hud.labelText = Babel(@"关注用户中");
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString *userToken = [[AuthorizeHelper sharedManager] getUserToken];
@@ -124,20 +124,20 @@
             [self initFuncButton];
         }else{
             hud.mode = MBProgressHUDModeText;
-            hud.labelText = @"关注失败！";
+            hud.labelText = Babel(@"关注失败");
             [hud hide:YES afterDelay:1.0];
         }
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"网络异常";
+        hud.labelText = Babel(@"网络故障");
         [hud hide:YES afterDelay:1.0];
     }];
     
 }
 - (void)deleteFollowUser{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_parent.view animated:YES];
-    hud.labelText = @"取消关注用户...";
+    hud.labelText = Babel(@"取消关注中");
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString *userToken = [[AuthorizeHelper sharedManager] getUserToken];
@@ -151,12 +151,12 @@
             [self initFuncButton];
         }else{
             hud.mode = MBProgressHUDModeText;
-            hud.labelText = @"取消关注失败！";
+            hud.labelText = Babel(@"取消关注失败");
             [hud hide:YES afterDelay:1.0];
         }
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"网络异常";
+        hud.labelText = Babel(@"网络故障");
         [hud hide:YES afterDelay:1.0];
     }];
     

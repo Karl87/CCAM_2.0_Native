@@ -93,7 +93,7 @@
          }
      }];
 }
-- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine *)timeline indexPath:(NSIndexPath *)indexPath{
+- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine *)timeline indexPath:(NSIndexPath *)indexPath onlyShare:(BOOL)onlyShare shareImage:(BOOL)shareImage{
     if (!_shareWindow) {
         _shareWindow = [[UIWindow alloc] initWithFrame:[UIApplication sharedApplication].keyWindow.bounds];
         [_shareWindow setUserInteractionEnabled:YES];
@@ -102,6 +102,13 @@
         ShareViewController * ani = [[ShareViewController alloc] init];
         ani.myself = myself;
         ani.delegate = delegate;
+        
+        if (onlyShare) {
+            ani.onlyShare = YES;
+        }else{
+            ani.onlyShare = NO;
+        }
+        ani.isShareImage = shareImage;
         ani.timeline = timeline;
         ani.indexPath = indexPath;
         _shareView = ani;

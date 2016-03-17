@@ -16,6 +16,8 @@
 #import "AFViewShaker.h"
 #import "CCamHelper.h"
 
+#import "KLWebViewController.h"
+#import "KLNavigationController.h"
 
 #import <MBProgressHUD/MBProgressHUD.h>
 
@@ -23,6 +25,8 @@
 
 @property (nonatomic,strong) CCamScrollView *submitBG;
 @property (nonatomic,strong) UIView *navi;
+
+@property (nonatomic,strong) UILabel *navigationTitle;
 
 @property (nonatomic,strong) NSMutableArray *contests;
 @property (nonatomic,strong) UIView *loadBG;
@@ -69,12 +73,24 @@
     [_navi setBackgroundColor:CCamSegmentColor];
     [self.view addSubview:_navi];
     
+    _navigationTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, _navi.frame.size.width, CCamThinNaviHeight)];
+    [_navi addSubview:_navigationTitle];
+    [_navigationTitle setBackgroundColor:CCamSegmentColor];
+    [_navigationTitle setText:Babel(@"发布照片")];
+    [_navigationTitle setTextAlignment:NSTextAlignmentCenter];
+    [_navigationTitle setTextColor:[UIColor whiteColor]];
+    [_navigationTitle setFont:[UIFont boldSystemFontOfSize:17.0]];
+    
     _backButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_backButton setImage:[UIImage imageNamed:@"backButton"] forState:UIControlStateNormal];
+    [_backButton setShowsTouchWhenHighlighted:YES];
+    [_backButton setImage:[[UIImage imageNamed:@"backButton"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_backButton sizeToFit];
-    [_backButton setCenter:CGPointMake(20+_backButton.frame.size.width/2, _navi.frame.size.height/2)];
+    [_backButton setFrame:CGRectMake(0, 0, _backButton.frame.size.width+30, _navi.frame.size.height)];
+    [_backButton setCenter:CGPointMake(_backButton.frame.size.width/2, _navi.frame.size.height/2)];
+    [_backButton setTintColor:[UIColor whiteColor]];
     [_backButton addTarget:self action:@selector(backToController) forControlEvents:UIControlEventTouchUpInside];
     [_navi addSubview:_backButton];
+    
     
     
     _loadBG  = [[UIView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight+5, CCamViewWidth, 44)];
@@ -83,7 +99,7 @@
     
     _loadButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [_loadButton setBackgroundColor:CCamBackgoundGrayColor];
-    [_loadButton setTitle:@"加载活动列表" forState:UIControlStateNormal];
+    [_loadButton setTitle:Babel(@"加载活动列表") forState:UIControlStateNormal];
     [_loadButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
     [_loadButton setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
     [_loadButton addTarget:self action:@selector(requestContests) forControlEvents:UIControlEventTouchUpInside];
@@ -115,7 +131,7 @@
     _placeholderText = [[UITextView alloc] initWithFrame:CGRectMake(10, _submitImage.frame.origin.y+_submitImage.frame.size.height+10, CCamViewWidth-20, 44*3)];
     [_placeholderText setBackgroundColor:CCamBackgoundGrayColor];
     [_placeholderText setEditable:NO];
-    [_placeholderText setText:@"说点什么吧！"];
+    [_placeholderText setText:Babel(@"说点什么吧")];
     [_placeholderText setTextColor:[UIColor lightGrayColor]];
     [_placeholderText setFont:[UIFont systemFontOfSize:14.0]];
     [_submitBG addSubview:_placeholderText];
@@ -135,25 +151,25 @@
     
     _submitButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [_submitButton setFrame:CGRectMake(0, CCamViewHeight-CCamThinSerieHeight, CCamViewWidth, CCamThinSerieHeight)];
-    [_submitButton setTitle:@"发布" forState:UIControlStateNormal];
+    [_submitButton setTitle:Babel(@"发布") forState:UIControlStateNormal];
     [_submitButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_submitButton setBackgroundColor:CCamRedColor];
     [_submitButton setTintColor:CCamRedColor];
     [_submitButton addTarget:self action:@selector(uploadPhoto) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_submitButton];
     
-    _personalButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_personalButton setBackgroundColor:[UIColor clearColor]];
-    [_personalButton.titleLabel setFont:[UIFont systemFontOfSize:14.0]];
-    [_personalButton setContentMode:UIViewContentModeScaleAspectFit];
-    [_personalButton setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
-    [_personalButton setTintColor:CCamGrayTextColor];
-    [_personalButton setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
-    [_personalButton setFrame:_textNumLabel.frame];
-    [_personalButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
-    [_personalButton setImage:[[self transformImage:[UIImage imageNamed:@"eraseDot"] Width:15 height:15] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [_personalButton setTitle:@"仅自己可见" forState:UIControlStateNormal];
-    [_submitBG addSubview:_personalButton];
+//    _personalButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [_personalButton setBackgroundColor:[UIColor clearColor]];
+//    [_personalButton.titleLabel setFont:[UIFont systemFontOfSize:14.0]];
+//    [_personalButton setContentMode:UIViewContentModeScaleAspectFit];
+//    [_personalButton setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
+//    [_personalButton setTintColor:CCamGrayTextColor];
+//    [_personalButton setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
+//    [_personalButton setFrame:_textNumLabel.frame];
+//    [_personalButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+//    [_personalButton setImage:[[self transformImage:[UIImage imageNamed:@"eraseDot"] Width:15 height:15] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+//    [_personalButton setTitle:@"仅自己可见" forState:UIControlStateNormal];
+//    [_submitBG addSubview:_personalButton];
     
     _viewShaker = [[AFViewShaker alloc] initWithView:_submitText];
 
@@ -164,7 +180,11 @@
         UIImage*img = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/screenshot.jpg",CCamDocPath]];
         [_submitImage setImage:img];
     }
-    [self requestContests];
+    if ([_contests count] && [_contests count]>0) {
+        
+    }else{
+        [self requestContests];
+    }
     UnityPause(1);
 }
 - (void)viewDidDisappear:(BOOL)animated{
@@ -177,14 +197,14 @@
 }
 - (void)setConestButtonWithState:(BOOL)state{
     if (state) {
-        [_loadButton setTitle:@"加载活动列表" forState:UIControlStateNormal];
+        [_loadButton setTitle:Babel(@"加载活动列表") forState:UIControlStateNormal];
         [_loadButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
         [_loadButton sizeToFit];
         [_loadButton setCenter:CGPointMake(_loadBG.bounds.size.width/2, _loadBG.bounds.size.height/2)];
         [_loadButton setEnabled:NO];
     }else{
         [_loadContests stopAnimating];
-        [_loadButton setTitle:@"点击重新加载活动列表" forState:UIControlStateNormal];
+        [_loadButton setTitle:Babel(@"点击重新加载活动列表") forState:UIControlStateNormal];
         [_loadButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
         [_loadButton sizeToFit];
         [_loadButton setCenter:CGPointMake(_loadBG.bounds.size.width/2, _loadBG.bounds.size.height/2)];
@@ -267,6 +287,8 @@
             [tempContests addObject:contestDic];
         }
         [self.contests addObjectsFromArray:tempContests];
+//        NSDictionary *privacyItem = @{@"contestid":@"-1",@"name":@"仅自己可见",@"en_name":@"",@"zh_name":@""};
+//        [self.contests addObject:privacyItem];
         [self.contestTable reloadData];
         
         [_contestTable selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionTop];
@@ -284,7 +306,13 @@
         [self getcontestsAnimation];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [self setConestButtonWithState:NO];
+//        [self setConestButtonWithState:NO];
+        [self.contests removeAllObjects];
+        NSDictionary *notPrivacyItem = @{@"contestid":@"0",@"name":@"分享到角色相机",@"en_name":@"Share to Character Camera",@"zh_name":@"分享到角色相機"};
+        NSDictionary *privacyItem = @{@"contestid":@"-1",@"name":@"仅自己可见",@"en_name":@"",@"zh_name":@"僅自己可見"};
+        [self.contests addObject:notPrivacyItem];
+        [self.contests addObject:privacyItem];
+        [self getcontestsAnimation];
     }];
 }
 - (void)uploadPhoto{
@@ -293,10 +321,13 @@
 
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     hud.mode = MBProgressHUDModeAnnularDeterminate;
-    hud.labelText = @"发布图片中...";
+    hud.labelText = Babel(@"发布照片中");
     
     [_submitButton setEnabled:NO];
     NSDictionary *parameters= @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"contestid":_currentContestID,@"description":_submitText.text,@"characterid":[[iOSBindingManager sharedManager] getSubmitCharactersList]};
+    
+    NSLog(@"%@",parameters);
+    
     NSData *imageData = UIImageJPEGRepresentation(_submitImage.image, 0.4);
     
     NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:CCamSubmitPhotoURL parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
@@ -318,7 +349,7 @@
                           NSLog(@"Error: %@", error);
 
                           hud.mode = MBProgressHUDModeText;
-                          hud.labelText = @"发布图片失败!";
+                          hud.labelText =Babel(@"发布照片失败");
                           [hud hide:YES afterDelay:2.0];
                           
                           [_submitButton setEnabled:YES];
@@ -327,7 +358,7 @@
                           NSLog(@"%@ %@", response, responseObject);
 
                           hud.mode = MBProgressHUDModeText;
-                          hud.labelText = @"发布图片成功!";
+                          hud.labelText = Babel(@"发布照片成功");
 //                          [hud hide:YES afterDelay:2.0];
 //                          [_submitButton setEnabled:YES];
                           [self performSelector:@selector(savePhoto) withObject:nil afterDelay:1.0];
@@ -339,17 +370,17 @@
 - (void)savePhoto{
     MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
     hud.mode = MBProgressHUDModeIndeterminate;
-    hud.labelText =@"保存图片中...";
+    hud.labelText =Babel(@"保存照片至系统相册");
      UIImageWriteToSavedPhotosAlbum(_submitImage.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
 }
 - (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo{
     MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
     hud.mode = MBProgressHUDModeText;
     if (error) {
-        hud.labelText = @"图片保存失败";
+        hud.labelText = Babel(@"保存照片失败");
 
     }else{
-        hud.labelText = @"图片已保存";
+        hud.labelText = Babel(@"保存照片成功");
 
     }
     [hud hide:YES afterDelay:1.0];
@@ -374,23 +405,49 @@
     return [_contests count];
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    _currentContestID = [[_contests objectAtIndex:indexPath.row] objectForKey:@"contestid"];
+    _currentContestID = [NSString stringWithFormat:@"%@",[[_contests objectAtIndex:indexPath.row] objectForKey:@"contestid"]];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     CCamSubmitContestCell *cell;
     
     if (cell == nil) {
         cell = [[CCamSubmitContestCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"submitContestCell"];
+        [cell.textLabel setHighlightedTextColor:CCamRedColor];
         [cell.textLabel setFont:[UIFont systemFontOfSize:14.0]];
         [cell.textLabel setTextColor:CCamGrayTextColor];
         cell.textLabel.text = [[_contests objectAtIndex:indexPath.row] objectForKey:@"name"];
-        [cell layoutCell];
+//        [cell layoutCell];
+        
+        if (!cell.cellButton) {
+            cell.cellButton = [UIButton new];
+            [cell.cellButton setBackgroundColor:[UIColor clearColor]];
+            [cell.contentView addSubview:cell.cellButton];
+            [cell.cellButton setFrame:CGRectMake(0, 0, 150, 44)];
+            cell.cellButton.tag = [[[_contests objectAtIndex:indexPath.row] objectForKey:@"contestid"] intValue];
+            [cell.cellButton addTarget:self action:@selector(callRulePage:) forControlEvents:UIControlEventTouchUpInside];
+        }
     }
 
     return cell;
 }
 
+- (void)callRulePage:(id)sender{
+    
+    UIButton *button = (UIButton *)sender;
+    
+    if(button.tag == 0 || button.tag == -1){
+        return;
+    }
+    
+    KLWebViewController *agree = [[KLWebViewController alloc] init];
+    agree.webURL = [NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Contest/rule/contestid/%ld/nobottom/1.html",(long)button.tag];
+    agree.vcTitle = Babel(@"比赛规则");
+    agree.setNavigationBar = YES;
+    KLNavigationController *nv = [[KLNavigationController alloc] initWithRootViewController:agree];
+    [self presentViewController:nv animated:YES completion:nil];
+}
 
+#pragma mark - text delegate
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range
  replacementText:(NSString *)text
 {
@@ -505,7 +562,7 @@
         [_textNumLabel setTextColor:CCamGrayTextColor];
          _textNumLabel.text = [NSString stringWithFormat:@"%ld/%ld",(long)MAX(0,MAX_LIMIT_NUMS - existTextNum),(long)MAX_LIMIT_NUMS];
     }else{
-         _textNumLabel.text = @"字数已满";
+         _textNumLabel.text = Babel(@"字数已满");
         [_textNumLabel setTextColor:CCamRedColor];
         [_viewShaker shake];
     }

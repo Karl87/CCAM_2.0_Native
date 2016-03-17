@@ -158,50 +158,30 @@
             [cell.downloadProgress setHidden:NO];
             [[DownloadHelper sharedManager] downloadSticker:cell.sticker];
         }else{
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请稍候" message:@"模型正在下载，请稍候" delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:Babel(@"请稍候") message:Babel(@"资源文件正在下载") delegate:nil cancelButtonTitle:Babel(@"确定") otherButtonTitles:nil];
             [alert show];
         }
     }else{
         CCSticker *sticker = cell.sticker;
-        NSString *mPath = [[FileHelper sharedManager] getStickerFilePath:sticker];
-        NSString *mHasTextField;
-        if ([sticker.type isEqualToString:@"text"]) {
-            mHasTextField = @"true";
-        }else{
-            mHasTextField = @"false";
-        }
-        NSString *mFontName = sticker.textFont;
-        NSString *mFontSize = @"30";
-        NSString *mX = @"0";
-        NSString *mY = @"0";
-        NSString *mWidth = @"100";
-        NSString *mHeight = @"100";
+        NSString *sticker_url = [[FileHelper sharedManager] getStickerFilePath:sticker];
+        NSString *sticker_type = sticker.type;
+        NSString *sticker_text = sticker.text;
+        NSString *sticker_text_font = sticker.textFont;
+        NSString *sticker_text_color = sticker.textColor;
+        NSString *sticker_text_coordinates = sticker.text_Coordinates;
         
         NSMutableDictionary *stickerJson = [[NSMutableDictionary alloc] init];
-        [stickerJson setObject:mPath forKey:@"mPath"];
-        [stickerJson setObject:mHasTextField forKey:@"mHasTextField"];
-        [stickerJson setObject:mFontName forKey:@"mFontName"];
-        [stickerJson setObject:mFontSize forKey:@"mFontSize"];
-        [stickerJson setObject:mX forKey:@"mX"];
-        [stickerJson setObject:mY forKey:@"mY"];
-        [stickerJson setObject:mWidth forKey:@"mWidth"];
-        [stickerJson setObject:mHeight forKey:@"mHeight"];
-        
+        [stickerJson setObject:sticker_url forKey:@"sticker_url"];
+        [stickerJson setObject:sticker_type forKey:@"sticker_type"];
+        [stickerJson setObject:sticker_text forKey:@"sticker_text"];
+        [stickerJson setObject:sticker_text_font forKey:@"sticker_text_font"];
+        [stickerJson setObject:sticker_text_color forKey:@"sticker_text_color"];
+        [stickerJson setObject:sticker_text_coordinates forKey:@"sticker_text_coordinates"];
         NSData * jsonData = [NSJSONSerialization dataWithJSONObject:stickerJson options:0 error:nil];
         NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"加载贴纸" message:jsonString delegate:nil cancelButtonTitle:@"哦" otherButtonTitles: nil];
-//        [alert show];
+
         UnitySendMessage(UnityController.UTF8String, "OnClickAPaster", jsonString.UTF8String);
 
     }
-    
-//    @{"mPath":"/Projects/CharacterCamera_V3/Assets/10.png",
-//      "mHasTextField":"true",
-//      "mFontName":"song",
-//      "mFontSize":"30",
-//      "mX":"0",
-//      "mY":"0",
-//      "mWidth":"1",
-//      "mHeight":"1"}
 }
 @end

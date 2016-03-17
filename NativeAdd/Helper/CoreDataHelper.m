@@ -53,9 +53,20 @@
     
     _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
     NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"CCam.sqlite"];
+    
+    //检查数据库格式
+    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithBool:YES],
+                             NSMigratePersistentStoresAutomaticallyOption,
+                             [NSNumber numberWithBool:YES],
+                             NSInferMappingModelAutomaticallyOption, nil];
+    
+
+    
+    
     NSError *error = nil;
     NSString *failureReason = @"There was an error creating or loading the application's saved data.";
-    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {
+    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
         // Report any error we got.
         NSMutableDictionary *dict = [NSMutableDictionary dictionary];
         dict[NSLocalizedDescriptionKey] = @"Failed to initialize the application's saved data";
@@ -105,63 +116,6 @@
 #pragma mark - Core Data Opreations
 
 - (void)insertCoreDataWithType:(NSString*)type andArray:(NSArray*)dataArray{
-    NSManagedObjectContext *context = [self managedObjectContext];
-    if ([type isEqualToString:@"CCEvent"]) {
-        for (CCEvent* event in dataArray) {
-            CCEvent* addEvent = (CCEvent*)[NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:context];
-            addEvent.eventCount = event.eventCount;
-            addEvent.eventCountDown = event.eventCountDown;
-            addEvent.eventImageURLCn = event.eventImageURLCn;
-            addEvent.eventImageURLEn = event.eventImageURLEn;
-            addEvent.eventImageURLZh = event.eventImageURLZh;
-            addEvent.eventIsStart = event.eventIsStart;
-            addEvent.eventName = event.eventName;
-            addEvent.eventURL = event.eventURL;
-            
-            NSError *error;
-            if(![context save:&error])
-            {
-                NSLog(@"不能保存：%@",[error localizedDescription]);
-            }
-        }
-    }else if ([type isEqualToString:@"CCSelectionPhoto"]||[type isEqualToString:@"CCHotPhoto"]||[type isEqualToString:@"CCNewPhoto"]){
-        for (CCPhoto* photo in dataArray) {
-            CCPhoto* addPhoto = (CCPhoto*)[NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:context];
-            addPhoto.workid = photo.workid;
-            addPhoto.memberid = photo.memberid;
-            addPhoto.contestid = photo.contestid;
-            addPhoto.serieid = photo.serieid;
-            addPhoto.character_id = photo.character_id;
-            addPhoto.stageid = photo.stageid;
-            addPhoto.groupid = photo.groupid;
-
-            addPhoto.name = photo.name;
-            addPhoto.type = photo.type;
-            addPhoto.contest = photo.contest;
-            addPhoto.middle_img = photo.middle_img;
-            addPhoto.big_img = photo.big_img;
-            addPhoto.share_img = photo.share_img;
-            addPhoto.photoDescription = photo.photoDescription;
-            addPhoto.upnum = photo.upnum;
-            addPhoto.clicknum = photo.clicknum;
-            addPhoto.share_click = photo.share_click;
-            addPhoto.checked = photo.checked;
-            addPhoto.report = photo.report;
-            addPhoto.isfinalist = photo.isfinalist;
-            addPhoto.winner_status = photo.winner_status;
-            addPhoto.dateline = photo.dateline;
-            addPhoto.like = photo.like;
-            addPhoto.upload_type = photo.upload_type;
-            addPhoto.image_url = photo.image_url;
-            addPhoto.liked = photo.liked;
-            
-            NSError *error;
-            if(![context save:&error])
-            {
-                NSLog(@"不能保存：%@",[error localizedDescription]);
-            }
-        }
-    }
     
 }
 - (NSArray*)showStoreInfoWithEntity:(NSString*)entity{
@@ -243,6 +197,34 @@
     {
         for (CCSticker*sticker in datas) {
             return sticker;
+        }
+    }
+    return nil;
+}
+- (CCSerie *)getSerie:(NSString *)serieID{
+    
+    if(!serieID || [serieID isEqualToString:@""]){
+        return nil;
+    }
+    
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSError *error;
+    
+    NSEntityDescription *entityObj = [NSEntityDescription entityForName:@"CCSerie" inManagedObjectContext:context];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"serieID = %@",serieID]];
+    
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setIncludesPropertyValues:NO];
+    [request setEntity:entityObj];
+    [request setPredicate:predicate];
+    
+    NSArray *datas = [context executeFetchRequest:request error:&error];
+    
+    if (!error && datas && [datas count])
+    {
+        for (CCSerie*serie in datas) {
+            return serie;
         }
     }
     return nil;

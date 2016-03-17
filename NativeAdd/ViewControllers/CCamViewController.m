@@ -40,6 +40,7 @@
 @property (nonatomic,assign) BOOL allowSelectTargetSerie;
 
 @property (nonatomic,strong) NSMutableArray *segments;
+@property (nonatomic,strong) NSMutableArray *segmentsShow;
 @property (nonatomic,strong) NSMutableArray *filters;
 
 @property (nonatomic,strong) NSMutableDictionary *currentAnimationInfo;
@@ -78,6 +79,7 @@
 - (id)init{
     if (self = [super init]) {
         [self segments];
+        [self segmentsShow];
         _allowSelectTargetSerie = YES;
     }
     return  self;
@@ -126,7 +128,7 @@
         
         UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, animationControlBar.bounds.size.width, animationControlBar.bounds.size.height)];
         [title setBackgroundColor:[UIColor clearColor]];
-        [title setText:@"动作表情调节"];
+        [title setText:Babel(@"动作表情调节")];
         [title setTextColor:CCamGrayTextColor];
         [title setFont:[UIFont boldSystemFontOfSize:17.0]];
         [title setTextAlignment:NSTextAlignmentCenter];
@@ -378,7 +380,7 @@
         
         UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, lightControlBar.bounds.size.width, lightControlBar.bounds.size.height)];
         [title setBackgroundColor:[UIColor clearColor]];
-        [title setText:@"灯光阴影调节"];
+        [title setText:Babel(@"灯光阴影调节")];
         [title setTextColor:CCamGrayTextColor];
         [title setFont:[UIFont boldSystemFontOfSize:17.0]];
         [title setTextAlignment:NSTextAlignmentCenter];
@@ -401,23 +403,15 @@
     }
     
     if (!_lightSlider) {
-//        _lightSlider = [[EFCircularSlider alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
-//        [_lightSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
-//        [_lightSlider setUnfilledColor:CCamBackgoundGrayColor];
-//        [_lightSlider setFilledColor:CCamRedColor];
-//        [_lightSlider setHandleType:CircularSliderHandleTypeBigCircle];
-//        [_lightSlider setHandleColor:CCamRedColor];
-//        [_lightSlider setMinimumValue:0.0];
-//        [_lightSlider setMaximumValue:1.0];
-//        [_lightSlider setCurrentValue:0.8];
+
         _lightSlider = [[WCCircularSlider alloc] init];
         [_lightSlider setBackgroundColor:[UIColor clearColor]];
         [_lightSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
         [_lightSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
         [_lightSlider setStartAngle:-90];
         [_lightSlider setCutoutAngle:60];
-        [_lightSlider setProgress:0.8];
-        [_lightSlider setLineWidth:3];
+        [_lightSlider setProgress:0.5];
+        [_lightSlider setLineWidth:5];
         [_lightSlider setGuideLineColor:CCamBackgoundGrayColor];
         [_lightSlider setTintColor:CCamRedColor];
         [_lightSlider addTarget:self action:@selector(lightStrengthChanged:) forControlEvents:UIControlEventValueChanged];
@@ -426,7 +420,7 @@
         [lightSliderTitle setUserInteractionEnabled:NO];
         [lightSliderTitle setCenter:CGPointMake(_lightSlider.center.x, _lightSlider.center.y+_lightSlider.bounds.size.height/2-15)];
         [lightSliderTitle setTextAlignment:NSTextAlignmentCenter];
-        [lightSliderTitle setText:@"灯光强度"];
+        [lightSliderTitle setText:Babel(@"灯光强度")];
         [lightSliderTitle setTextColor:CCamGrayTextColor];
         [lightSliderTitle setFont:[UIFont boldSystemFontOfSize:11.0]];
         [lightSliderTitle setBackgroundColor:[UIColor clearColor]];
@@ -434,15 +428,7 @@
     }
     
     if (!_shadowSlider) {
-//        _shadowSlider = [[EFCircularSlider alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/3*0.8,_lightControl.bounds.size.width/3*0.8)];
-//        [_shadowSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
-//        [_shadowSlider setUnfilledColor:CCamBackgoundGrayColor];
-//        [_shadowSlider setFilledColor:CCamRedColor];
-//        [_shadowSlider setHandleType:CircularSliderHandleTypeDoubleCircleWithClosedCenter];
-//        [_shadowSlider setHandleColor:CCamRedColor];
-//        [_shadowSlider setMinimumValue:0.0];
-//        [_shadowSlider setMaximumValue:1.0];
-//        [_shadowSlider setCurrentValue:0.5];
+
         _shadowSlider = [[WCCircularSlider alloc] init];
         [_shadowSlider setBackgroundColor:[UIColor clearColor]];
         [_shadowSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/3*0.8,_lightControl.bounds.size.width/3*0.8)];
@@ -450,7 +436,7 @@
         [_shadowSlider setStartAngle:-90];
         [_shadowSlider setCutoutAngle:90];
         [_shadowSlider setProgress:0.5];
-        [_shadowSlider setLineWidth:3];
+        [_shadowSlider setLineWidth:5];
         [_shadowSlider setGuideLineColor:CCamBackgoundGrayColor];
         [_shadowSlider setTintColor:CCamRedColor];
         [_shadowSlider addTarget:self action:@selector(ShadowStrengthChanged:) forControlEvents:UIControlEventValueChanged];
@@ -459,7 +445,7 @@
         [shadowSliderTitle setUserInteractionEnabled:NO];
         [shadowSliderTitle setCenter:CGPointMake(_shadowSlider.center.x, _shadowSlider.center.y+_shadowSlider.bounds.size.height/2-15)];
         [shadowSliderTitle setTextAlignment:NSTextAlignmentCenter];
-        [shadowSliderTitle setText:@"阴影强度"];
+        [shadowSliderTitle setText:Babel(@"阴影强度")];
         [shadowSliderTitle setTextColor:CCamGrayTextColor];
         [shadowSliderTitle setFont:[UIFont boldSystemFontOfSize:11.0]];
         [shadowSliderTitle setBackgroundColor:[UIColor clearColor]];
@@ -467,15 +453,8 @@
     }
 }
 - (void)lightStrengthChanged:(WCCircularSlider*)slider{
-    NSString *eStrength = [NSString stringWithFormat:@"%f",slider.progress];
-    NSString *mStrength = [NSString stringWithFormat:@"%f",0.5*slider.progress];
-    NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
-    [lightDic setObject:eStrength forKey:@"environment"];
-    [lightDic setObject:mStrength forKey:@"mainLight"];
-    NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
-    NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-//    NSString *strength = [NSString stringWithFormat:@"%f",slider.currentValue];
-    UnitySendMessage(UnityController.UTF8String, "ChangeLightIntensity", jsonString.UTF8String);
+    NSString *strength = [NSString stringWithFormat:@"%f",slider.progress];
+    UnitySendMessage(UnityController.UTF8String, "OnSliderChangeLightIntensity", strength.UTF8String);
 }
 - (void)ShadowStrengthChanged:(WCCircularSlider*)slider{
     NSString *strength = [NSString stringWithFormat:@"%f",slider.progress];
@@ -519,6 +498,10 @@
     _segments = [[NSMutableArray alloc] initWithObjects:@"3D角色",@"贴纸",@"滤镜",@"擦除", nil];
     return _segments;
 }
+- (NSMutableArray *)segmentsShow{
+    _segmentsShow = [[NSMutableArray alloc] initWithObjects:Babel(@"3D角色"),Babel(@"贴纸"),Babel(@"滤镜"),Babel(@"擦除"), nil];
+    return _segmentsShow;
+}
 - (void)backToAlbum{
     [DataHelper sharedManager].ccamVC = nil;
     [self.navigationController popToRootViewControllerAnimated:YES];
@@ -537,10 +520,10 @@
     
     if ([userGroup isEqualToString:versionGroup]) {
         if ([DataHelper sharedManager].series.count == 0) {
-            [[DataHelper sharedManager] getLocalSeriesInfo];
+            [[DataHelper sharedManager] updateSeriesInfo];
         }
         if ([DataHelper sharedManager].stickerSets.count == 0) {
-            [[DataHelper sharedManager] getLocalStickerSetsInfo];
+            [[DataHelper sharedManager] updateStickerSetsInfo];
         }
     }else{
         [[DataHelper sharedManager] updateSeriesInfo];
@@ -575,27 +558,31 @@
     _navigationTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, _navigationView.frame.size.width, CCamThinNaviHeight)];
     [_navigationView addSubview:_navigationTitle];
     [_navigationTitle setBackgroundColor:CCamSegmentColor];
-    [_navigationTitle setText:@"3D角色"];
+    [_navigationTitle setText:Babel(@"3D角色")];
     [_navigationTitle setTextAlignment:NSTextAlignmentCenter];
     [_navigationTitle setTextColor:[UIColor whiteColor]];
     [_navigationTitle setFont:[UIFont boldSystemFontOfSize:17.0]];
     
     
     _backButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_backButton setShowsTouchWhenHighlighted:YES];
     [_backButton setImage:[[UIImage imageNamed:@"backButton"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_backButton sizeToFit];
-    [_backButton setCenter:CGPointMake(15+_backButton.frame.size.width/2, _navigationView.frame.size.height/2)];
+    [_backButton setFrame:CGRectMake(0, 0, _backButton.frame.size.width+30, _navigationView.frame.size.height)];
+    [_backButton setCenter:CGPointMake(_backButton.frame.size.width/2, _navigationView.frame.size.height/2)];
     [_backButton setTintColor:[UIColor whiteColor]];
     [_backButton addTarget:self action:@selector(backToAlbum) forControlEvents:UIControlEventTouchUpInside];
     [_navigationView addSubview:_backButton];
         
     _nextButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_nextButton setTitle:@"下一步" forState:UIControlStateNormal];
+    [_nextButton setShowsTouchWhenHighlighted:YES];
+    [_nextButton setTitle:Babel(@"下一步") forState:UIControlStateNormal];
     [_nextButton setBackgroundColor:[UIColor whiteColor]];
     [_nextButton setTitleColor:CCamRedColor forState:UIControlStateNormal];
     [_nextButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
-    [_nextButton setFrame:CGRectMake(0, 0, 70, 24)];
-    [_nextButton setCenter:CGPointMake(_navigationView.frame.size.width-15-35, _navigationView.frame.size.height/2)];
+    [_nextButton sizeToFit];
+    [_nextButton setFrame:CGRectMake(0, 0, _nextButton.frame.size.width+24, _navigationView.frame.size.height-16)];
+    [_nextButton setCenter:CGPointMake(_navigationView.frame.size.width-15-_nextButton.frame.size.width/2, _navigationView.frame.size.height/2)];
     [_nextButton.layer setCornerRadius:_nextButton.frame.size.height/2];
     [_nextButton addTarget:self action:@selector(goToSubmit) forControlEvents:UIControlEventTouchUpInside];
     [_navigationView addSubview:_nextButton];
@@ -740,7 +727,7 @@
     if (collectionView.tag == CCamSegmentCollectionView) {
         cellIdentifer = @"segmentCell";
         CCamSegmentCell *segCell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifer forIndexPath:indexPath];
-        [segCell.titleLabel setText:[_segments objectAtIndex:indexPath.row]];
+        [segCell.titleLabel setText:[_segmentsShow objectAtIndex:indexPath.row]];
         return segCell;
     }else if (collectionView.tag == CCamSegmentContentCollectionView){
         CCamSegmentContentCell *segContentCell;
@@ -814,7 +801,7 @@
                 [segContentCell.filterSlider setCenter:CGPointMake(segContentCell.bounds.size.width/2, segContentCell.bounds.size.height/4)];
                 [segContentCell.filterSlider addTarget:self action:@selector(getFilterSliderValue:) forControlEvents:UIControlEventValueChanged];
                 [segContentCell.contentView addSubview:segContentCell.filterSlider];
-                [segContentCell.filterSlider setValue:1 animated:YES];
+                [segContentCell.filterSlider setValue:0.5 animated:YES];
                 
             }
             
@@ -829,7 +816,7 @@
                 
                 segContentCell.eraserResetButton = [UIButton buttonWithType:UIButtonTypeCustom];
                 [segContentCell.eraserResetButton setBackgroundColor:CCamRedColor];
-                [segContentCell.eraserResetButton setTitle:@"重置" forState:UIControlStateNormal];
+                [segContentCell.eraserResetButton setTitle:Babel(@"重置") forState:UIControlStateNormal];
                 [segContentCell.eraserResetButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
                 [segContentCell.eraserResetButton setFrame:CGRectMake(15, 15, 50, 30)];
                 [segContentCell.eraserResetButton setCenter:CGPointMake(40, segContentCell.eraseView.frame.size.height/2)];
@@ -862,7 +849,7 @@
                 [segContentCell.eraseView addSubview:segContentCell.eraseZoneSwitch];
                 
                 segContentCell.eraseZoneLabel = [[UILabel alloc] init];
-                [segContentCell.eraseZoneLabel setText:@"擦除区域"];
+                [segContentCell.eraseZoneLabel setText:Babel(@"擦除区域")];
                 [segContentCell.eraseZoneLabel setBackgroundColor:CCamBackgoundGrayColor];
                 [segContentCell.eraseZoneLabel setTextColor:CCamGrayTextColor];
                 [segContentCell.eraseZoneLabel setFont:[UIFont systemFontOfSize:14.0]];
@@ -870,16 +857,16 @@
                 [segContentCell.eraseZoneLabel setCenter:CGPointMake(segContentCell.eraseView.frame.size.width-40-segContentCell.eraseZoneSwitch.frame.size.width-segContentCell.eraseZoneLabel.frame.size.width/2, segContentCell.eraseView.frame.size.height/2)];
                 [segContentCell.eraseView addSubview:segContentCell.eraseZoneLabel];
                 
-                            NSArray *segAry = @[@"擦除",@"恢复"];
+                            NSArray *segAry = @[Babel(@"擦除"),Babel(@"恢复")];
                             UISegmentedControl *seg = [[UISegmentedControl alloc] initWithItems:segAry];
                             [seg setFrame:CGRectMake(0, 0, 200, CCamThinSerieHeight)];
                             [seg setCenter:CGPointMake(segContentCell.bounds.size.width/2 , segContentCell.bounds.size.height/2-44)];
                             [seg setSelectedSegmentIndex:0];
                             [seg setTintColor:CCamRedColor];
                             [seg setImage:[UIImage imageNamed:@"eraseButton"] forSegmentAtIndex:0];
-                            [seg setTitle:@"擦除" forSegmentAtIndex:0];
+                            [seg setTitle:Babel(@"擦除") forSegmentAtIndex:0];
                             [seg setImage:[UIImage imageNamed:@"unEraseButton"] forSegmentAtIndex:1];
-                            [seg setTitle:@"恢复" forSegmentAtIndex:1];
+                            [seg setTitle:Babel(@"恢复") forSegmentAtIndex:1];
                             [segContentCell.contentView addSubview:seg];
                 
                 self.eraseType = 1;
@@ -950,29 +937,31 @@
         
         if (serieContentCell.countObj.number == 0) {
             [serieContentCell.surfaceView setHidden:NO];
-            [serieContentCell.surfaceView.surfaceBG sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Inner]] placeholderImage:nil];
+//            [serieContentCell.surfaceView.surfaceBG sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Inner]] placeholderImage:nil];
             [serieContentCell.surfaceView.surfaceImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Mini]] placeholderImage:nil];
-            SDWebImageManager *manager = [SDWebImageManager sharedManager];
-            [manager downloadImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Mini]]
-                                  options:0
-                                 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
-                                     // progression tracking code
-                                 }
-                                completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-                                    if (image) {
-                                        [serieContentCell.surfaceView.surfaceButton setImage:image forState:UIControlStateNormal];
-//                                        [serieContentCell.surfaceView.surfaceButton sizeToFit];
-                                    }
-                                }];
+//            SDWebImageManager *manager = [SDWebImageManager sharedManager];
+//            [manager downloadImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serieContentCell.serie.image_Mini]]
+//                                  options:0
+//                                 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+//                                     // progression tracking code
+//                                 }
+//                                completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+//                                    if (image) {
+//                                        [serieContentCell.surfaceView.surfaceButton setImage:image forState:UIControlStateNormal];
+//                                    }
+//                                }];
             if ([[DownloadHelper sharedManager].downloadInfos objectForKey:[NSString stringWithFormat:@"Character%@",character.characterID]]) {
                 NSString *progress =[[DownloadHelper sharedManager].downloadInfos objectForKey:[NSString stringWithFormat:@"Character%@",character.characterID]];
                 [serieContentCell.surfaceView.surfaceProgress setProgress:[progress floatValue] animated:NO];
                 [serieContentCell.surfaceView.surfaceProgress setHidden:NO];
-                [serieContentCell.surfaceView.surfaceButton setHidden:YES];
+                [serieContentCell.surfaceView.surfaceButton setEnabled:NO];
+//                [serieContentCell.surfaceView.surfaceButton setHidden:YES];
             }else{
                 [serieContentCell.surfaceView.surfaceProgress setProgress:0.0 animated:NO];
                 [serieContentCell.surfaceView.surfaceProgress setHidden:YES];
-                [serieContentCell.surfaceView.surfaceButton setHidden:NO];
+//                [serieContentCell.surfaceView.surfaceButton setHidden:NO];
+                [serieContentCell.surfaceView.surfaceButton setEnabled:YES];
+
             }
             
         }else{
@@ -987,8 +976,8 @@
         
         [stickerSetCell.stickerSetImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,stickerSetCell.stickerSet.image_Mini]] placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType,NSURL *imageURL){
             POPBasicAnimation *animation = [POPBasicAnimation animationWithPropertyNamed:kPOPViewAlpha];
-            animation.fromValue = [NSNumber numberWithFloat:1.0];
-            animation.toValue = [NSNumber numberWithFloat:0.0];
+            animation.fromValue = [NSNumber numberWithFloat:0.0];
+            animation.toValue = [NSNumber numberWithFloat:1.0];
             animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
             animation.duration = 0.15;
             [stickerSetCell.stickerSetImage pop_addAnimation:animation forKey:@"alphaAnimation"];
@@ -1081,11 +1070,11 @@
             UnitySendMessage(UnityController.UTF8String, "ShowEraseRect", "false");
             UnitySendMessage(UnityController.UTF8String, "EraseOpacity", "false");
         }
-        
-        NSString *title = [_segments objectAtIndex:indexPath.row];
+        NSString *note = [_segments objectAtIndex:indexPath.row];
+        NSString *title = [_segmentsShow objectAtIndex:indexPath.row];
         [_navigationTitle setText:title];
         [_segmentContentCollection setContentOffset:CGPointMake(CCamViewWidth*indexPath.row, 0) animated:YES];
-        UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", title.UTF8String);
+        UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", note.UTF8String);
        
         
     }else if (collectionView.tag == CCamFilterCollectionView){

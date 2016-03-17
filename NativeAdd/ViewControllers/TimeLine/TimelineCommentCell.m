@@ -38,7 +38,7 @@
     [_commentLabel setBackgroundColor:[UIColor clearColor]];
     [_commentLabel setTextAlignment:NSTextAlignmentLeft];
     [_commentLabel setTextColor:CCamGrayTextColor];
-    [_commentLabel setFont:[UIFont systemFontOfSize:12.0]];
+    [_commentLabel setFont:[UIFont systemFontOfSize:13.0]];
 
     NSArray *views = @[_commentLabel];
     [views enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -56,7 +56,7 @@
     .topSpaceToView(contentView,0)
     .rightSpaceToView(contentView,10).autoHeightRatio(0);
     
-    [self setupAutoHeightWithBottomView:_commentLabel bottomMargin:5];
+    [self setupAutoHeightWithBottomView:_commentLabel bottomMargin:11];
 }
 - (void)callUserPage{
     CCUserViewController *userpage = [[CCUserViewController alloc] init];
@@ -80,12 +80,12 @@
 
     NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@   %@",_comment.userName,_comment.comment]];
     [str addAttribute:NSForegroundColorAttributeName value:CCamRedColor range:NSMakeRange(0,_comment.userName.length)];
-    [str addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12.0] range:NSMakeRange(0,_comment.userName.length)];
+    [str addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:13.0] range:NSMakeRange(0,_comment.userName.length)];
 //    [str addAttribute:NSForegroundColorAttributeName value:CCamGrayTextColor range:NSMakeRange(_comment.userName.length,str.length-1)];
 //    [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12.0] range:NSMakeRange(_comment.userName.length,str.length-1)];
 
     [_commentLabel setAttributedText:str];
-    _commentLabel.sd_layout.leftSpaceToView(_userName,10).minHeightIs(cellMinHeight).maxHeightIs(44);
+    _commentLabel.sd_layout.leftSpaceToView(_userName,10);//.minHeightIs(cellMinHeight).maxHeightIs(44);
 }
 
 - (void)awakeFromNib {

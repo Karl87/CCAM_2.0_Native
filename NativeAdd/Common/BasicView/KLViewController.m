@@ -22,7 +22,7 @@
     
     if (self.setNavigationBar) {
 //        if(iOS8){
-//            [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
+            [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
 //            UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
 //            UIVisualEffectView * blur = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
 //            [blur setFrame:CGRectMake(0, -20, CCamViewWidth, CCamNavigationBarHeight)];

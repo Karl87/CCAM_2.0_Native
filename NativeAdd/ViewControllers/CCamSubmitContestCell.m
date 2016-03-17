@@ -40,13 +40,12 @@
         
         self.selectedBackgroundView = _cellSelBG;
     }
+    
+    
 }
 - (void)layoutCell{
     
-    
-    
-    
-    
+//    [self.cellButton setTitle:@"" forState:UIControlStateNormal];
 }
 - (void)awakeFromNib {
     // Initialization code

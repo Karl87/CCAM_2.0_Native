@@ -11,6 +11,9 @@
 #import <UIKit/UIKit.h>
 
 #import "CCLaunchViewController.h"
+#import "KLWebViewController.h"
+#import "KLNavigationController.h"
+#import "PersonInfoViewController.h"
 
 #import <ShareSDK/ShareSDK.h>
 #import <ShareSDKUI/ShareSDK+SSUI.h>
@@ -23,10 +26,41 @@
 
 @property (nonatomic,strong) UIWindow * authorizeWindow;
 @property (nonatomic,strong) CCLaunchViewController *authorizeView;
+
+@property (nonatomic,strong) NSTimer *timer;
+@property (nonatomic,assign) NSInteger smsTimeCount;
+
+
 @end
 
 @implementation AuthorizeHelper
 
+- (void)startSmsTimer{
+    
+    _smsTimeCount = 30;
+    
+    if (_timer) {
+        if (![_timer isValid]) {
+            NSLog(@"取消Timer暂停");
+            [_timer fire];
+        }
+    }else{
+        NSLog(@"初始化Timer");
+        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(smsTimerCount) userInfo:nil repeats:YES];
+    }
+    
+}
+- (void)smsTimerCount{
+    _smsTimeCount = _smsTimeCount-1;
+    if (_smsTimeCount == -1) {
+        [_timer invalidate];
+    }else{
+        if (_authorizeView) {
+            [_authorizeView smsTimerCount:_smsTimeCount];
+        }
+    }
+    
+}
 + (AuthorizeHelper*)sharedManager
 {
     static dispatch_once_t pred;
@@ -44,7 +78,7 @@
 
 - (void)logout{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view animated:YES];
-    hud.labelText = @"登出角色相机中";
+    hud.labelText = Babel(@"登出角色相机中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -55,18 +89,23 @@
         NSString *hubMessage = @"";
         
         if ([jsonStr isEqualToString:@"1"]) {
-            hubMessage = @"登出成功!";
+            hubMessage = Babel(@"登出成功");
             [self setUserToken:@""];
             [self setUserID:@""];
+            
+            if ([MessageHelper sharedManager].tabVC) {
+                [[MessageHelper sharedManager].tabVC reloadWhenLogin];
+            }
+            
         }else{
-            hubMessage = @"登出失败!";
+            hubMessage = Babel(@"登出失败");
         }
         
         hud.labelText = hubMessage;
         [hud hide:YES afterDelay:1.0f];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0f];
     }];
 }
@@ -169,12 +208,44 @@
 }
 
 - (void)dismissAuthorizeView{
+    
+    NSString *type = @"";
+    if (_authorizeView.dismissType) {
+        type = _authorizeView.dismissType;
+    }
+    
+    [_authorizeWindow setHidden:YES];
     [_authorizeWindow removeFromSuperview];
     [_authorizeWindow resignKeyWindow];
     _authorizeView = nil;
     _authorizeWindow = nil;
     NSLog(@"window count = %lu",(unsigned long)[UIApplication sharedApplication].windows.count);
     [[UIApplication sharedApplication].windows[0] makeKeyAndVisible];
+    
+    if ([type isEqualToString:@"agreement"]) {
+        if ([MessageHelper sharedManager].tabVC) {
+            [self callAgreement:[MessageHelper sharedManager].tabVC];
+        }
+    }else if ([type isEqualToString:@"userinfo"]){
+        if ([MessageHelper sharedManager].tabVC) {
+            [self callPersonnalInfo:[MessageHelper sharedManager].tabVC];
+        }
+    }
+}
+-(void)callPersonnalInfo:(UITabBarController*)tab{
+    PersonInfoViewController *person = [[PersonInfoViewController alloc] init];
+    person.vcTitle = Babel(@"完善用户信息");
+    person.setNavigationBar = YES;
+    KLNavigationController *nv = [[KLNavigationController alloc] initWithRootViewController:person];
+    [tab presentViewController:nv animated:YES completion:nil];
+}
+- (void)callAgreement:(UITabBarController *)tab{
+    KLWebViewController *agree = [[KLWebViewController alloc] init];
+    agree.webURL = CCamAgreementURL;
+    agree.vcTitle = Babel(@"角色相机用户协议");
+    agree.setNavigationBar = YES;
+    KLNavigationController *nv = [[KLNavigationController alloc] initWithRootViewController:agree];
+    [tab presentViewController:nv animated:YES completion:nil];
 }
 - (void)getSocialPlatformInfoWithTypeID:(NSString*)typeID shareType:(SSDKPlatformType)type isLogin:(BOOL)isLogin{
     
@@ -183,16 +254,16 @@
     NSString *platForm = @"";
     switch (type) {
         case SSDKPlatformTypeWechat:
-            platForm = @"微信";
+            platForm = Babel(@"微信");
             break;
         case SSDKPlatformTypeQQ:
-            platForm = @"QQ";
+            platForm = Babel(@"QQ");
             break;
         case SSDKPlatformTypeSinaWeibo:
-            platForm = @"新浪微博";
+            platForm = Babel(@"新浪微博");
             break;
         case SSDKPlatformTypeFacebook:
-            platForm = @"Facebook";
+            platForm = Babel(@"Facebook");
             break;
         default:
             break;
@@ -206,7 +277,7 @@
                    [hud hide:YES];
                    [self loginWithTypeID:typeID shareType:type userInfo:user isLogin:YES];
                }else{
-                   hud.labelText = [NSString stringWithFormat:@"%@登录失败",platForm];
+                   hud.labelText = [NSString stringWithFormat:@"%@%@",platForm,Babel(@"登录失败")];
                    NSLog(@"%@",error);
                    [hud hide:YES afterDelay:1.0f];
                }
@@ -228,7 +299,7 @@
     NSString *platForm = @"";
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_authorizeView.view animated:YES];
-    hud.labelText = @"登陆角色相机中";
+    hud.labelText = Babel(@"登录角色相机中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -241,9 +312,10 @@
     NSLog(@"UID:%@",user.uid);
     switch (type) {
         case SSDKPlatformTypeWechat:
+//            [AuthorizeHelper sharedManager].authorizeView.dismissType = @"userinfo";
             wechat_name = user.nickname;
             wechatunion_id = [user.rawData objectForKey:@"unionid"];
-            platForm = @"微信";
+            platForm = Babel(@"微信");
             NSLog(@"WECHAT UNIONID:%@",wechatunion_id);
             if (login) {
                 parameters = @{@"login":@"0",@"type_id":type_id,@"account_code":account_id,@"head_url":head_url,@"wechat_name":wechat_name,@"unionid":wechatunion_id};
@@ -253,7 +325,7 @@
             break;
         case SSDKPlatformTypeQQ:
             QQ_name = user.nickname;
-            platForm = @"QQ";
+            platForm = Babel(@"QQ");
             if (login) {
                 parameters = @{@"login":@"0",@"type_id":type_id,@"account_code": account_id,@"head_url":head_url,@"QQ_name":QQ_name};
             }else{
@@ -262,7 +334,7 @@
             break;
         case SSDKPlatformTypeSinaWeibo:
             weibo_name = user.nickname;
-            platForm = @"新浪微博";
+            platForm = Babel(@"新浪微博");
             if (login) {
                 parameters = @{@"login":@"0",@"type_id":type_id,@"account_code": account_id,@"head_url":head_url,@"weibo_name":weibo_name};
             }else{
@@ -271,7 +343,7 @@
             break;
         case SSDKPlatformTypeFacebook:
             facebook_name = user.nickname;
-            platForm = @"Facebook";
+            platForm = Babel(@"Facebook");
             if (login) {
                 parameters = @{@"login":@"0",@"type_id":type_id,@"account_code": account_id,@"head_url":head_url,@"facebook_name":facebook_name};
             }else{
@@ -303,9 +375,9 @@
             NSLog(@"用户登录信息:\n--->登录状态:%@\n--->TOKEN:%@\n--->ID:%@\n--->GROUP:%@\n--->COUNTRY:%@",stateMessage,userToken,userID,groupID,userZone);
             
             if ([stateMessage isEqualToString:@"1"] || [stateMessage isEqualToString:@"2"]) {
-                hubMessage = @"登录角色相机成功!";//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
+                hubMessage = Babel(@"登录成功");//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
             }else if ([stateMessage isEqualToString:@"3"]){
-                hubMessage = @"账号关联成功!";
+                hubMessage = Babel(@"账号关联成功");
             }
             NSLog(@"%@",userToken);
             [[AuthorizeHelper sharedManager] setUserToken:userToken];
@@ -319,37 +391,51 @@
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
         }else{
             if ([jsonStr isEqualToString:@"-1"] || [jsonStr isEqualToString:@"-4"]) {
-                hubMessage = @"登录失败!";
+                hubMessage = Babel(@"登录失败");
             }else if ([jsonStr isEqualToString:@"-2"]){
-                hubMessage = @"已绑定其他账号!";
+                hubMessage = Babel(@"已绑定其他账号");
             }else if ([jsonStr isEqualToString:@"-3"]){
-                hubMessage = @"登录状态失效,请重新登录!";
+                hubMessage = Babel(@"登录状态失效，请重新登录");
             }else if ([jsonStr isEqualToString:@"-5"]){
-                hubMessage = @"手机号码错误!";
+                hubMessage = Babel(@"该手机号码尚未注册");
             }else if ([jsonStr isEqualToString:@"-6"]){
-                hubMessage = @"密码错误!";
+                hubMessage = Babel(@"密码错误");
             }else if ([jsonStr isEqualToString:@"-7"]){
-                hubMessage = @"手机号码已注册或关联!";
+                hubMessage = Babel(@"该手机号码已注册或关联其他账号");
             }
         }
         
         hud.labelText = hubMessage;
         [hud hide:YES afterDelay:1.0f];
+        if ([MessageHelper sharedManager].tabVC) {
+            [[MessageHelper sharedManager].tabVC reloadWhenLogin];
+        }
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0f];
     }];
 
 }
 - (void)mobileLoginWithPhone:(NSString *)phone password:(NSString *)password isLogin:(BOOL)login{
     
+    
+    NSLog(@"%@",phone);
+    NSLog(@"%@",password);
+    
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_authorizeView.view animated:YES];
-    hud.labelText = @"注册角色相机中";
+//    hud.labelText = @"注册角色相机中";
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    NSDictionary *parameters = @{@"type_id": @"1",@"login":@"1",@"account_code": phone,@"password":[self md5:password]};
+    
+    NSDictionary *parameters;
+    if (login) {
+        parameters = @{@"type_id": @"1",@"login":@"1",@"account_code": phone,@"password":[self md5:password]};
+    }else{
+        parameters = @{@"type_id": @"1",@"account_code": phone,@"password":[self md5:password]};
+    }
+    
     
     [manager POST:CCamLoginURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSString *jsonStr = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
@@ -372,9 +458,9 @@
             NSLog(@"用户登录信息:\n--->登录状态:%@\n--->TOKEN:%@\n--->ID:%@\n--->GROUP:%@\n--->COUNTRY:%@\n--->Name:%@\n--->Image:%@",stateMessage,userToken,userID,groupID,userZone,userName,userImage);
             
             if ([stateMessage isEqualToString:@"1"] || [stateMessage isEqualToString:@"2"]) {
-                hubMessage = @"登录角色相机成功!";//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
+                hubMessage = Babel(@"登录成功");//[NSString stringWithFormat:@"%@登录角色相机成功!",platForm];
             }else if ([stateMessage isEqualToString:@"3"]){
-                hubMessage = @"账号关联成功!";
+                hubMessage = Babel(@"账号关联成功");
             }
             NSLog(@"%@",userToken);
             [[AuthorizeHelper sharedManager] setUserToken:userToken];
@@ -384,22 +470,28 @@
             [[AuthorizeHelper sharedManager] setUserName:userName];
             [[AuthorizeHelper sharedManager] setUserImage:userImage];
             
-            
+            if (!login) {
+                _authorizeView.dismissType = @"userinfo";
+            }
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
+            
+            if ([MessageHelper sharedManager].tabVC) {
+                [[MessageHelper sharedManager].tabVC reloadWhenLogin];
+            }
            
         }else{
             if ([jsonStr isEqualToString:@"-1"] || [jsonStr isEqualToString:@"-4"]) {
-                hubMessage = @"登录失败!";
+                hubMessage = Babel(@"登录失败");
             }else if ([jsonStr isEqualToString:@"-2"]){
-                hubMessage = @"已绑定其他账号!";
+                hubMessage = Babel(@"已绑定其他账号");
             }else if ([jsonStr isEqualToString:@"-3"]){
-                hubMessage = @"登录状态失效,请重新登录!";
+                hubMessage = Babel(@"登录状态失效，请重新登录");
             }else if ([jsonStr isEqualToString:@"-5"]){
-                hubMessage = @"手机号码错误!";
+                hubMessage = Babel(@"该手机号码尚未注册");
             }else if ([jsonStr isEqualToString:@"-6"]){
-                hubMessage = @"密码错误!";
+                hubMessage = Babel(@"密码错误");
             }else if ([jsonStr isEqualToString:@"-7"]){
-                hubMessage = @"手机号码已注册或关联!";
+                hubMessage = Babel(@"该手机号码已注册或关联其他账号");
             }
         }
         
@@ -407,13 +499,13 @@
         [hud hide:YES afterDelay:1.0f];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0f];
     }];
 }
 - (void)mobileResetPasswordWithPhone:(NSString *)phone password:(NSString *)password{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:_authorizeView.view animated:YES];
-    hud.labelText = @"修改密码中";
+    hud.labelText = Babel(@"修改密码中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -427,16 +519,16 @@
         if ([jsonStr isEqualToString:@"-2"]) {
             hubMessage = [NSString stringWithFormat:@"手机号码%@\n尚未注册",phone];
         }else if ([jsonStr isEqualToString:@"-1"]) {
-            hubMessage = @"修改密码失败!";
+            hubMessage = Babel(@"密码修改失败");
         }else if ([jsonStr isEqualToString:@"1"]) {
-            hubMessage = @"修改密码成功!";
+            hubMessage = Babel(@"密码修改成功");
         }
         
         hud.labelText = hubMessage;
         [hud hide:YES afterDelay:1.0f];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0f];
     }];
 }

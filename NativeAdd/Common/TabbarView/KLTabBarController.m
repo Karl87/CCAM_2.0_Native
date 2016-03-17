@@ -15,14 +15,22 @@
 #import "CCSerieViewController.h"
 #import "CCUserViewController.h"
 
+#import "LaunchScreenViewController.h"
+
 //test
 #import "TestPostRequestWebViewController.h"
 #import "KLImagePickerViewController.h"
 
 @interface KLTabBarController () <UITabBarDelegate>
 
-@property (nonatomic,strong) UIWindow * authorizeWindow;
+@property (nonatomic,strong) CCHomeViewController *vc_home;
+@property (nonatomic,strong) CCEventViewController *vc_event;
+@property (nonatomic,strong) CCSerieViewController *vc_serie;
+@property (nonatomic,strong) CCUserViewController *vc_me;
 
+@property (nonatomic,strong) UIWindow * authorizeWindow;
+@property (nonatomic,strong) LaunchScreenViewController *launchScreen;
+@property (nonatomic,assign) NSUInteger lastSelectedIndex;
 @end
 
 @implementation KLTabBarController
@@ -41,33 +49,35 @@
 - (void)viewDidLoad{
     
     [super viewDidLoad];
-        
-    CCHomeViewController *vc_home = [[CCHomeViewController alloc] init];
-    CCEventViewController *vc_event = [[CCEventViewController alloc] init];
+    
+    _lastSelectedIndex = 0;
+    
+    _vc_home = [[CCHomeViewController alloc] init];
+    _vc_event = [[CCEventViewController alloc] init];
     CCEventViewController *vc_nil = [[CCEventViewController alloc] init];
-    CCSerieViewController *vc_serie = [[CCSerieViewController alloc] init];
-    CCUserViewController *vc_me = [[CCUserViewController alloc] init];
-    vc_me.showSetting = YES;
+    _vc_serie = [[CCSerieViewController alloc] init];
+    _vc_me = [[CCUserViewController alloc] init];
+    _vc_me.showSetting = YES;
     
-    [DataHelper sharedManager].serieVC = vc_serie;
+    [DataHelper sharedManager].serieVC = _vc_serie;
     
-    vc_me.vcTitle = @"我";
-    vc_event.vcTitle = @"活动";
-    vc_home.vcTitle = @"首页";
-    vc_serie.vcTitle = @"系列";
+    _vc_me.vcTitle = NSLocalizedString(@"我", @"");
+    _vc_event.vcTitle = NSLocalizedString(@"活动", @"");
+    _vc_home.vcTitle = NSLocalizedString(@"首页", @"");
+    _vc_serie.vcTitle = NSLocalizedString(@"系列", @"");
     vc_nil.vcTitle = @"";
     
-    vc_me.setNavigationBar =YES;
-    vc_event.setNavigationBar = YES;
-    vc_home.setNavigationBar = YES;
-    vc_serie.setNavigationBar = YES;
+    _vc_me.setNavigationBar =YES;
+    _vc_event.setNavigationBar = YES;
+    _vc_home.setNavigationBar = YES;
+    _vc_serie.setNavigationBar = YES;
     vc_nil.setNavigationBar = YES;
     
-    KLNavigationController *navc1 = [[KLNavigationController alloc] initWithRootViewController:vc_home];
-    KLNavigationController *navc2= [[KLNavigationController alloc] initWithRootViewController:vc_event];
+    KLNavigationController *navc1 = [[KLNavigationController alloc] initWithRootViewController:_vc_home];
+    KLNavigationController *navc2= [[KLNavigationController alloc] initWithRootViewController:_vc_event];
     KLNavigationController *navc3 = [[KLNavigationController alloc] initWithRootViewController:vc_nil];
-    KLNavigationController *navc4 = [[KLNavigationController alloc] initWithRootViewController:vc_serie];
-    KLNavigationController *navc5 = [[KLNavigationController alloc] initWithRootViewController:vc_me];
+    KLNavigationController *navc4 = [[KLNavigationController alloc] initWithRootViewController:_vc_serie];
+    KLNavigationController *navc5 = [[KLNavigationController alloc] initWithRootViewController:_vc_me];
     
     self.viewControllers = [NSArray arrayWithObjects:navc1, navc2, navc3,navc4,navc5,nil ];
     
@@ -94,14 +104,14 @@
     UITabBarItem *tabBarItem_message = [self.tabBar.items objectAtIndex:3];
     UITabBarItem *tabBarItem_me = [self.tabBar.items objectAtIndex:4];
     
-    tabBarItem_home.title = @"Home";
+    tabBarItem_home.title = NSLocalizedString(@"首页", @"");
     tabBarItem_home.image = [UIImage imageNamed:@"tabHomeIcon"];
-    tabBarItem_discovery.title = @"Event";
+    tabBarItem_discovery.title = NSLocalizedString(@"活动", @"");
     tabBarItem_discovery.image = [UIImage imageNamed:@"tabEventIcon"];
     tabBarItem_capture.title = @"";
-    tabBarItem_message.title = @"Serie";
+    tabBarItem_message.title = NSLocalizedString(@"系列", @"");
     tabBarItem_message.image = [UIImage imageNamed:@"tabSerieIcon"];
-    tabBarItem_me.title = @"Me";
+    tabBarItem_me.title = NSLocalizedString(@"我", @"");
     tabBarItem_me.image = [UIImage imageNamed:@"tabMeIcon"];
 
     UIButton *midBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -114,6 +124,13 @@
     [self.tabBar setShadowImage:[[UIImage alloc] init]];
 
     [midBtn setCenter:CGPointMake(self.tabBar.frame.size.width/2, self.tabBar.frame.size.height/2)];
+    
+    
+    if ([iOSBindingManager sharedManager].showLauchScreen) {
+        _launchScreen = [[LaunchScreenViewController alloc] init];
+        [self.view addSubview:_launchScreen.view];
+        [iOSBindingManager sharedManager].showLauchScreen = NO;
+    }
 }
 
 - (void)customTabbarItemOnClick{
@@ -129,6 +146,38 @@
     
 }
 - (void)KillWindow{
+
+}
+- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item{
+    NSUInteger selectedIndex = [tabBar.items indexOfObject:item];
+    if (selectedIndex ==_lastSelectedIndex) {
+        _lastSelectedIndex = selectedIndex;
+        switch (selectedIndex) {
+            case 0:
+                [_vc_home returnTopPosition];
+                break;
+            case 1:
+                [_vc_event returnTopPosition];
+                break;
+            case 3:
+                [_vc_serie returnTopPosition];
+                break;
+            case 4:
+                [_vc_me returnTopPosition];
+                break;
+            default:
+                break;
+        }
+    }else{
+        _lastSelectedIndex = selectedIndex;
+    }
+}
+- (void)reloadWhenLogin{
+    NSLog(@"reload");
+    [_vc_home reloadInfo];
+    [_vc_me reloadInfo];
+    [_vc_event reloadInfo];
+    [_vc_serie reloadInfo];
 
 }
 @end

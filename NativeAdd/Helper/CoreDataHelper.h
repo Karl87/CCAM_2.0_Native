@@ -10,6 +10,8 @@
 #import <CoreData/CoreData.h>
 #import "CCCharacter.h"
 #import "CCSticker.h"
+#import "CCSerie.h"
+
 @interface CoreDataHelper : NSObject
 
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
@@ -24,6 +26,7 @@
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
 - (void)saveContext;
 
+- (CCSerie *)getSerie:(NSString*)serieID;
 - (CCCharacter *)getCharacter:(NSString*)characterID;
 - (CCSticker *)getSticker:(NSString*)stickerID;
 

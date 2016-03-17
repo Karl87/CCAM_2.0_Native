@@ -44,4 +44,6 @@
 - (void)mobileLoginWithPhone:(NSString*)phone password:(NSString*)password isLogin:(BOOL)login;
 //mobile reset psw
 - (void)mobileResetPasswordWithPhone:(NSString*)phone password:(NSString*)password;
+//sms time count
+- (void)startSmsTimer;
 @end

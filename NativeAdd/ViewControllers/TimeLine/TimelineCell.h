@@ -16,6 +16,8 @@
 @property (nonatomic,strong) UILabel *userName;
 @property (nonatomic,strong) UILabel *photoTime;
 @property (nonatomic,strong) UIImageView *photo;
+@property (nonatomic,strong) UIImageView *photoLomo;
+@property (nonatomic,strong) UIImageView *photoSpotlight;
 @property (nonatomic,strong) UIButton *photoTitle;
 @property (nonatomic,strong) UILabel *contestDes;
 @property (nonatomic,strong) UIImageView *privacySign;
@@ -37,7 +39,7 @@
 
 @property (nonatomic, strong) NSIndexPath *indexPath;
 @property (nonatomic, copy) void (^likeButtonBlock)(NSIndexPath *indexPath);
-@property (nonatomic, copy) void (^commentButtonBlock)(NSIndexPath *indexPath);
+@property (nonatomic, copy) void (^deleteBlock)(NSIndexPath *indexPath);
 - (void)reloadComments;
 
 @end

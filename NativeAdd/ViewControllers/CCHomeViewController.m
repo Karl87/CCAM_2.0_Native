@@ -33,9 +33,6 @@
 @interface CCHomeViewController () <UICollectionViewDataSource,UICollectionViewDelegate,KLCollectionLayoutDelegate,UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property(assign) BOOL needUpdate;
-@property(assign) BOOL loadingSelection;
-@property(assign) BOOL loadingPopular;
-@property(assign) BOOL loadingLast;
 
 @property (nonatomic,strong) UIScrollView *backgroundView;
 @property (nonatomic,strong) UIScrollView *photoBGView;
@@ -65,6 +62,23 @@
 
 @implementation CCHomeViewController
 static NSString *const MJCollectionViewCellIdentifier = @"color";
+
+- (void)returnTopPosition{
+    
+    if (_backgroundView.contentOffset.x == 0) {
+        [_timeline scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    }else{
+        if (_photoBGView.contentOffset.x == 0){
+            [_selectionCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+        }else if (_photoBGView.contentOffset.x == CCamViewWidth){
+            [_popularCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+        }else if (_photoBGView.contentOffset.x == CCamViewWidth*2){
+            [_lastCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+        }
+    }
+}
+
+
 - (void)loadMessage{
     
     if (![[AuthorizeHelper sharedManager] checkToken]) {
@@ -73,7 +87,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     }
     
     MessageViewController *message = [[MessageViewController alloc] init];
-    message.vcTitle = @"消息";
+    message.vcTitle = NSLocalizedString(@"消息", @"");
     message.showLastest = NO;
     message.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:message animated:YES];
@@ -84,7 +98,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     [self reloadMessageHeader];
     
     MessageViewController *message = [[MessageViewController alloc] init];
-    message.vcTitle = @"消息";
+    message.vcTitle = NSLocalizedString(@"消息", @"");
     message.showLastest = YES;
     message.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:message animated:YES];
@@ -94,17 +108,17 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     
     _reloadIndexs = [NSMutableArray new];
     
-    UIBarButtonItem *messageBtn = [[UIBarButtonItem alloc] initWithTitle:@"消息" style:UIBarButtonItemStylePlain target:self action:@selector(loadMessage)];
-    [self.navigationItem setLeftBarButtonItem:messageBtn];
+    UIBarButtonItem *messageBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"messageIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(loadMessage)];
+    [self.navigationItem setRightBarButtonItem:messageBtn];
     
     self.needUpdate = YES;
     
-    self.loadingSelection = NO;
-    self.loadingPopular = NO;
-    self.loadingLast = NO;
+//    self.loadingSelection = NO;
+//    self.loadingPopular = NO;
+//    self.loadingLast = NO;
     
-    NSArray* segArray = @[@"订阅",@"广场"];
-    _segmegtItems = [[NSMutableArray alloc] initWithCapacity:0];
+    NSArray* segArray = @[NSLocalizedString(@"订阅", @""),NSLocalizedString(@"广场", @"")];
+    _segmegtItems = [NSMutableArray new];
     
     _segmentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamSegItemWidth*segArray.count, CCamSegItemHeight)];
     [_segmentView setBackgroundColor:[UIColor clearColor]];
@@ -135,15 +149,11 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     [_segmentSlider addSubview:segmentSlider];
     [_segmentView addSubview:_segmentSlider];
     
-    self.selectionPhotos = [[NSMutableArray alloc] initWithCapacity:0];
-    self.popularPhotos = [[NSMutableArray alloc] initWithCapacity:0];
-    self.lastPhotos = [[NSMutableArray alloc] initWithCapacity:0];
+    self.selectionPhotos = [NSMutableArray new];
+    self.popularPhotos = [NSMutableArray new];
+    self.lastPhotos = [NSMutableArray new];
     
-    self.timeLines = [[NSMutableArray alloc] initWithCapacity:0];
-    
-    [self.selectionPhotos addObjectsFromArray:[[CoreDataHelper sharedManager] showStoreInfoWithEntity:@"CCSelectionPhoto"]];
-    [self.popularPhotos addObjectsFromArray:[[CoreDataHelper sharedManager] showStoreInfoWithEntity:@"CCHotPhoto"]];
-    [self.lastPhotos addObjectsFromArray:[[CoreDataHelper sharedManager] showStoreInfoWithEntity:@"CCNewPhoto"]];
+    self.timeLines = [NSMutableArray new];
     
     self.selectionLayout = [[KLCollectionLayout alloc] init];
     self.popularLayout = [[KLCollectionLayout alloc] init];
@@ -249,7 +259,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     [_photoSegView setBackgroundColor:CCamViewBackgroundColor];
     [self.view addSubview:_photoSegView];
     
-    NSArray *photoSegArray = @[@"精选",@"热门",@"最新"];
+    NSArray *photoSegArray = @[NSLocalizedString(@"精选", @""),NSLocalizedString(@"热门", @""),NSLocalizedString(@"最新", @"")];
     _photoSegItems = [[NSMutableArray alloc] initWithCapacity:0];
     
     float photoSegWidth = (CCamViewWidth - photoSegArray.count +1)/photoSegArray.count;
@@ -278,6 +288,9 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     
     
     [self loadLocalTimeline];
+    [self loadLocalPhotoWithOrder:@"selection"];
+    [self loadLocalPhotoWithOrder:@"like"];
+    [self loadLocalPhotoWithOrder:@""];
 }
 
 - (void)loadTimeline{
@@ -495,7 +508,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         }else{
             photo = (CCPhoto*)[self.lastPhotos lastObject];
         }
-        parameter = photo.workid;
+        parameter = photo.photoID;
     }else if ([type isEqualToString:@"lastlike"]){
         if ([order isEqualToString:@"like"]) {
             photo = (CCPhoto*)[self.popularPhotos lastObject];
@@ -507,9 +520,9 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
                 
                 CCPhoto *photoForHot = (CCPhoto*)[self.popularPhotos objectAtIndex:i];
                 if (i == self.popularPhotos.count-1) {
-                    parameter = [NSString stringWithFormat:@"%@%@",parameter,photoForHot.workid];
+                    parameter = [NSString stringWithFormat:@"%@%@",parameter,photoForHot.photoID];
                 }else{
-                    parameter = [NSString stringWithFormat:@"%@%@,",parameter,photoForHot.workid];
+                    parameter = [NSString stringWithFormat:@"%@%@,",parameter,photoForHot.photoID];
                 }
             }
         }
@@ -531,6 +544,12 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     }
     
 }
+- (void)reloadInfo{
+    [_timeline.mj_header beginRefreshing];
+    [_selectionCollection.mj_header beginRefreshing];
+    [_popularCollection.mj_header beginRefreshing];
+    [_lastCollection.mj_header beginRefreshing];
+}
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
@@ -545,57 +564,50 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     
     self.needUpdate = NO;
 }
-//- (void)autonAnimationRefreshPhotosWithType:(NSString*)type{
-//    if ([type isEqualToString:@"selection"]) {
-//        if (!self.selectionCollection.refresh.refreshing) {
-//            if (self.selectionCollection.contentOffset.y == -CCamNavigationBarHeight) {
-//                [UIView animateWithDuration:0.25
-//                                      delay:0
-//                                    options:UIViewAnimationOptionBeginFromCurrentState
-//                                 animations:^(void){
-//                                     self.selectionCollection.contentOffset = CGPointMake(0, -self.selectionCollection.refresh.frame.size.height-CCamNavigationBarHeight);
-//                                 } completion:^(BOOL finished){
-//                                     [self.selectionCollection.refresh beginRefreshing];
-//                                     [self.selectionCollection.refresh sendActionsForControlEvents:UIControlEventValueChanged];
-//                                 }];
-//                
-//            }
-//        }
-//    }else if ([type isEqualToString:@"like"]){
-//        if (!self.popularCollection.refresh.refreshing) {
-//            if (self.popularCollection.contentOffset.y == -CCamNavigationBarHeight) {
-//                [UIView animateWithDuration:0.25
-//                                      delay:0
-//                                    options:UIViewAnimationOptionBeginFromCurrentState
-//                                 animations:^(void){
-//                                     self.popularCollection.contentOffset = CGPointMake(0, -self.popularCollection.refresh.frame.size.height-CCamNavigationBarHeight);
-//                                 } completion:^(BOOL finished){
-//                                     [self.popularCollection.refresh beginRefreshing];
-//                                     [self.popularCollection.refresh sendActionsForControlEvents:UIControlEventValueChanged];
-//                                 }];
-//                
-//            }
-//        }
-//
-//    }else if ([type isEqualToString:@""]){
-//        if (!self.lastCollection.refresh.refreshing) {
-//            if (self.lastCollection.contentOffset.y == -CCamNavigationBarHeight) {
-//                [UIView animateWithDuration:0.25
-//                                      delay:0
-//                                    options:UIViewAnimationOptionBeginFromCurrentState
-//                                 animations:^(void){
-//                                     self.lastCollection.contentOffset = CGPointMake(0, -self.lastCollection.refresh.frame.size.height-CCamNavigationBarHeight);
-//                                 } completion:^(BOOL finished){
-//                                     [self.lastCollection.refresh beginRefreshing];
-//                                     [self.lastCollection.refresh sendActionsForControlEvents:UIControlEventValueChanged];
-//                                 }];
-//                
-//            }
-//        }
-//
-//    }
-//}
+- (void)collectionCellUserPage:(id)sender{
+    if (![[AuthorizeHelper sharedManager] checkToken]) {
+        [[AuthorizeHelper sharedManager] callAuthorizeView];
+        return;
+    }
+    UIButton *likeButton = (UIButton*)sender;
+    
+    KLCollectionCell *collectionCell = (KLCollectionCell*)[[likeButton superview] superview];
+    
+    NSLog(@"memberid:%@",collectionCell.photo.userID);
+    NSLog(@"name:%@",collectionCell.photo.userName);
+    
+    CCUserViewController *userpage = [[CCUserViewController alloc] init];
+    userpage.userID = collectionCell.photo.userID;
+    userpage.vcTitle = collectionCell.photo.userName;
+    userpage.hidesBottomBarWhenPushed = YES;
+    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+    backItem.title=@"";
+    self.navigationItem.backBarButtonItem=backItem;
+    [self.navigationController pushViewController:userpage animated:YES];
+}
+- (void)collectionCellPhotoPage:(id)sender{
+    
+    UIButton *likeButton = (UIButton*)sender;
+    
+    KLCollectionCell *collectionCell = (KLCollectionCell*)[[likeButton superview] superview];
+    
+    NSLog(@"photoid:%@",collectionCell.photo.photoID);
+
+    CCPhotoViewController *photoView = [[CCPhotoViewController alloc] init];
+    photoView.photoID = collectionCell.photo.photoID;
+    photoView.vcTitle = [NSString stringWithFormat:@"%@",collectionCell.photo.userName];
+    photoView.hidesBottomBarWhenPushed = YES;
+    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+    backItem.title=@"";
+    self.navigationItem.backBarButtonItem=backItem;
+    [self.navigationController pushViewController:photoView animated:YES];
+}
 - (void)likePhoto:(id)sender{
+    
+    if (![[AuthorizeHelper sharedManager] checkToken]) {
+        [[AuthorizeHelper sharedManager] callAuthorizeView];
+        return;
+    }
     
     UIButton *likeButton = (UIButton*)sender;
     
@@ -607,12 +619,15 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     }
     
     [likeButton setTintColor:CCamRedColor];
-    [collectionCell.likeButton setTitle:[NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue+1] forState:UIControlStateNormal];
-    NSLog(@"%@",collectionCell.photo.name);
+    NSLog(@"%@",collectionCell.photo.userName);
     collectionCell.photo.liked = @"1";
     collectionCell.photo.like = [NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue+1];
+    [collectionCell.likeButton setTitle:collectionCell.photo.like forState:UIControlStateNormal];
+    [collectionCell.likeButton sizeToFit];
+    [collectionCell.likeButton setFrame:CGRectMake(0, 0, collectionCell.likeButton.frame.size.width+2, 44)];
+    [collectionCell.likeButton setCenter:CGPointMake(collectionCell.bounds.size.width-10-collectionCell.likeButton.frame.size.width/2, collectionCell.userName.center.y)];
     
-    NSDictionary *parameters = @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"workid":collectionCell.photo.workid};
+    NSDictionary *parameters = @{@"token":[[AuthorizeHelper sharedManager] getUserToken],@"workid":collectionCell.photo.photoID};
     NSLog(@"Request parmeters is %@",parameters);
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -625,43 +640,68 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         }else if ([likeResult isEqualToString:@"-1"]){
             NSLog(@"likephoto result is failed!");
             [likeButton setTintColor:CCamPhotoSegLightGray];
-            [collectionCell.likeButton setTitle:[NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue-1] forState:UIControlStateNormal];
             collectionCell.photo.liked = @"0";
             collectionCell.photo.like = [NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue-1];
+            [collectionCell.likeButton setTitle:collectionCell.photo.like forState:UIControlStateNormal];
+            [collectionCell.likeButton sizeToFit];
+            [collectionCell.likeButton setFrame:CGRectMake(0, 0, collectionCell.likeButton.frame.size.width+2, 44)];
+            [collectionCell.likeButton setCenter:CGPointMake(collectionCell.bounds.size.width-10-collectionCell.likeButton.frame.size.width/2, collectionCell.userName.center.y)];
         }else if ([likeResult isEqualToString:@"-2"]){
             NSLog(@"likephoto result is has been liked!");
+            collectionCell.photo.like = [NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue-1];
+            [collectionCell.likeButton setTitle:collectionCell.photo.like forState:UIControlStateNormal];
+            [collectionCell.likeButton sizeToFit];
+            [collectionCell.likeButton setFrame:CGRectMake(0, 0, collectionCell.likeButton.frame.size.width+2, 44)];
+            [collectionCell.likeButton setCenter:CGPointMake(collectionCell.bounds.size.width-10-collectionCell.likeButton.frame.size.width/2, collectionCell.userName.center.y)];
         }else{
             NSLog(@"likephoto result is unknown!");
         }
-
+        
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         [likeButton setBackgroundImage:[UIImage imageNamed:@"unlike"] forState:UIControlStateNormal];
         collectionCell.photo.liked = @"0";
+        collectionCell.photo.like = [NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue-1];
+        [collectionCell.likeButton setTitle:collectionCell.photo.like forState:UIControlStateNormal];
+        [collectionCell.likeButton sizeToFit];
+        [collectionCell.likeButton setFrame:CGRectMake(0, 0, collectionCell.likeButton.frame.size.width+2, 44)];
+        [collectionCell.likeButton setCenter:CGPointMake(collectionCell.bounds.size.width-10-collectionCell.likeButton.frame.size.width/2, collectionCell.userName.center.y)];
     }];
     
 
 }
-- (void)loadDiscoveryWithRefresh:(BOOL)refresh order:(NSString*)order lastid:(NSString*)lastid lastlike:(NSString*)lastlike ids:(NSString*)ids{
-    
+
+- (void)loadLocalPhotoWithOrder:(NSString*)order{
+    NSError *error;
+    NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
+    NSEntityDescription *entityObj = [NSEntityDescription entityForName:@"CCPhoto" inManagedObjectContext:context];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"photoDataType = '%@'",order]];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setIncludesPropertyValues:NO];
+    [request setEntity:entityObj];
+    [request setPredicate:predicate];
+    NSArray *datas = [context executeFetchRequest:request error:&error];
     if ([order isEqualToString:@"selection"]) {
-        if (self.loadingSelection) return;
-        self.loadingSelection = YES;
-        if (!refresh) {
-//            [self.selectionLoading startAnimating];
-        }
+        [self.selectionPhotos removeAllObjects];
+        [self.selectionPhotos addObjectsFromArray:datas];
+        NSLog(@"### Selection photoes count = %lu",(unsigned long)self.selectionPhotos.count);
+        [self.selectionCollection reloadData];
+        
     }else if ([order isEqualToString:@"like"]){
-        if (self.loadingPopular) return;
-        self.loadingPopular = YES;
-        if (!refresh) {
-//            [self.popularLoading startAnimating];
-        }
+        [self.popularPhotos removeAllObjects];
+        [self.popularPhotos addObjectsFromArray:datas];
+        NSLog(@"### Popular photoes count = %lu",(unsigned long)self.popularPhotos.count);
+        [self.popularCollection reloadData];
+        
     }else{
-        if (self.loadingLast) return;
-        self.loadingLast = YES;
-        if (!refresh) {
-//            [self.lastLoading startAnimating];
-        }
+        [self.lastPhotos removeAllObjects];
+        [self.lastPhotos addObjectsFromArray:datas];
+        NSLog(@"### Lastest photoes count = %lu",(unsigned long)self.lastPhotos.count);
+        [self.lastCollection reloadData];
     }
+
+}
+
+- (void)loadDiscoveryWithRefresh:(BOOL)refresh order:(NSString*)order lastid:(NSString*)lastid lastlike:(NSString*)lastlike ids:(NSString*)ids{
     
     
     NSString *url;
@@ -692,47 +732,68 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         }
         
         NSArray * receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
+        NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
+        NSMutableArray *tempPhotos = [NSMutableArray new];
         
-        NSMutableArray *tempPhotos = [[NSMutableArray alloc] initWithCapacity:0];
         
-        for (int i = 0; i < receiveArray.count; i++) {
-            NSDictionary* photoDic = [receiveArray objectAtIndex:i];
-            CCPhoto *photo = [[CCPhoto alloc] init];
-            [photo initPhotoWithData:photoDic];
-            [tempPhotos addObject:photo];
-        }
         
         NSLog(@"Arrive photos count = %lu",(unsigned long)tempPhotos.count);
         
         if (refresh) {
             
-            if ([order isEqualToString:@"selection"]) {
-                [self.selectionPhotos removeAllObjects];
-                [self.selectionPhotos addObjectsFromArray:tempPhotos];
-                NSLog(@"### Selection photoes count = %lu",(unsigned long)self.selectionPhotos.count);
-                [self.selectionCollection.mj_header endRefreshing];
-                [self.selectionCollection reloadData];
-                [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCSelectionPhoto"];
-                [[CoreDataHelper sharedManager] insertCoreDataWithType:@"CCSelectionPhoto" andArray:self.selectionPhotos];
-            }else if ([order isEqualToString:@"like"]){
-                [self.popularPhotos removeAllObjects];
-                [self.popularPhotos addObjectsFromArray:tempPhotos];
-                NSLog(@"### Popular photoes count = %lu",(unsigned long)self.popularPhotos.count);
-                [self.popularCollection.mj_header endRefreshing];
-                [self.popularCollection reloadData];
-                [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCHotPhoto"];
-                [[CoreDataHelper sharedManager] insertCoreDataWithType:@"CCHotPhoto" andArray:self.popularPhotos];
-            }else{
-                [self.lastPhotos removeAllObjects];
-                [self.lastPhotos addObjectsFromArray:tempPhotos];
-                NSLog(@"### Lastest photoes count = %lu",(unsigned long)self.lastPhotos.count);
-                [self.lastCollection.mj_header endRefreshing];
-                [self.lastCollection reloadData];
-                [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCNewPhoto"];
-                [[CoreDataHelper sharedManager] insertCoreDataWithType:@"CCNewPhoto" andArray:self.lastPhotos];
+            NSEntityDescription *entityObj = [NSEntityDescription entityForName:@"CCPhoto" inManagedObjectContext:context];
+            
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"photoDataType = '%@'",order]];
+            
+            NSFetchRequest *request = [[NSFetchRequest alloc] init];
+            [request setIncludesPropertyValues:NO];
+            [request setEntity:entityObj];
+            [request setPredicate:predicate];
+            
+            NSArray *datas = [context executeFetchRequest:request error:&error];
+            NSLog(@"动画数量为%lu",(unsigned long)[datas count]);
+            if (!error && datas && [datas count])
+            {
+                for (CCPhoto *obj in datas){
+                    [context deleteObject:obj];
+                }
             }
             
+            for (int i = 0; i < receiveArray.count; i++) {
+                NSDictionary* photoDic = [receiveArray objectAtIndex:i];
+                CCPhoto *photo = [NSEntityDescription insertNewObjectForEntityForName:@"CCPhoto" inManagedObjectContext:context];
+                [photo initPhotoWith:photoDic];
+                photo.photoDataType = [order copy];
+                [tempPhotos addObject:photo];
+                if (![context save:&error]) {
+                    NSLog(@"照片保存失败%@",photo.photoID);
+                }
+            }
+            
+            if ([order isEqualToString:@"selection"]) {
+                [self.selectionCollection.mj_header endRefreshing];
+                
+            }else if ([order isEqualToString:@"like"]){
+                [self.popularCollection.mj_header endRefreshing];
+                
+            }else{
+                [self.lastCollection.mj_header endRefreshing];
+            }
+            
+            [self loadLocalPhotoWithOrder:order];
         }else{
+            
+            for (int i = 0; i < receiveArray.count; i++) {
+                NSDictionary* photoDic = [receiveArray objectAtIndex:i];
+                CCPhoto *photo = [NSEntityDescription insertNewObjectForEntityForName:@"CCPhoto" inManagedObjectContext:context];
+                [photo initPhotoWith:photoDic];
+                photo.photoDataType = [order copy];
+                [tempPhotos addObject:photo];
+                if (![context save:&error]) {
+                    NSLog(@"照片保存失败%@",photo.photoID);
+                }
+
+            }
             
             if ([order isEqualToString:@"selection"]) {
                 [self.selectionPhotos addObjectsFromArray:tempPhotos];
@@ -757,34 +818,35 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         [tempPhotos removeAllObjects];
         tempPhotos = nil;
         
-        [self resetRequestStateWithType:order];
 
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [self resetRequestStateWithType:order];
-
+        if (refresh) {
+            if ([order isEqualToString:@"selection"]) {
+                [self.selectionCollection.mj_header endRefreshing];
+            }else if ([order isEqualToString:@"like"]){
+                [self.popularCollection.mj_header endRefreshing];
+            }else{
+                [self.lastCollection.mj_header endRefreshing];
+            }
+            
+        }else{
+            if ([order isEqualToString:@"selection"]) {
+                [self.selectionCollection.mj_footer endRefreshing];
+            }else if ([order isEqualToString:@"like"]){
+                [self.popularCollection.mj_footer endRefreshing];
+            }else{
+                [self.lastCollection.mj_footer endRefreshing];
+            }
+        }
     }];
 }
-- (void)resetRequestStateWithType:(NSString*)order{
-    if ([order isEqualToString:@"selection"]) {
-        self.loadingSelection = NO;
-//        [self.selectionCollection.refresh endRefreshing];
-//        [self.selectionLoading stopAnimating];
-    }else if ([order isEqualToString:@"like"]){
-        self.loadingPopular = NO;
-//        [self.popularLoading stopAnimating];
-//        [self.popularCollection.refresh endRefreshing];
-    }else{
-        self.loadingLast = NO;
-//        [self.lastLoading stopAnimating];
-//        [self.lastCollection.refresh endRefreshing];
-    }
-}
+
 #pragma mark - CollectionView Delegate
 - (CGFloat)collectionLayout:(KLCollectionLayout*)layout heightForWidth:(CGFloat)width indexPath:(NSIndexPath*)indexPath{
    
     if (layout == self.selectionLayout) {
         NSString * note = @"";
-        CCPhoto * photo = (CCPhoto*)[self.selectionPhotos objectAtIndex:indexPath.row];
+        CCPhoto * photo =[_selectionPhotos objectAtIndex:indexPath.row];
         if (photo.photoDescription != nil && [photo.photoDescription isKindOfClass:[NSString class]]) {
             note = photo.photoDescription;
         }
@@ -797,7 +859,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     }
     else if (layout == self.popularLayout) {
         NSString * note = @"";
-        CCPhoto * photo = (CCPhoto*)[self.popularPhotos objectAtIndex:indexPath.row];
+        CCPhoto * photo = [_popularPhotos objectAtIndex:indexPath.row];
         if (photo.photoDescription != nil && [photo.photoDescription isKindOfClass:[NSString class]]) {
             note = photo.photoDescription;
         }
@@ -810,7 +872,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     }
     else if (layout == self.lastLayout) {
         NSString*note= @"";
-        CCPhoto * photo = (CCPhoto*)[self.lastPhotos objectAtIndex:indexPath.row];
+        CCPhoto * photo = [_lastPhotos objectAtIndex:indexPath.row];
         if (photo.photoDescription != nil && [photo.photoDescription isKindOfClass:[NSString class]]) {
             note = photo.photoDescription;
         }
@@ -837,29 +899,29 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 }
 -(UICollectionViewCell*)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     KLCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"DiscoveryCell" forIndexPath:indexPath];
-    CCPhoto*photo;
+//    CCPhoto*photo;
     
     if (collectionView == self.selectionCollection) {
-        photo = (CCPhoto*)[self.selectionPhotos objectAtIndex:indexPath.row];
+        cell.photo = (CCPhoto*)[self.selectionPhotos objectAtIndex:indexPath.row];
     }else if (collectionView == self.popularCollection){
-        photo = (CCPhoto*)[self.popularPhotos objectAtIndex:indexPath.row];
+        cell.photo = (CCPhoto*)[self.popularPhotos objectAtIndex:indexPath.row];
     }else if (collectionView == self.lastCollection) {
-        photo = (CCPhoto*)[self.lastPhotos objectAtIndex:indexPath.row];
+        cell.photo = (CCPhoto*)[self.lastPhotos objectAtIndex:indexPath.row];
     }
     
-    cell.photo = photo;
+//    cell.photo = photo;
     
     [cell setBackgroundColor:[UIColor whiteColor]];
 //    [cell.layer setMasksToBounds:YES];
 //    [cell.layer setCornerRadius:5.0];
     
     [cell.workImage setBackgroundColor:CCamViewBackgroundColor];
-    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:cell.photo.middle_img] placeholderImage:nil];
+    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:cell.photo.imageMiddle] placeholderImage:nil];
     [cell.workImage setContentMode:UIViewContentModeScaleAspectFit];
     
-    [cell.avatar sd_setImageWithURL:[NSURL URLWithString:cell.photo.image_url] placeholderImage:nil];
+    [cell.avatar sd_setImageWithURL:[NSURL URLWithString:cell.photo.userImage] placeholderImage:nil];
     
-    [cell.userName setText:cell.photo.name];
+    [cell.userName setText:cell.photo.userName];
     [cell.userName setFont:[UIFont boldSystemFontOfSize:14.0]];
     [cell.userName setTextColor:CCamGrayTextColor];
     
@@ -867,21 +929,14 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     [cell.pictureNote setFont:[UIFont systemFontOfSize:11.0]];
     [cell.pictureNote setTextColor:CCamGrayTextColor];
     [cell.pictureNote setNumberOfLines:0];
-    CGRect textRect = [cell.pictureNote.text boundingRectWithSize:CGSizeMake(cell.frame.size.width-10, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:11.0]} context:nil];
-    [cell.pictureNote setFrame:CGRectMake(5, cell.frame.size.width + 22 +20, cell.frame.size.width-10, textRect.size.height)];
-    
-//    [cell.likeCount setText:cell.photo.like];
-//    [cell.likeCount setFont:[UIFont systemFontOfSize:11.0]];
-//    [cell.likeCount setTextColor:CCamGrayTextColor];
-//    CGRect likeRect = [cell.likeCount.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 15) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:11.0]} context:nil];
-//    [cell.likeCount setFrame:CGRectMake(cell.frame.size.width-8-likeRect.size.width, cell.likeCount.frame.origin.y, likeRect.size.width, likeRect.size.height)];
+    CGRect textRect = [cell.pictureNote.text boundingRectWithSize:CGSizeMake(cell.frame.size.width-16, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:11.0]} context:nil];
+    [cell.pictureNote setFrame:CGRectMake(8, cell.frame.size.width + 22 +20, cell.frame.size.width-16, textRect.size.height)];
     
     [cell.likeButton setTitle:cell.photo.like forState:UIControlStateNormal];
     [cell.likeButton.titleLabel setFont:[UIFont systemFontOfSize:11.0]];
     [cell.likeButton setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
     [cell.likeButton setImage:[[UIImage imageNamed:@"likeIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [cell.likeButton setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
-//    [cell.likeButton setFrame:CGRectMake(cell.likeButton.frame.origin.x - likeRect.size.width - 5, cell.likeButton.frame.origin.y, cell.likeButton.frame.size.width, cell.likeButton.frame.size.height)];
     
     if ([cell.photo.liked isEqualToString:@"1"]) {
         [cell.likeButton setTintColor:CCamRedColor];
@@ -889,8 +944,12 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         [cell.likeButton setTintColor:CCamPhotoSegLightGray];
     }
     [cell.likeButton sizeToFit];
+    [cell.likeButton setFrame:CGRectMake(0, 0, cell.likeButton.frame.size.width+2, 44)];
     [cell.likeButton setCenter:CGPointMake(cell.bounds.size.width-10-cell.likeButton.frame.size.width/2, cell.userName.center.y)];
     [cell.likeButton addTarget:self action:@selector(likePhoto:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [cell.userButton addTarget:self action:@selector(collectionCellUserPage:) forControlEvents:UIControlEventTouchUpInside];
+    [cell.imageButton addTarget:self action:@selector(collectionCellPhotoPage:) forControlEvents:UIControlEventTouchUpInside];
     
     return cell;
     
@@ -898,36 +957,30 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     
-    CCPhoto*photo = [[CCPhoto alloc] init];
-    
-    if (collectionView == self.selectionCollection) {
-        NSLog(@"Collection is selection");
-        photo = [self.selectionPhotos objectAtIndex:indexPath.row];
-      
-    }else if (collectionView == self.popularCollection) {
-        NSLog(@"Collection is hot");
-        photo = [self.popularPhotos objectAtIndex:indexPath.row];
-       
-    }else if (collectionView == self.lastCollection){
-        NSLog(@"Collection is new");
-        photo = [self.lastPhotos objectAtIndex:indexPath.row];
-        
-    }
-//    NSLog(@"Choose item %ld",(long)indexPath.row);
-//    NSLog(@"username is %@",photo.workid);
-//    NSLog(@"username is %@",photo.name);
-//    NSLog(@"description is %@",photo.photoDescription);
-//    NSLog(@"like is %@",photo.like);
-//    NSLog(@"like status is %@",photo.liked);
-
-    CCPhotoViewController *photoView = [[CCPhotoViewController alloc] init];
-    photoView.photoID = photo.workid;
-    photoView.vcTitle = [NSString stringWithFormat:@"%@",photo.name];
-    photoView.hidesBottomBarWhenPushed = YES;
-    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
-    backItem.title=@"";
-    self.navigationItem.backBarButtonItem=backItem;
-    [self.navigationController pushViewController:photoView animated:YES];
+//    CCPhoto*photo = [[CCPhoto alloc] init];
+//    
+//    if (collectionView == self.selectionCollection) {
+//        NSLog(@"Collection is selection");
+//        photo = [self.selectionPhotos objectAtIndex:indexPath.row];
+//      
+//    }else if (collectionView == self.popularCollection) {
+//        NSLog(@"Collection is hot");
+//        photo = [self.popularPhotos objectAtIndex:indexPath.row];
+//       
+//    }else if (collectionView == self.lastCollection){
+//        NSLog(@"Collection is new");
+//        photo = [self.lastPhotos objectAtIndex:indexPath.row];
+//        
+//    }
+//
+//    CCPhotoViewController *photoView = [[CCPhotoViewController alloc] init];
+//    photoView.photoID = photo.workid;
+//    photoView.vcTitle = [NSString stringWithFormat:@"%@",photo.name];
+//    photoView.hidesBottomBarWhenPushed = YES;
+//    UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+//    backItem.title=@"";
+//    self.navigationItem.backBarButtonItem=backItem;
+//    [self.navigationController pushViewController:photoView animated:YES];
 }
 
 //#pragma mark - ScrollView Delegate
@@ -1107,6 +1160,16 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         }];
     }
     
+    if (!cell.deleteBlock) {
+        [cell setDeleteBlock:^(NSIndexPath *indexPath) {
+            [_timeLines removeObjectAtIndex:indexPath.row];
+            [weakSelf.timeline beginUpdates];
+            [weakSelf.timeline deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [weakSelf.timeline endUpdates];
+            [weakSelf.timeline reloadData];
+        }];
+    }
+    
     cell.timeline = (CCTimeLine*)[_timeLines objectAtIndex:indexPath.row];
     cell.parent = self;
     
@@ -1137,7 +1200,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     if ([[MessageHelper sharedManager].messageCount isEqualToString:@"0"]) {
         return 0;
     }else{
-        return 54;
+        return 44;
     }
     
 }
@@ -1150,19 +1213,19 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     static NSString *identifier = @"header";
     UITableViewHeaderFooterView *view = [[UITableViewHeaderFooterView alloc] initWithReuseIdentifier:identifier];
-    [view setFrame:CGRectMake(0, 0, CCamViewWidth, 54)];
+    [view setFrame:CGRectMake(0, 0, CCamViewWidth, 44)];
     
     UIButton* btn = [UIButton new];
-    [btn setFrame:CGRectMake(5, 5, CCamViewWidth-10, 44)];
-    [btn.layer setCornerRadius:5.0];
+    [btn setFrame:CGRectMake(0, 0, CCamViewWidth, 44)];
+//    [btn.layer setCornerRadius:5.0];
 //    [btn.layer setBorderColor:CCamRedColor.CGColor];
 //    [btn.layer setBorderWidth:0.5];
-    [btn.layer setMasksToBounds:YES];
+//    [btn.layer setMasksToBounds:YES];
     [view addSubview:btn];
-    [btn setBackgroundColor:[UIColor whiteColor]];
-    [btn setTitle:[NSString stringWithFormat:@"您有%@条新消息",[MessageHelper sharedManager].messageCount] forState:UIControlStateNormal];
+    [btn setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.7]];
+    [btn setTitle:[NSString stringWithFormat:@"%@%@%@",NSLocalizedString(@"您有", @""),[MessageHelper sharedManager].messageCount,NSLocalizedString(@"条新消息",@"")] forState:UIControlStateNormal];
     [btn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
-    [btn setTitleColor:CCamRedColor forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(loadNewMessage) forControlEvents:UIControlEventTouchUpInside];
     return view;
 }

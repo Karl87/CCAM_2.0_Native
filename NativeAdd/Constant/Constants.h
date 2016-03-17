@@ -19,6 +19,9 @@
 #define GetValidNumber(_x_) (![_x_ isKindOfClass:[NSNull class]] && _x_ != nil) ? [NSString stringWithFormat:@"%@",_x_] : [NSString stringWithFormat:@"0"]
 #define GetValidChar( _x_ ) ( _x_ != NULL ) ? [NSString stringWithFormat:@"%@",_x_] : [NSString stringWithFormat:@""]
 
+
+#define Babel(_x_) NSLocalizedString(_x_, @"")
+
 #define iOS7 [[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0
 #define iOS8 [[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0
 #define iOS9 [[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0

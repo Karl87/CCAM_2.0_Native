@@ -8,6 +8,7 @@
 
 #import "PersonInfoViewController.h"
 
+#import "CCUserViewController.h"
 #import "PersonImageCell.h"
 #import "PersonBasicInfoCell.h"
 
@@ -51,9 +52,17 @@
         [hud hide:YES afterDelay:1.0];
     }];
 }
-
+- (void)returnWhenPresentSelf{
+    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    if ([self.navigationController.viewControllers count]==1) {
+        UIBarButtonItem * dismissBtn = [[UIBarButtonItem alloc] initWithTitle:@"关闭" style:UIBarButtonItemStylePlain target:self action:@selector(returnWhenPresentSelf)];
+        self.navigationItem.rightBarButtonItem = dismissBtn;
+        
+    }
     
     _infoTable = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStylePlain];
     [_infoTable registerClass:[PersonImageCell class] forCellReuseIdentifier:@"imageCell"];
@@ -185,6 +194,13 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if (_parent && [_parent isKindOfClass:[CCUserViewController class]]) {
+        CCUserViewController *user = (CCUserViewController*)_parent;
+        user.needUpdate = YES;
+    }
+    
+    
     if (indexPath.section == 0) {
         if (indexPath.row == 0) {
             UIActionSheet *actionsheet = [[UIActionSheet alloc] initWithTitle:@"编辑照片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"从相册选择",@"拍照", nil];
@@ -359,8 +375,8 @@
         UIGraphicsEndImageContext();
         // 调整图片角度完毕
     }
-    
-    NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+    //压缩用户上传图片
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.4);
     
     NSDictionary *parameters = @{@"token":[[AuthorizeHelper sharedManager] getUserToken]};
     

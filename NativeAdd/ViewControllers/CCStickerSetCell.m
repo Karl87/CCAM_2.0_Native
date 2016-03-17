@@ -16,10 +16,6 @@
         [self setClipsToBounds:YES];
         [self setBackgroundColor:[UIColor clearColor]];
         
-        UIView *selectedBG = [[UIView alloc] initWithFrame:self.bounds];
-        [selectedBG setBackgroundColor:CCamExLightGrayColor];
-        
-        self.selectedBackgroundView = selectedBG;
         if (!_stickerSetImage) {
             _stickerSetImage = [[UIImageView alloc] initWithFrame:CGRectMake(2, 2, self.bounds.size.width-4, self.bounds.size.height-4)];
             [_stickerSetImage setBackgroundColor:[UIColor clearColor]];
@@ -27,6 +23,12 @@
             [_stickerSetImage setClipsToBounds:YES];
             [self.contentView addSubview:_stickerSetImage];
         }
+        
+        UIView *selectedBG = [[UIView alloc] initWithFrame:self.bounds];
+        [selectedBG setBackgroundColor:CCamExLightGrayColor];
+        
+        self.selectedBackgroundView = selectedBG;
+        
     }
     return self;
 }

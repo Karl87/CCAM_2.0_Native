@@ -16,6 +16,7 @@
 
 #import "CCamViewController.h"
 #import "KLTabBarController.h"
+#import "LaunchScreenViewController.h"
 
 #import <MBProgressHUD/MBProgressHUD.h>
 
@@ -24,6 +25,8 @@ void UnityPause( bool pause );
 
 UIViewController *UnityGetGLViewController();
 @interface iOSBindingManager ()
+
+
 @property (nonatomic,strong) KLTabBarController *tabVC;
 @property (nonatomic,strong) KLImagePickerViewController *imagePicker;
 @property (nonatomic,strong) UINavigationController *editSurface;
@@ -39,6 +42,13 @@ UIViewController *UnityGetGLViewController();
 	dispatch_once( &pred, ^{ _sharedInstance = [[self alloc] init]; } );
 	return _sharedInstance;
 }
+- (id)init{
+    self = [super init];
+    if (self) {
+        _showLauchScreen = YES;
+    }
+    return self;
+}
 - (void)initEditScene{
     NSString *rectStr = [NSString stringWithFormat:@"0|%f|1|%f",CCamThinNaviHeight/CCamViewHeight,CCamViewWidth/CCamViewHeight];
     
@@ -46,11 +56,20 @@ UIViewController *UnityGetGLViewController();
 
 }
 - (void)homeAddNativeSurface{
-    if (!_tabVC) {
-        KLTabBarController *tab = [[KLTabBarController alloc] init];
-        _tabVC = tab;
-        [UnityGetGLViewController() presentViewController:tab animated:NO completion:nil];
-    }
+    
+    
+        if (!_tabVC) {
+            KLTabBarController *tab = [[KLTabBarController alloc] init];
+            _tabVC = tab;
+            [UnityGetGLViewController() presentViewController:tab animated:NO completion:nil];
+//            if (_showLauchScreen) {
+//                LaunchScreenViewController *launch = [[LaunchScreenViewController alloc] init];
+//                [_tabVC presentViewController:launch animated:NO completion:^{
+//                    _showLauchScreen = NO;
+//                }];
+//            }
+        }
+    
 }
 - (void)homeRemoveNativeSurface{
     if (_tabVC) {
@@ -109,6 +128,7 @@ UIViewController *UnityGetGLViewController();
     
     return str;
 }
+
 - (void)callLightControl{
     [[DataHelper sharedManager].ccamVC SetLightControlAppear];
 }
@@ -138,19 +158,44 @@ UIViewController *UnityGetGLViewController();
     [[DataHelper sharedManager].ccamVC setHeadDirectionAvilable:hasFunction X:xPos andY:yPos];
 }
 - (void)setLightStrength:(NSString *)strength{
+    NSLog(@"SetLightData first");
+    UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
+    _serie = [[CoreDataHelper sharedManager] getSerie:[self getContestSerieID]];
+    
+    if (_serie) {
+        NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
+        [lightDic setObject:_serie.environmentMin forKey:@"environmentMin"];
+        [lightDic setObject:_serie.environmentMax forKey:@"environmentMax"];
+        [lightDic setObject:_serie.mainLightMin forKey:@"mainLightMin"];
+        [lightDic setObject:_serie.mainLightMax forKey:@"mainLightMax"];
+        [lightDic setObject:_serie.hdrAdd forKey:@"hdrAdd"];
+        [lightDic setObject:_serie.addThread forKey:@"addThread"];
+
+        NSLog(@"灯光参数设置：%@",lightDic);
+        
+        NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
+        NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        UnitySendMessage(UnityController.UTF8String, "SetLightData", jsonString.UTF8String);
+    }
+    
+    
+
+    
     NSLog(@"LIGHTSTRENGTH = %@",strength);
     CGFloat strengthValue = [strength floatValue];
-    if (strengthValue == 0) {
-        strengthValue = 0.4;
-    }
-    [[DataHelper sharedManager].ccamVC setLightStrength:strengthValue*2];
+//    if (strengthValue == 0) {
+//        strengthValue = 0.4;
+//    }
+//    [[DataHelper sharedManager].ccamVC setLightStrength:strengthValue*2];
+    [[DataHelper sharedManager].ccamVC setLightStrength:strengthValue];
+
 }
 - (void)setShadowStrength:(NSString *)strength{
     NSLog(@"SHADOWSTRENGTH = %@",strength);
     CGFloat strengthValue = [strength floatValue];
-    if (strengthValue == 0) {
-        strengthValue = 0.8;
-    }
+//    if (strengthValue == 0) {
+//        strengthValue = 0;
+//    }
     [[DataHelper sharedManager].ccamVC setShadowStrength:strengthValue];
 }
 - (void)callAnimationControl{
@@ -166,7 +211,7 @@ UIViewController *UnityGetGLViewController();
 - (void)cannotAddDifferentSerieCharacter{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view.window animated:YES];
     [[[ViewHelper sharedManager] getCurrentVC].view.window addSubview:hud];
-    hud.labelText = @"无法添加其他系列角色!";
+    hud.labelText = Babel(@"无法添加其他系列角色");
     hud.mode = MBProgressHUDModeText;
     hud.removeFromSuperViewOnHide = YES;
     hud.margin = 15.0f;
@@ -176,7 +221,7 @@ UIViewController *UnityGetGLViewController();
 - (void)cannotAddMoreCharacter{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view.window animated:YES];
     [[[ViewHelper sharedManager] getCurrentVC].view.window addSubview:hud];
-    hud.labelText = @"无法添加更多角色!";
+    hud.labelText = Babel(@"无法添加更多角色");
     hud.mode = MBProgressHUDModeText;
     hud.removeFromSuperViewOnHide = YES;
     hud.margin = 15.0f;
@@ -212,5 +257,17 @@ UIViewController *UnityGetGLViewController();
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Failed" message:@"Photo cannot save!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
+}
+- (UIImage *)createImageWithColor:(UIColor *)color
+{
+    CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return theImage;
 }
 @end

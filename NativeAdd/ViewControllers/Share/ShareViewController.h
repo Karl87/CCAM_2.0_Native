@@ -21,4 +21,6 @@
 @property (nonatomic,assign) BOOL myself;
 @property (nonatomic,strong) CCTimeLine *timeline;
 @property (nonatomic,strong) NSIndexPath *indexPath;
+@property (nonatomic,assign) BOOL onlyShare;
+@property (nonatomic,assign) BOOL isShareImage;
 @end

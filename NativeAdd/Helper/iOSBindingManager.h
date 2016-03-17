@@ -7,8 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CCSerie.h"
 
 @interface iOSBindingManager : NSObject
+
+@property (nonatomic,strong) CCSerie *serie;
+@property (nonatomic,assign) BOOL showLauchScreen;
 
 + (iOSBindingManager*)sharedManager;
 
@@ -40,4 +44,7 @@
 - (void)saveCroppedImageWith:(UIImage *)image;
 - (void)saveImageToAlbum:(UIImage*)image;
 - (void)addStuff;
+
+- (UIImage *)createImageWithColor:(UIColor *)color;
+
 @end

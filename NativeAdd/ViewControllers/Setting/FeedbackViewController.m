@@ -24,13 +24,13 @@
     
     if (_contactInfo.text.length == 0) {
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"请填写联系方式";
+        hud.labelText = Babel(@"请留下您的联系方式");
         [hud hide:YES afterDelay:1.0f];
         return;
     }
     if (_feedbackInfo.text.length ==0) {
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"请填写反馈内容";
+        hud.labelText = Babel(@"请填写您的意见或反馈");
         [hud hide:YES afterDelay:1.0f];
         return;
     }
@@ -43,15 +43,15 @@
     [manager POST:CCamFeedbackURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"发布成功";
-        hud.detailsLabelText = @"您的意见对我们十分重要，我们将尽快处理";
+        hud.labelText = Babel(@"反馈发布成功");
+        hud.detailsLabelText = Babel(@"您的意见对我们十分重要，我们将尽快处理");
         [hud hide:YES afterDelay:2.0f];
         
         _feedbackInfo.text = @"";
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         hud.mode = MBProgressHUDModeText;
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0f];
     }];
 
@@ -59,10 +59,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIBarButtonItem *submit =[[UIBarButtonItem alloc] initWithTitle:@"提交" style:UIBarButtonItemStylePlain target:self action:@selector(submitFeedback)];
+    UIBarButtonItem *submit =[[UIBarButtonItem alloc] initWithTitle:Babel(@"提交") style:UIBarButtonItemStylePlain target:self action:@selector(submitFeedback)];
     [self.navigationItem setRightBarButtonItem:submit];
     
-    _titles = @[@"请留下您的联系方式",@"请填写您的意见或反馈"];
+    _titles = @[Babel(@"请留下您的联系方式"),Babel(@"请填写您的意见或反馈")];
     
     _feedback = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStylePlain];
     [_feedback registerClass:[UITableViewCell class] forCellReuseIdentifier:@"contactCell"];

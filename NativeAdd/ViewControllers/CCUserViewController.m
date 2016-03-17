@@ -25,7 +25,10 @@
 #import <SDAutoLayout/UITableView+SDAutoTableViewCellHeight.h>
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
-@interface CCUserViewController()<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UICollectionViewDataSource,DZNEmptyDataSetDelegate,DZNEmptyDataSetSource>
+@interface CCUserViewController()<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UICollectionViewDataSource,DZNEmptyDataSetDelegate,DZNEmptyDataSetSource,UIScrollViewDelegate>
+
+@property (nonatomic,strong) UIButton *topBtn;
+
 @property (nonatomic,strong)UIScrollView *userBG;
 @property (nonatomic,strong)UIView * userTopView;
 @property (nonatomic,strong)UIImageView *userProfile;
@@ -51,6 +54,48 @@
 
 @implementation CCUserViewController
 
+- (void)reloadInfo{
+    [_userBG.mj_header beginRefreshing];
+}
+- (void)returnTopPosition{
+    [self userPageGoTop];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if (scrollView == _timeline){// || scrollView == _photoCollection) {
+        
+//        NSLog(@"%f",scrollView.contentOffset.y);
+        
+        if (scrollView.contentOffset.y>-131 && scrollView.contentOffset.y<=0) {
+            [_userTopView setCenter:CGPointMake(CCamViewWidth/2, 46-scrollView.contentOffset.y-131)];
+            [_modeView setCenter:CGPointMake(CCamViewWidth/2, 93+19-scrollView.contentOffset.y-131)];
+            [_timeline setContentInset:UIEdgeInsetsMake(131-scrollView.contentOffset.y, 0, _timeline.contentInset.bottom, 0)];
+        }else if(scrollView.contentOffset.y <= -131){
+            [_userTopView setCenter:CGPointMake(CCamViewWidth/2, 46)];
+            [_modeView setCenter:CGPointMake(CCamViewWidth/2, 93+19)];
+            [_timeline setContentInset:UIEdgeInsetsMake(131, 0, _timeline.contentInset.bottom, 0)];
+        }else if(scrollView.contentOffset.y>0){
+            [_userTopView setCenter:CGPointMake(CCamViewWidth/2, -39-46)];
+            [_modeView setCenter:CGPointMake(CCamViewWidth/2, -19)];
+            [_timeline setContentInset:UIEdgeInsetsMake(131, 0, _timeline.contentInset.bottom, 0)];
+        }
+    }else if (scrollView == _photoCollection){
+        
+        if (scrollView.contentOffset.y>-131 && scrollView.contentOffset.y<=0) {
+            [_userTopView setCenter:CGPointMake(CCamViewWidth/2, 46-scrollView.contentOffset.y-131)];
+            [_modeView setCenter:CGPointMake(CCamViewWidth/2, 93+19-scrollView.contentOffset.y-131)];
+            [_photoCollection setContentInset:UIEdgeInsetsMake(131-scrollView.contentOffset.y, 0, _timeline.contentInset.bottom, 0)];
+        }else if(scrollView.contentOffset.y <= -131){
+            [_userTopView setCenter:CGPointMake(CCamViewWidth/2, 46)];
+            [_modeView setCenter:CGPointMake(CCamViewWidth/2, 93+19)];
+            [_photoCollection setContentInset:UIEdgeInsetsMake(131, 0, _timeline.contentInset.bottom, 0)];
+        }else if(scrollView.contentOffset.y>0){
+            [_userTopView setCenter:CGPointMake(CCamViewWidth/2, -39-46)];
+            [_modeView setCenter:CGPointMake(CCamViewWidth/2, -19)];
+            [_photoCollection setContentInset:UIEdgeInsetsMake(131, 0, _timeline.contentInset.bottom, 0)];
+        }
+    }
+}
 - (void)switchShowTimelineOrFlowCollection{
     if (_timeline.hidden) {
         _photoCollection.hidden = YES;
@@ -71,29 +116,44 @@
         [_timeline reloadRowsAtIndexPaths:_reloadIndexs withRowAnimation:UITableViewRowAnimationAutomatic];
         [_reloadIndexs removeAllObjects];
     }
+    
+    if (_needUpdate) {
+        
+        [_userProfile setImage:nil];
+        [_photoCount setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"提交照片")] forState:UIControlStateNormal];
+        [_followerBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"关注者")] forState:UIControlStateNormal];
+        [_followBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"关注")] forState:UIControlStateNormal];
+        
+        [_photos removeAllObjects];
+        [_photoCollection reloadData];
+        [_timeline reloadData];
+        
+        [_userBG.mj_header beginRefreshing];
+        _needUpdate = NO;
+    }
 }
-- (void)viewDidLoad{
-    [super viewDidLoad];
+- (void)initUserUI{
     
-    _reloadIndexs = [NSMutableArray new];
-    _photos = [NSMutableArray new];
+    _needUpdate = NO;
     
-    _userBG = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, CCamViewHeight)];
-    [_userBG setContentSize:CGSizeMake(CCamViewWidth, CCamViewHeight-CCamNavigationBarHeight)];
-    [_userBG setBackgroundColor:CCamViewBackgroundColor];
-    [self.view addSubview:_userBG];
+    [_userBG setBackgroundColor:CCamRedColor];
     
     _userTopView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, 92)];
     [_userTopView setBackgroundColor:[UIColor whiteColor]];
     [_userBG addSubview:_userTopView];
     
+    UIView *redBg = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, 46)];
+    [_userTopView addSubview:redBg];
+    [redBg setBackgroundColor:CCamRedColor];
+    
     _userProfile = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, _userTopView.bounds.size.height-20, _userTopView.bounds.size.height-20)];
     [_userProfile.layer setMasksToBounds:YES];
+    [_userProfile setBackgroundColor:CCamViewBackgroundColor];
     [_userProfile.layer setCornerRadius:_userProfile.bounds.size.height/2];
     [_userTopView addSubview:_userProfile];
     
     _pageFuncBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_pageFuncBtn setFrame:CGRectMake(25+_userProfile.bounds.size.width, 49, _userTopView.bounds.size.width-25-_userProfile.bounds.size.width-10, 24)];
+    [_pageFuncBtn setFrame:CGRectMake(25+_userProfile.bounds.size.width, 58, _userTopView.bounds.size.width-25-_userProfile.bounds.size.width-10, 24)];
     [_pageFuncBtn setTitle:@"" forState:UIControlStateNormal];
     [_pageFuncBtn.titleLabel setFont:[UIFont systemFontOfSize:11.0]];
     [_pageFuncBtn setBackgroundColor:CCamViewBackgroundColor];
@@ -109,32 +169,32 @@
     [_photoCount.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [_photoCount setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
     [_photoCount setContentVerticalAlignment:UIControlContentVerticalAlignmentCenter];
-    [_photoCount setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:@"提交照片"] forState:UIControlStateNormal];
-    [_photoCount setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
+    [_photoCount setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"提交照片")] forState:UIControlStateNormal];
+    [_photoCount setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_userTopView addSubview:_photoCount];
     
-//    _photoCountLab = [UILabel new];
-//    [_photoCountLab setNumberOfLines:0];
-//    [_photoCountLab setTextAlignment:NSTextAlignmentCenter];
-//    [_photoCountLab setFrame:_photoCount.frame];
-//    [_photoCountLab setAttributedText:[self returnStrWithTitle:@"0" andSubtitle:@"提交照片"]];
-//    [_photoCountLab setUserInteractionEnabled:NO];
-//    [_userTopView addSubview:_photoCountLab];
+    //    _photoCountLab = [UILabel new];
+    //    [_photoCountLab setNumberOfLines:0];
+    //    [_photoCountLab setTextAlignment:NSTextAlignmentCenter];
+    //    [_photoCountLab setFrame:_photoCount.frame];
+    //    [_photoCountLab setAttributedText:[self returnStrWithTitle:@"0" andSubtitle:@"提交照片"]];
+    //    [_photoCountLab setUserInteractionEnabled:NO];
+    //    [_userTopView addSubview:_photoCountLab];
     
     _followerBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_followerBtn setFrame:CGRectMake(_pageFuncBtn.frame.origin.x+_pageFuncBtn.frame.size.width/3, 0, _pageFuncBtn.frame.size.width/3, 49)];
     [_followerBtn.titleLabel setNumberOfLines:0];
     [_followerBtn.titleLabel setTextAlignment:NSTextAlignmentCenter];
-    [_followerBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:@"关注者"] forState:UIControlStateNormal];
+    [_followerBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"关注者")] forState:UIControlStateNormal];
     [_followerBtn addTarget:self action:@selector(callFollowerPage) forControlEvents:UIControlEventTouchUpInside];
-    [_followerBtn setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
+    [_followerBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_userTopView addSubview:_followerBtn];
     
     _followBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_followBtn setFrame:CGRectMake(_pageFuncBtn.frame.origin.x+_pageFuncBtn.frame.size.width*2/3, 0, _pageFuncBtn.frame.size.width/3, 49)];
-    [_followBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:@"关注者"] forState:UIControlStateNormal];
+    [_followBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"关注者")] forState:UIControlStateNormal];
     [_followBtn.titleLabel setNumberOfLines:0];
-    [_followBtn setTitleColor:CCamGrayTextColor forState:UIControlStateNormal];
+    [_followBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_followBtn.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [_followBtn addTarget:self action:@selector(callFollowPage) forControlEvents:UIControlEventTouchUpInside];
     [_userTopView addSubview:_followBtn];
@@ -159,30 +219,32 @@
     [_flowBtn setCenter:CGPointMake(_userTopView.bounds.size.height/2, 19)];
     [_modeView addSubview:_flowBtn];
     [_flowBtn addTarget:self action:@selector(switchShowTimelineOrFlowCollection) forControlEvents:UIControlEventTouchUpInside];
-    
+}
+- (void)initPhotoUI{
     UICollectionViewFlowLayout *flowLayout=[[UICollectionViewFlowLayout alloc] init];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
-    
-    _photoCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0,_userTopView.frame.size.height+_modeView.frame.size.height+1 , CCamViewWidth, _userBG.frame.size.height-(_userTopView.frame.size.height+_modeView.frame.size.height+1)) collectionViewLayout:flowLayout];
+
+    _photoCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, CCamViewHeight) collectionViewLayout:flowLayout];
+//    _photoCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0,_userTopView.frame.size.height+_modeView.frame.size.height+1 , CCamViewWidth, _userBG.frame.size.height-(_userTopView.frame.size.height+_modeView.frame.size.height+1)) collectionViewLayout:flowLayout];
     
     [_photoCollection registerClass:[TimelineCollectionCell class] forCellWithReuseIdentifier:@"timelineCollectionCell"];
     [_photoCollection setDelegate:self];
     [_photoCollection setDataSource:self];
     [_photoCollection setBackgroundColor:CCamViewBackgroundColor];
     
-    
-    _timeline = [[UITableView alloc] initWithFrame:CGRectMake(0,_userTopView.frame.size.height+_modeView.frame.size.height+1 , CCamViewWidth, _userBG.frame.size.height-(_userTopView.frame.size.height+_modeView.frame.size.height+1)) style:UITableViewStylePlain];
+    _timeline  = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, CCamViewHeight) style:UITableViewStylePlain];
+    //    _timeline = [[UITableView alloc] initWithFrame:CGRectMake(0,_userTopView.frame.size.height+_modeView.frame.size.height+1 , CCamViewWidth, _userBG.frame.size.height-(_userTopView.frame.size.height+_modeView.frame.size.height+1)) style:UITableViewStylePlain];
     [_timeline setDelegate:self];
     [_timeline setDataSource:self];
     [_timeline setBackgroundColor:CCamViewBackgroundColor];
     [_timeline setSeparatorColor:CCamViewBackgroundColor];
     
     if (self.hidesBottomBarWhenPushed) {
-        [_timeline setContentInset:UIEdgeInsetsMake(0, 0, 64, 0)];
-        [_photoCollection setContentInset:UIEdgeInsetsMake(0, 0, 64, 0)];
+        [_timeline setContentInset:UIEdgeInsetsMake(131, 0, 64, 0)];
+        [_photoCollection setContentInset:UIEdgeInsetsMake(131, 0, 64, 0)];
     }else{
-        [_timeline setContentInset:UIEdgeInsetsMake(0, 0, 64+49, 0)];
-        [_photoCollection setContentInset:UIEdgeInsetsMake(0, 0, 64, 0)];
+        [_timeline setContentInset:UIEdgeInsetsMake(131, 0, 64, 0)];
+        [_photoCollection setContentInset:UIEdgeInsetsMake(131, 0, 64, 0)];
     }
     
     [_userBG addSubview:_photoCollection];
@@ -193,19 +255,28 @@
     MJRefreshNormalHeader *timelineHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(initUserPage)];
     timelineHeader.automaticallyChangeAlpha = YES;
     timelineHeader.lastUpdatedTimeLabel.hidden = YES;
-    _timeline.mj_header = timelineHeader;
+    timelineHeader.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+    [timelineHeader.arrowView setImage:nil];
+    timelineHeader.stateLabel.textColor = [UIColor whiteColor];
+    _userBG.mj_header = timelineHeader;
+
+//    _timeline.mj_header = timelineHeader;
     MJRefreshAutoNormalFooter *timelineFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePhotos)];
     timelineFooter.automaticallyChangeAlpha = YES;
-//    timelineFooter.automaticallyHidden = YES;
+    //    timelineFooter.automaticallyHidden = YES;
     _timeline.mj_footer = timelineFooter;
     
-    MJRefreshNormalHeader *collectionHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(initUserPage)];
-    collectionHeader.automaticallyChangeAlpha = YES;
-    collectionHeader.lastUpdatedTimeLabel.hidden = YES;
-    _photoCollection.mj_header = collectionHeader;
+//    MJRefreshNormalHeader *collectionHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(initUserPage)];
+//    collectionHeader.automaticallyChangeAlpha = YES;
+//    collectionHeader.lastUpdatedTimeLabel.hidden = YES;
+//    _photoCollection.mj_header = collectionHeader;
     MJRefreshAutoNormalFooter *collectionFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePhotos)];
     collectionFooter.automaticallyChangeAlpha = YES;
-    collectionFooter.automaticallyHidden = YES;
+    [collectionFooter setTitle:@"加载更多照片" forState:MJRefreshStateIdle];
+    [collectionFooter setTitle:@"一大波照片正在赶来" forState:MJRefreshStateRefreshing];
+    [collectionFooter setTitle:@"亲，没有更多照片了" forState:MJRefreshStateNoMoreData];
+    collectionFooter.hidden = NO;
+//    collectionFooter.automaticallyHidden = NO;
     _photoCollection.mj_footer = collectionFooter;
     
     
@@ -216,20 +287,34 @@
     _photoCollection.emptyDataSetSource =self;
     _photoCollection.emptyDataSetDelegate = self;
     
-//    if (_userID) {
-//        if ([_userID isEqualToString:@""]) {
-//            _userID = [[AuthorizeHelper sharedManager] getUserID];
-//            [self initUserPage];
-//        }else{
-//            [self initUserPage];
-//        }
-//    }else{
-//        _userID = [[AuthorizeHelper sharedManager] getUserID];
-//        [self initUserPage];
-//    }
+    //    if (_userID) {
+    //        if ([_userID isEqualToString:@""]) {
+    //            _userID = [[AuthorizeHelper sharedManager] getUserID];
+    //            [self initUserPage];
+    //        }else{
+    //            [self initUserPage];
+    //        }
+    //    }else{
+    //        _userID = [[AuthorizeHelper sharedManager] getUserID];
+    //        [self initUserPage];
+    //    }
+}
+- (void)viewDidLoad{
+    [super viewDidLoad];
+    
+    _reloadIndexs = [NSMutableArray new];
+    _photos = [NSMutableArray new];
+    
+    _userBG = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, CCamViewWidth, CCamViewHeight)];
+    [_userBG setContentSize:CGSizeMake(CCamViewWidth, CCamViewHeight)];//-CCamNavigationBarHeight)];
+    [_userBG setBackgroundColor:CCamViewBackgroundColor];
+    [self.view addSubview:_userBG];
+    
+    [self initPhotoUI];
+    [self initUserUI];
     
     if (self.showSetting) {
-        UIBarButtonItem *setting = [[UIBarButtonItem alloc] initWithTitle:@"设置" style:UIBarButtonItemStylePlain target:self action:@selector(callSettingPage)];
+        UIBarButtonItem *setting = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"settingIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(callSettingPage)];
         [self.navigationItem setRightBarButtonItem:setting];
         if (![[AuthorizeHelper sharedManager] checkToken]) {
             [[AuthorizeHelper sharedManager] callAuthorizeView];
@@ -239,6 +324,24 @@
         }
     }else{
         [self initUserPage];
+    }
+    
+    _topBtn = [UIButton new];
+    [_topBtn setBackgroundColor:[UIColor clearColor]];
+    [_topBtn setFrame:CGRectMake(0, 0, CCamNavigationBarHeight - 20, CCamNavigationBarHeight - 20)];
+    [_topBtn setCenter:CGPointMake(self.navigationController.navigationBar.frame.size.width/2, self.navigationController.navigationBar.frame.size.height/2)];
+    [_topBtn addTarget:self action:@selector(userPageGoTop) forControlEvents:UIControlEventTouchUpInside];
+    [self.navigationController.navigationBar addSubview:_topBtn];
+    
+}
+- (void)userPageGoTop{
+    if (_photos.count == 0) {
+        return;
+    }
+    if (_photoCollection.hidden) {
+        [_timeline scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    }else{
+        [_photoCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
     }
 }
 #pragma mark -empty data datasources
@@ -303,10 +406,10 @@
 //        string = [[NSAttributedString alloc] initWithString:@"制作照片" attributes:attributes];
 //    }else
     if (_showSetting && ![[AuthorizeHelper sharedManager] checkToken]) {
-        string = [[NSAttributedString alloc] initWithString:@"登录" attributes:attributes];
+        string = [[NSAttributedString alloc] initWithString:Babel(@"登录") attributes:attributes];
     }else{
         if (_showSetting) {
-            string = [[NSAttributedString alloc] initWithString:@"制作照片" attributes:attributes];
+            string = [[NSAttributedString alloc] initWithString:Babel(@"制作照片") attributes:attributes];
 
         }else{
             string = [[NSAttributedString alloc] initWithString:@"" attributes:attributes];
@@ -346,9 +449,9 @@
 - (NSMutableAttributedString *)returnStrWithTitle:(NSString *)mainTitle andSubtitle:(NSString *)subtitle{
     NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n%@",mainTitle,subtitle]];
     [str addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:13.0] range:NSMakeRange(0, mainTitle.length)];
-    [str addAttribute:NSForegroundColorAttributeName value:CCamGrayTextColor range:NSMakeRange(0, mainTitle.length)];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, mainTitle.length)];
     [str addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10.0] range:NSMakeRange(mainTitle.length+1, subtitle.length)];
-    [str addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:NSMakeRange(mainTitle.length+1, subtitle.length)];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(mainTitle.length+1, subtitle.length)];
     
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
     [paragraphStyle setLineSpacing:5.0];//调整行间距
@@ -362,7 +465,7 @@
             //myself
             [_pageFuncBtn setBackgroundColor:CCamViewBackgroundColor];
             [_pageFuncBtn setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-            [_pageFuncBtn setTitle:@"编辑个人主页" forState:UIControlStateNormal];
+            [_pageFuncBtn setTitle:Babel(@"编辑个人主页") forState:UIControlStateNormal];
             [_pageFuncBtn.layer setBorderColor:CCamViewBackgroundColor.CGColor];
             [_pageFuncBtn.layer setBorderWidth:0.5];
             break;
@@ -370,7 +473,7 @@
             //not followed
             [_pageFuncBtn setBackgroundColor:[UIColor whiteColor]];
             [_pageFuncBtn setTitleColor:CCamRedColor forState:UIControlStateNormal];
-            [_pageFuncBtn setTitle:@"关注" forState:UIControlStateNormal];
+            [_pageFuncBtn setTitle:Babel(@"关注") forState:UIControlStateNormal];
             [_pageFuncBtn.layer setBorderColor:CCamRedColor.CGColor];
             [_pageFuncBtn.layer setBorderWidth:0.5];
             break;
@@ -378,7 +481,7 @@
             //followed
             [_pageFuncBtn setBackgroundColor:CCamYellowColor];
             [_pageFuncBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-            [_pageFuncBtn setTitle:@"已关注" forState:UIControlStateNormal];
+            [_pageFuncBtn setTitle:Babel(@"已关注") forState:UIControlStateNormal];
             [_pageFuncBtn.layer setBorderColor:CCamYellowColor.CGColor];
             [_pageFuncBtn.layer setBorderWidth:0.5];
             break;
@@ -390,8 +493,8 @@
     
     if (_showSetting && ![[AuthorizeHelper sharedManager] checkToken]) {
         [[AuthorizeHelper sharedManager] callAuthorizeView];
-        [_timeline.mj_header endRefreshing];
-        [_photoCollection.mj_header endRefreshing];
+        [_userBG.mj_header endRefreshing];
+//        [_photoCollection.mj_header endRefreshing];
         return;
     }
     
@@ -400,7 +503,7 @@
     }
     
     MBProgressHUD * hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"加载中...";
+    hud.labelText = Babel(@"加载中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -414,12 +517,15 @@
         NSError *error;
         NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
        NSDictionary *receiveDic =[NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
+        if (!_showSetting) {
+            self.title =[[receiveDic objectForKey:@"member"] objectForKey:@"name"];
+        }
         [_userProfile sd_setImageWithURL:[NSURL URLWithString:[[receiveDic objectForKey:@"member"] objectForKey:@"image_url"]]];
-        [_photoCount setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"workNums"] andSubtitle:@"提交照片"] forState:UIControlStateNormal];
+        [_photoCount setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"workNums"] andSubtitle:Babel(@"提交照片")] forState:UIControlStateNormal];
 //        [_photoCountLab setAttributedText:[self returnStrWithTitle:[receiveDic objectForKey:@"workNums"] andSubtitle:@"提交照片"]];
 
-        [_followerBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"byfollowNum"] andSubtitle:@"关注者"] forState:UIControlStateNormal];
-        [_followBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"followNum"] andSubtitle:@"关注"] forState:UIControlStateNormal];
+        [_followerBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"byfollowNum"] andSubtitle:Babel(@"关注者")] forState:UIControlStateNormal];
+        [_followBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"followNum"] andSubtitle:Babel(@"关注")] forState:UIControlStateNormal];
         _ifFollow = [[receiveDic objectForKey:@"ifFollow"] integerValue];
         [self initPageFuncBtn];
         
@@ -428,6 +534,9 @@
         NSArray *receivePhotos = [receiveDic objectForKey:@"works"];
         NSLog(@"当前用户有%ld张照片",[receivePhotos count]);
         if (!receivePhotos || ![receivePhotos count]) {
+            [_userBG.mj_header endRefreshing];
+            [_photoCollection reloadData];
+            [_timeline reloadData];
             return ;
         }
         NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
@@ -467,15 +576,15 @@
         
         [_photoCollection reloadData];
         
-        [_timeline.mj_header endRefreshing];
+        [_userBG.mj_header endRefreshing];
         [_timeline.mj_footer setState:MJRefreshStateIdle];
-        [_photoCollection.mj_header endRefreshing];
+//        [_photoCollection.mj_header endRefreshing];
         [_photoCollection.mj_footer setState:MJRefreshStateIdle];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         [hud hide:YES];
-        [_timeline.mj_header endRefreshing];
+        [_userBG.mj_header endRefreshing];
         [_timeline.mj_footer setState:MJRefreshStateIdle];
-        [_photoCollection.mj_header endRefreshing];
+//        [_photoCollection.mj_header endRefreshing];
         [_photoCollection.mj_footer setState:MJRefreshStateIdle];
         
     }];
@@ -605,6 +714,17 @@
         }];
     }
     
+    if (!cell.deleteBlock) {
+        [cell setDeleteBlock:^(NSIndexPath *indexPath) {
+            [_photos removeObjectAtIndex:indexPath.row];
+            [weakSelf.timeline beginUpdates];
+            [weakSelf.timeline deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [weakSelf.timeline endUpdates];
+            [weakSelf.timeline reloadData];
+            [weakSelf.photoCollection reloadData];
+        }];
+    }
+    
     cell.timeline = (CCTimeLine*)[_photos objectAtIndex:indexPath.row];
     cell.parent = self;
     
@@ -690,7 +810,7 @@
     
     CCFollowViewController *follow = [[CCFollowViewController alloc] init];
     follow.userID = _userID;
-    follow.vcTitle = [NSString stringWithFormat:@"%@的关注列表",self.vcTitle];
+    follow.vcTitle = [NSString stringWithFormat:@"%@%@",self.vcTitle,Babel(@"的关注列表")];
     follow.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
@@ -706,7 +826,7 @@
     
     CCFollowerViewController *follower = [[CCFollowerViewController alloc] init];
     follower.userID = _userID;
-    follower.vcTitle = [NSString stringWithFormat:@"%@的关注者列表",self.vcTitle];
+    follower.vcTitle = [NSString stringWithFormat:@"%@%@",self.vcTitle,Babel(@"的关注者列表")];
     follower.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
@@ -721,7 +841,8 @@
     }
     
     PersonInfoViewController * infoPage = [[PersonInfoViewController alloc] init];
-    infoPage.vcTitle = @"编辑个人信息";
+    infoPage.parent = self;
+    infoPage.vcTitle = Babel(@"编辑个人信息");
     infoPage.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
@@ -736,7 +857,8 @@
 //    }
     
     SettingViewController *settingPage = [[SettingViewController alloc] init];
-    settingPage.vcTitle = @"设置";
+    settingPage.parent = self;
+    settingPage.vcTitle = Babel(@"设置");
     settingPage.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
@@ -745,7 +867,7 @@
 }
 #pragma mark - PageFunc
 - (void)pageFunction{
-    NSString *alertMsg = [NSString stringWithFormat:@"是否取消对%@的关注？",self.vcTitle];
+    NSString *alertMsg = [NSString stringWithFormat:@"%@%@%@?",Babel(@"是否取消对"),self.vcTitle,Babel(@"的关注")];
 
     switch (_ifFollow) {
         case 0:
@@ -758,7 +880,7 @@
             break;
         case 1:
             //followed
-            _deleteFollowAlert = [[UIAlertView alloc] initWithTitle:@"提醒" message:alertMsg delegate:self cancelButtonTitle:@"保持关注" otherButtonTitles:@"取消关注", nil];
+            _deleteFollowAlert = [[UIAlertView alloc] initWithTitle:Babel(@"提示") message:alertMsg delegate:self cancelButtonTitle:Babel(@"保持关注") otherButtonTitles:Babel(@"取消关注"), nil];
             [_deleteFollowAlert show];
             break;
         default:
@@ -768,7 +890,7 @@
 }
 - (void)followUser{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"关注用户...";
+    hud.labelText = Babel(@"关注用户中");
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString *userToken = [[AuthorizeHelper sharedManager] getUserToken];
@@ -782,20 +904,20 @@
             [self initPageFuncBtn];
         }else{
             hud.mode = MBProgressHUDModeText;
-            hud.labelText = @"关注失败！";
+            hud.labelText = Babel(@"关注失败");
             [hud hide:YES afterDelay:1.0];
         }
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"网络异常";
+        hud.labelText = Babel(@"网络故障");
         [hud hide:YES afterDelay:1.0];
     }];
 
 }
 - (void)deleteFollowUser{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"取消关注用户...";
+    hud.labelText = Babel(@"取消关注中");
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString *userToken = [[AuthorizeHelper sharedManager] getUserToken];
@@ -809,12 +931,12 @@
             [self initPageFuncBtn];
         }else{
             hud.mode = MBProgressHUDModeText;
-            hud.labelText = @"取消关注失败！";
+            hud.labelText = Babel(@"取消关注失败");
             [hud hide:YES afterDelay:1.0];
         }
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"网络异常";
+        hud.labelText = Babel(@"网络故障");
         [hud hide:YES afterDelay:1.0];
     }];
 

@@ -11,5 +11,6 @@
 @interface CCamSubmitContestCell : UITableViewCell
 @property (nonatomic,strong) UIView *cellBG;
 @property (nonatomic,strong) UIView *cellSelBG;
+@property (nonatomic,strong) UIButton *cellButton;
 - (void)layoutCell;
 @end

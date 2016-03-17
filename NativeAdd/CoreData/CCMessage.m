@@ -26,6 +26,6 @@
     self.photoID = GetValidString([dic objectForKey:@"workid"]);
     self.replyUserID = GetValidString([dic objectForKey:@"bymemberid"]);
     self.userID = GetValidString([dic objectForKey:@"memberid"]);
-
+    self.messageURL = GetValidString([dic objectForKey:@"url"]);
 }
 @end

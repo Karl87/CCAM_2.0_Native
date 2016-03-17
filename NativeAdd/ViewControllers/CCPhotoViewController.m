@@ -54,10 +54,16 @@
 - (void)initPhotoPage{
     
     MBProgressHUD * hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"加载中...";
+//    hud.labelText = @"加载中...";
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    
+    if (!_photoID || [_photoID isEqualToString:@""]) {
+        [self.navigationController popViewControllerAnimated:YES];
+        return;
+    }
+    
     NSLog(@"访问照片%@",_photoID);
     NSDictionary *parameters = @{@"id" :_photoID};
     [manager POST:CCamGetPhotoPageURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
@@ -157,6 +163,16 @@
             }
             [timeLine setLikes:[[NSOrderedSet alloc] initWithArray:likes]];
             [weakSelf.timeline reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }];
+    }
+    
+    if (!cell.deleteBlock) {
+        [cell setDeleteBlock:^(NSIndexPath *indexPath) {
+            [_photos removeObjectAtIndex:indexPath.row];
+            [weakSelf.timeline beginUpdates];
+            [weakSelf.timeline deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [weakSelf.timeline endUpdates];
+            [weakSelf.timeline reloadData];
         }];
     }
     

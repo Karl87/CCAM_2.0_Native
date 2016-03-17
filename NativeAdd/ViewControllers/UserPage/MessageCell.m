@@ -104,18 +104,25 @@
     if ([_message.messageType isEqualToString:@"2"]) {
         
     }else if ([_message.messageType isEqualToString:@"3"]) {
-        [_userName setTitle:@"系统消息" forState:UIControlStateNormal];
+        [_userName setTitle:Babel(@"系统消息") forState:UIControlStateNormal];
         [_userName sizeToFit];
         _userName.sd_layout.widthIs(_userName.bounds.size.width+2);
         [_profileImage setImage:[UIImage imageNamed:@"ccam"]];
-        [_messageLabel setText:@"棒棒哒，您的作品被选为精选！"];
+        [_messageLabel setText:Babel(@"棒棒哒，您的作品被选为精选！")];
     }else if ([_message.messageType isEqualToString:@"4"]) {
-        [_userName setTitle:@"系统消息" forState:UIControlStateNormal];
+        [_userName setTitle:Babel(@"系统消息") forState:UIControlStateNormal];
         [_userName sizeToFit];
         _userName.sd_layout.widthIs(_userName.bounds.size.width+2);
         [_profileImage setImage:[UIImage imageNamed:@"ccam"]];
     }else if ([_message.messageType isEqualToString:@"5"]) {
-        [_messageLabel setText:@"赞了你的照片！"];
+        [_messageLabel setText:Babel(@"赞了你的照片！")];
+    }else if ([_message.messageType isEqualToString:@"6"]){
+        if (![_message.messageURL isEqualToString:@""]) {
+            [_userName setTitle:Babel(@"系统消息") forState:UIControlStateNormal];
+            [_userName sizeToFit];
+            _userName.sd_layout.widthIs(_userName.bounds.size.width+2);
+            [_profileImage setImage:[UIImage imageNamed:@"ccam"]];
+        }
     }
     
     NSDate* timeDate = [NSDate dateWithTimeIntervalSince1970:[_message.creatTime integerValue]];
@@ -128,13 +135,13 @@
     long temp = 0;
     NSString *result;
     if (timeInterval < 60) {
-        result = [NSString stringWithFormat:@"刚刚"];
+        result = [NSString stringWithFormat:Babel(@"刚刚")];
     }else if((temp = timeInterval/60) <60){
-        result = [NSString stringWithFormat:@"%ld分钟前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"分钟前")];
     }else if((temp = temp/60) <24){
-        result = [NSString stringWithFormat:@"%ld小时前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"小时前")];
     }else if((temp = temp/24) <7){
-        result = [NSString stringWithFormat:@"%ld天前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"天前")];
     }
     //    else if((temp = temp/30) <12){
     //        result = [NSString stringWithFormat:@"%ld月前",temp];
@@ -143,7 +150,7 @@
         //        temp = temp/12;
         //        result = [NSString stringWithFormat:@"%ld年前",temp];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+        [dateFormatter setDateFormat:@"yyyy.MM.dd"];
         result = [dateFormatter stringFromDate:compareDate];
     }
     

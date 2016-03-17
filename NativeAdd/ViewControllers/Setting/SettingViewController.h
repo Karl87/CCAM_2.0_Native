@@ -9,5 +9,5 @@
 #import "KLViewController.h"
 
 @interface SettingViewController : KLViewController
-
+@property (nonatomic,strong) UIViewController *parent;
 @end

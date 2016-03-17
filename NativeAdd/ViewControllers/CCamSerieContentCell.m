@@ -86,7 +86,8 @@
             for (CCAnimation *animation in character.animations) {
                 if ([animation.type isEqualToString:@"pose"]) {
                     _countObj.number++;
-                    [_characterInfos insertObject:animation atIndex:0];
+                    [_characterInfos addObject:animation];
+//                    [_characterInfos insertObject:animation atIndex:0];
                 }
             }
         }else{
@@ -110,7 +111,8 @@
 - (void)downloadFirstCharacter{
     CCCharacter *character = [_characterInfos firstObject];
     [[DataHelper sharedManager]updateAnimationInfo:character];
-    [_surfaceView.surfaceButton setHidden:YES];
+//    [_surfaceView.surfaceButton setHidden:YES];
+    [_surfaceView.surfaceButton setEnabled:NO];
     [_surfaceView.surfaceProgress setHidden:NO];
 }
 - (void)layoutSubviews{
@@ -218,6 +220,24 @@
                 [animationCell.contentView addSubview:animationCell.animationImage];
             }
             
+            if (!animationCell.mask) {
+                animationCell.mask = [UIView new];
+                [animationCell.mask setFrame:animationCell.animationImage.frame];
+                [animationCell.contentView addSubview:animationCell.mask];
+                [animationCell.mask setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.6]];
+                [animationCell.mask setHidden:YES];
+            }
+            
+            if (!animationCell.loading) {
+                animationCell.loading = [UIActivityIndicatorView new];
+                [animationCell.loading setFrame:CGRectMake(0, 0, 44, 44)];
+                [animationCell.contentView addSubview:animationCell.loading];
+                [animationCell.loading setCenter:animationCell.contentView.center];
+                [animationCell.loading setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhite];
+                [animationCell.loading setTintColor:CCamRedColor];
+                animationCell.loading.hidesWhenStopped = YES;
+            }
+            
             [animationCell.animationImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",animationCell.animation.image]] placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType,NSURL *imageURL){
                 POPBasicAnimation *ani = [POPBasicAnimation animationWithPropertyNamed:kPOPViewAlpha];
                 ani.fromValue = [NSNumber numberWithFloat:0.0];
@@ -245,18 +265,19 @@
                 [cell.downloadProgress setHidden:NO];
                 [[DataHelper sharedManager]updateAnimationInfo:cell.character];
             }else{
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请稍候" message:@"模型正在下载，请稍候" delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:Babel(@"请稍候") message:Babel(@"资源文件正在下载") delegate:nil cancelButtonTitle:Babel(@"确定") otherButtonTitles:nil];
                 [alert show];
             }
         }
     }else if ([[_characterInfos objectAtIndex:indexPath.row] isKindOfClass:[CCAnimation class]]){
         
-        
-        
+        CCamAnimationCell * cell = (CCamAnimationCell*)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.row inSection:indexPath.section]];
+        [cell UILoadingCharacter];
 //
         
         CCAnimation * cellAnimation = (CCAnimation*)[_characterInfos objectAtIndex:indexPath.row];
         CCCharacter * cellCharacter = [[CoreDataHelper sharedManager] getCharacter:cellAnimation.characterID];
+                
         NSLog(@"动画名:%@，动画ID:%@,角色名称:%@,角色ID:%@,系列名称:%@,系列ID:%@",cellAnimation.nameCN,cellAnimation.animationID,cellAnimation.character.nameCN,cellAnimation.character.characterID,cellAnimation.character.serie.nameCN,cellAnimation.character.serie.serieID);
         
         NSLog(@"系列区域信息:%@",cellAnimation.character.serie.regionInfo);
@@ -268,25 +289,43 @@
         NSString *region = [[AuthorizeHelper sharedManager] getUserZone];
         NSArray * regionArray = [cellAnimation.character.serie.regionInfo componentsSeparatedByString:@","];
         
-        if([cellAnimation.character.serie.regionType isEqualToString:@"include"]){
-            
-            if ([regionArray indexOfObject:region]==NSNotFound) {
-                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
-                hud.mode = MBProgressHUDModeText;
-                hud.detailsLabelText = @"由于版权原因,该角色无法在您所在的地区使用";
-                [hud hide:YES afterDelay:2.0];
-                return;
+        if([[[AuthorizeHelper sharedManager] getUserGroup] isEqualToString:@"0"]||[[[AuthorizeHelper sharedManager] getUserGroup] isEqualToString:@"ug0"]){
+            if([cellAnimation.character.serie.regionType isEqualToString:@"include"]){
+                
+                if ([regionArray indexOfObject:region]==NSNotFound) {
+                    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
+                    hud.mode = MBProgressHUDModeText;
+                    hud.detailsLabelText = Babel(@"管理员忽略版权地区限制");
+                    [hud hide:YES afterDelay:2.0];
+                }
+            }else if ([cellAnimation.character.serie.regionType isEqualToString:@"exclude"]){
+                if ([regionArray indexOfObject:region]!=NSNotFound) {
+                    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
+                    hud.mode = MBProgressHUDModeText;
+                    hud.detailsLabelText = Babel(@"管理员忽略版权地区限制");
+                    [hud hide:YES afterDelay:2.0];
+                }
             }
-        }else if ([cellAnimation.character.serie.regionType isEqualToString:@"exclude"]){
-            if ([regionArray indexOfObject:region]!=NSNotFound) {
-                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
-                hud.mode = MBProgressHUDModeText;
-                hud.detailsLabelText = @"由于版权原因,该角色无法在您所在的地区使用";
-                [hud hide:YES afterDelay:2.0];
-                return;
+        }else{
+            if([cellAnimation.character.serie.regionType isEqualToString:@"include"]){
+                
+                if ([regionArray indexOfObject:region]==NSNotFound) {
+                    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
+                    hud.mode = MBProgressHUDModeText;
+                    hud.detailsLabelText = Babel(@"由于版权原因,该角色无法在您所在的地区使用");
+                    [hud hide:YES afterDelay:2.0];
+                    return;
+                }
+            }else if ([cellAnimation.character.serie.regionType isEqualToString:@"exclude"]){
+                if ([regionArray indexOfObject:region]!=NSNotFound) {
+                    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[DataHelper sharedManager].ccamVC.view animated:YES];
+                    hud.mode = MBProgressHUDModeText;
+                    hud.detailsLabelText =Babel(@"由于版权原因,该角色无法在您所在的地区使用");
+                    [hud hide:YES afterDelay:2.0];
+                    return;
+                }
             }
         }
-        
         
         NSString *mPath = [NSString stringWithFormat:@"file://%@",[[FileHelper sharedManager] getCharacterFilePath:cellCharacter]];
         NSString *mSerieID = cellCharacter.serieID;

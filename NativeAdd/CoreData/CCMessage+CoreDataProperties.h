@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, retain) NSString *messageUserName;
 @property (nullable, nonatomic, retain) NSString *messageUserImage;
 @property (nullable, nonatomic, retain) NSString *messagePhoto;
+@property (nullable, nonatomic, retain) NSString *messageURL;
 
 @end
 

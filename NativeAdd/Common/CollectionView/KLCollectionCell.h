@@ -12,7 +12,9 @@
 @interface KLCollectionCell : UICollectionViewCell
 @property (nonatomic,strong) CCPhoto *photo;
 @property (nonatomic,strong) UIImageView * avatar;
+@property (nonatomic,strong) UIButton *userButton;
 @property (nonatomic,strong) UIImageView * workImage;
+@property (nonatomic,strong) UIButton *imageButton;
 //@property (nonatomic,strong) UILabel *likeCount;
 @property (nonatomic,strong) UILabel *userName;
 @property (nonatomic,strong) UILabel *pictureNote;

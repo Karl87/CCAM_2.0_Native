@@ -9,5 +9,5 @@
 #import "KLViewController.h"
 
 @interface PersonInfoViewController : KLViewController
-
+@property (nonatomic,strong) UIViewController *parent;
 @end

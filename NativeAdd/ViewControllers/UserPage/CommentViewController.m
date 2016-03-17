@@ -142,8 +142,8 @@
     self.shouldScrollToBottomAfterKeyboardShows = YES;
     self.inverted = NO;
     
-    [self.rightButton setTitle:@"发布" forState:UIControlStateNormal];
-    [self.textView setPlaceholder:@"说点什么吧..."];
+    [self.rightButton setTitle:Babel(@"发布") forState:UIControlStateNormal];
+    [self.textView setPlaceholder:Babel(@"说点什么吧...")];
     self.textInputbar.autoHideRightButton = NO;
     self.textInputbar.maxCharCount = 140;
     self.textInputbar.counterStyle = SLKCounterStyleSplit;
@@ -211,7 +211,7 @@
         
         MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [hud setMode:MBProgressHUDModeText];
-        [hud setLabelText:@"评论加载失败"];
+        [hud setLabelText:Babel(@"评论加载失败")];
         [hud hide:YES afterDelay:1.0];
         
 //        [self.tableView.mj_header endRefreshing];
@@ -221,7 +221,7 @@
 - (void)loadMoreComments{
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"一大波评论正在赶来...";
+//    hud.labelText = @"一大波评论正在赶来...";
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -246,7 +246,7 @@
 //            [self.tableView.mj_footer endRefreshing];
         }else{
             [hud setMode:MBProgressHUDModeText];
-            [hud setLabelText:@"已显示全部评论"];
+            [hud setLabelText:Babel(@"已显示全部评论")];
             [hud hide:YES afterDelay:1.0];
             _noMoreData = YES;
             [self.tableView reloadData];
@@ -259,7 +259,7 @@
 //        [self.tableView.mj_footer endRefreshing];
 //        [self.tableView.mj_header endRefreshing];
         [hud setMode:MBProgressHUDModeText];
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0];
     }];
 }
@@ -296,10 +296,10 @@
         [cell.textLabel setFont:[UIFont boldSystemFontOfSize:13.0]];
         [cell.textLabel setTextColor:[UIColor lightGrayColor]];
         [cell.textLabel setTextAlignment:NSTextAlignmentCenter];
-        [cell.textLabel setText:@"点我加载更多评论"];
+        [cell.textLabel setText:Babel(@"加载更多评论")];
 
         if (_noMoreData) {
-            [cell.textLabel setText:@"已显示全部评论"];
+            [cell.textLabel setText:Babel(@"已显示全部评论")];
         }
         return cell;
     }
@@ -402,7 +402,7 @@
         
         MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [hud setMode:MBProgressHUDModeText];
-        [hud setLabelText:@"评论失败"];
+        [hud setLabelText:Babel(@"评论失败")];
         [hud hide:YES afterDelay:1.0];
     }];
     [self.textView refreshFirstResponder];

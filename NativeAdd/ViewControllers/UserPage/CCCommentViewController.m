@@ -75,7 +75,7 @@
         
         MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [hud setMode:MBProgressHUDModeText];
-        [hud setLabelText:@"评论加载失败"];
+        [hud setLabelText:Babel(@"评论加载失败")];
         [hud hide:YES afterDelay:1.0];
         
         [_commentsTable.mj_header endRefreshing];

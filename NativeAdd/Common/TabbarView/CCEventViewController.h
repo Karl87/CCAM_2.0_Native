@@ -9,4 +9,6 @@
 #import "KLTableViewController.h"
 
 @interface CCEventViewController : KLTableViewController
+- (void)returnTopPosition;
+- (void)reloadInfo;
 @end

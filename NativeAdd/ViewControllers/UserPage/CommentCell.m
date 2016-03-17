@@ -129,7 +129,7 @@
     [_userName setText:_comment.userName];
     
     if ([_comment.dateline isEqualToString:@"-1"]) {
-        [_timeLabel setText:@"刚刚"];
+        [_timeLabel setText:Babel(@"刚刚")];
     }else{
         NSDate* timeDate = [NSDate dateWithTimeIntervalSince1970:[_comment.dateline integerValue]];
         [_timeLabel setText:[self compareCurrentTime:timeDate]];
@@ -144,16 +144,22 @@
     long temp = 0;
     NSString *result;
     if (timeInterval < 60) {
-        result = [NSString stringWithFormat:@"刚刚"];
+        result = [NSString stringWithFormat:Babel(@"刚刚")];
     }else if((temp = timeInterval/60) <60){
-        result = [NSString stringWithFormat:@"%ld分前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"分钟前")];
     }else if((temp = temp/60) <24){
-        result = [NSString stringWithFormat:@"%ld小时前",temp];
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"小时前")];
     }else if((temp = temp/24) <7){
-        result = [NSString stringWithFormat:@"%ld天前",temp];
-    }else{
+        result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"天前")];
+    }
+    //    else if((temp = temp/30) <12){
+    //        result = [NSString stringWithFormat:@"%ld月前",temp];
+    //    }
+    else{
+        //        temp = temp/12;
+        //        result = [NSString stringWithFormat:@"%ld年前",temp];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+        [dateFormatter setDateFormat:@"yyyy.MM.dd"];
         result = [dateFormatter stringFromDate:compareDate];
     }
     

@@ -47,7 +47,7 @@
     
     _version = [UILabel new];
     [_version setBackgroundColor:CCamRedColor];
-    [_version setText:[NSString stringWithFormat:@"当前版本 %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]];
+    [_version setText:[NSString stringWithFormat:@"%@ %@",Babel(@"版本"),[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]];
     [_version setFrame:CGRectMake(0, 0, CCamViewWidth, 44)];
     [_version setCenter:CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2-30)];
     [_version setTextColor:[UIColor whiteColor]];
@@ -57,7 +57,7 @@
     
     _copyright = [UILabel new];
     [_copyright setBackgroundColor:CCamRedColor];
-    [_copyright setText:@"Copyright© 2015 i-Craftsmen Limited. All rights reserved."];
+    [_copyright setText:Babel(@"版权声明")];
     [_copyright setFrame:CGRectMake(0, CCamViewHeight-44-CCamNavigationBarHeight, CCamViewWidth, 44)];
     [_copyright setTextColor:[UIColor whiteColor]];
     [_copyright setFont:[UIFont systemFontOfSize:11.0]];
@@ -67,7 +67,7 @@
     _agreementBtn = [UIButton new];
     [_agreementBtn setBackgroundColor:CCamRedColor];
     [_agreementBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
-    [_agreementBtn setTitle:@"查看用户协议" forState:UIControlStateNormal];
+    [_agreementBtn setTitle:Babel(@"查看用户协议") forState:UIControlStateNormal];
     [_agreementBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_agreementBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [_agreementBtn sizeToFit];
@@ -78,7 +78,7 @@
     _licensesBtn = [UIButton new];
     [_licensesBtn setBackgroundColor:CCamRedColor];
     [_licensesBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
-    [_licensesBtn setTitle:@"Licenses" forState:UIControlStateNormal];
+    [_licensesBtn setTitle:Babel(@"Licenses") forState:UIControlStateNormal];
     [_licensesBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_licensesBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [_licensesBtn sizeToFit];
@@ -90,7 +90,7 @@
     _homepageBtn = [UIButton new];
     [_homepageBtn setBackgroundColor:CCamRedColor];
     [_homepageBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
-    [_homepageBtn setTitle:@"官方网站" forState:UIControlStateNormal];
+    [_homepageBtn setTitle:Babel(@"官方网站") forState:UIControlStateNormal];
     [_homepageBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_homepageBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [_homepageBtn sizeToFit];
@@ -102,7 +102,7 @@
 - (void)callAgreement{
     KLWebViewController *agree = [[KLWebViewController alloc] init];
     agree.webURL = CCamAgreementURL;
-    agree.vcTitle = @"角色相机用户协议";
+    agree.vcTitle = Babel(@"角色相机用户协议");
     agree.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
@@ -113,7 +113,7 @@
 - (void)callHomepage{
     KLWebViewController *agree = [[KLWebViewController alloc] init];
     agree.webURL = CCamHomepageURL;
-    agree.vcTitle = @"角色相机";
+    agree.vcTitle = Babel(@"角色相机");
     agree.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
@@ -122,7 +122,7 @@
 }
 - (void)callLicensespage{
     LicensesViewController *agree = [[LicensesViewController alloc] init];
-    agree.vcTitle = @"Licenses";
+    agree.vcTitle = Babel(@"Licenses");
     agree.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";

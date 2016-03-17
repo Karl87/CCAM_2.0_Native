@@ -122,17 +122,17 @@
     UIImageWriteToSavedPhotosAlbum(capturedImage.rotatedPreviewImage, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
 //    [[iOSBindingManager sharedManager] saveImageToAlbum:capturedImage.rotatedPreviewImage];
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
-    hud.labelText = @"保存照片中...";
+    hud.labelText = Babel(@"保存照片至系统相册");
 }
 - (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo{
     MBProgressHUD *hud = [MBProgressHUD HUDForView:[UIApplication sharedApplication].keyWindow];
     hud.mode = MBProgressHUDModeText;
     if (error) {
-        hud.labelText = @"照片保存失败";
+        hud.labelText = Babel(@"保存照片失败");
         [hud hide:YES afterDelay:1.0];
         [self.fastCamera startRunning];
     }else{
-        hud.labelText = @"照片已保存";
+        hud.labelText = Babel(@"保存照片成功");
         [hud hide:YES afterDelay:1.0];
         [self backToAlbum];
     }
@@ -350,22 +350,25 @@
     [self.albumBG addSubview:_albumNavi];
     //init naviClose
     _albumNaviClose = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_albumNaviClose setShowsTouchWhenHighlighted:YES];
     [_albumNaviClose setTintColor:[UIColor whiteColor]];
     [_albumNaviClose setImage:[[UIImage imageNamed:@"albumClose"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_albumNaviClose sizeToFit];
-    [_albumNaviClose setCenter:CGPointMake(15+_albumNaviClose.frame.size.width/2, _albumNavi.frame.size.height/2)];
+    [_albumNaviClose setFrame:CGRectMake(0, 0, _albumNaviClose.frame.size.width+30, _albumNavi.frame.size.height)];
+    [_albumNaviClose setCenter:CGPointMake(_albumNaviClose.frame.size.width/2, _albumNavi.frame.size.height/2)];
     [_albumNaviClose addTarget:self action:@selector(exitPicker) forControlEvents:UIControlEventTouchUpInside];
     [_albumNavi addSubview:_albumNaviClose];
     //init naviContinue
     _albumNaviContinue = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_albumNaviContinue setTitle:@"下一步" forState:UIControlStateNormal];
+    [_albumNaviContinue setShowsTouchWhenHighlighted:YES];
+    [_albumNaviContinue setTitle:Babel(@"下一步") forState:UIControlStateNormal];
     [_albumNaviContinue.titleLabel setFont:[UIFont systemFontOfSize:14.]];
     [_albumNaviContinue setTitleColor:CCamRedColor forState:UIControlStateNormal];
-    [_albumNaviContinue setFrame:CGRectMake(0, 0, 70, 24)];
-    [_albumNaviContinue.layer setCornerRadius:12.0];
-    [_albumNaviContinue setBackgroundColor:[UIColor whiteColor]];
-    [_albumNaviContinue setTintColor:CCamRedColor];
+    [_albumNaviContinue sizeToFit];
+    [_albumNaviContinue setFrame:CGRectMake(0, 0, _albumNaviContinue.frame.size.width+24, _albumNavi.frame.size.height-16)];
     [_albumNaviContinue setCenter:CGPointMake(_albumNavi.frame.size.width-15-_albumNaviContinue.frame.size.width/2, _albumNavi.frame.size.height/2)];
+    [_albumNaviContinue.layer setCornerRadius:_albumNaviContinue.frame.size.height/2];    [_albumNaviContinue setBackgroundColor:[UIColor whiteColor]];
+    [_albumNaviContinue setTintColor:CCamRedColor];
     [_albumNaviContinue addTarget:self action:@selector(showCroppedImage) forControlEvents:UIControlEventTouchUpInside];
     [_albumNavi addSubview:_albumNaviContinue];
     
@@ -460,6 +463,7 @@
     NSLog(@"%@",[NSValue valueWithCGRect:_captureButtonsBG.frame]);
     
     _captureDeviceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_captureDeviceBtn setShowsTouchWhenHighlighted:YES];
 //    [_captureDeviceBtn setTitle:@"Device" forState:UIControlStateNormal];
     [_captureDeviceBtn setImage:[UIImage imageNamed:@"captureDeviceIcon"] forState:UIControlStateNormal];
     [_captureDeviceBtn sizeToFit];
@@ -468,6 +472,7 @@
     [_captureDeviceBtn addTarget:self action:@selector(switchCameraButtonPressed) forControlEvents:UIControlEventTouchUpInside];
     
     _captureFlashBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_captureFlashBtn setShowsTouchWhenHighlighted:YES];
     [_captureFlashBtn setImage:[UIImage imageNamed:@"captureFlashOffIcon"] forState:UIControlStateNormal];
 //    [_captureFlashBtn setTitle:@"Flash Off" forState:UIControlStateNormal];
     [_captureFlashBtn sizeToFit];
@@ -477,6 +482,7 @@
     
     
     _captureShupBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_captureShupBtn setShowsTouchWhenHighlighted:YES];
     [_captureShupBtn setImage:[UIImage imageNamed:@"captureShupIcon"] forState:UIControlStateNormal];
     [_captureShupBtn sizeToFit];
     [_captureShupBtn setCenter:CGPointMake(_captureButtonsBG.frame.size.width-30-_captureShupBtn.frame.size.width/2, _captureButtonsBG.frame.size.height/2)];

@@ -11,6 +11,7 @@
 #import "KLWebViewController.h"
 #import "AboutUsViewController.h"
 #import "FeedbackViewController.h"
+#import "CCUserViewController.h"
 
 @interface SettingViewController ()<UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>
 @property (nonatomic,strong) UITableView *setting;
@@ -28,9 +29,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    _settings_action = @[@"清理缓存",@"检查更新",@"给个好评",@"意见反馈"];
-    _settings_normal = @[@"关于我们"];
-    _settings_login = @[@"登出"];
+    _settings_action = @[Babel(@"清理缓存"),Babel(@"检查更新"),Babel(@"给个好评"),Babel(@"意见反馈")];
+    _settings_normal = @[Babel(@"关于角色相机")];
+    _settings_login = @[Babel(@"登出")];
     _setting = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStyleGrouped];
     [self.view addSubview:_setting];
     [_setting setBackgroundColor:CCamViewBackgroundColor];
@@ -177,7 +178,7 @@
 }
 - (void)logout{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"登出角色相机中";
+    hud.labelText = Babel(@"登出角色相机中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -188,11 +189,17 @@
         NSString *hubMessage = @"";
         
         if ([jsonStr isEqualToString:@"1"]) {
-            hubMessage = @"登出成功!";
+            hubMessage = Babel(@"登出成功");
             [[AuthorizeHelper sharedManager] setUserToken:@""];
             [[AuthorizeHelper sharedManager] setUserID:@""];
+            
+            if (_parent&&[_parent isKindOfClass:[CCUserViewController class]]) {
+                CCUserViewController *user = (CCUserViewController*)_parent;
+                user.needUpdate = YES;
+            }
+            
         }else{
-            hubMessage = @"登出失败!";
+            hubMessage = Babel(@"登出失败");
         }
         
         hud.labelText = hubMessage;
@@ -200,7 +207,7 @@
         [_setting reloadData];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0f];
     }];
 }
@@ -217,7 +224,7 @@
         if (folderSize/1024.0<1024.0) {
             NSString *size =[NSString stringWithFormat:@"%.2fKB",folderSize/1024.0];
             if ([size isEqualToString:@"0.00KB"]) {
-                size = @"暂无缓存";
+                size = Babel(@"暂无缓存");
             }
             return size;
         }else if (folderSize/1024.0/1024.0<1024.0){
@@ -228,7 +235,7 @@
             return [NSString stringWithFormat:@"%.2fTB",folderSize/1024.0/1024.0/1024.0/1024.0];
         }
     }
-    return @"暂无缓存";
+    return Babel(@"暂无缓存");
 }
 -(float)fileSizeAtPath:(NSString *)path{
     NSFileManager *fileManager=[NSFileManager defaultManager];
@@ -241,7 +248,7 @@
 -(void)clearCache:(NSString *)path{
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"清理缓存文件中...";
+    hud.labelText = Babel(@"清理缓存文件中");
     
     NSFileManager *fileManager=[NSFileManager defaultManager];
     if ([fileManager fileExistsAtPath:path]) {
@@ -253,7 +260,7 @@
         }
     }
     [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
-        hud.labelText = @"缓存文件清理完成！";
+        hud.labelText =Babel(@"缓存我呢见清理完成");
         hud.mode = MBProgressHUDModeText;
         [hud hide:YES afterDelay:1.0];
         [_setting reloadData];
@@ -262,7 +269,7 @@
 }
 - (void)checkAppUpdateWithAppID:(NSString*)appid{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = @"检查更新中...";
+    hud.labelText = Babel(@"检查更新中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -283,31 +290,31 @@
                     NSDictionary *resultDic = [resultArray objectAtIndex:0];
                     NSString *lastVersion = [resultDic objectForKey:@"version"];
                     if ([lastVersion doubleValue]>[currentVersion doubleValue]) {
-                        NSString *message = [NSString stringWithFormat:@"最新版本为%@,是否前往更新？",lastVersion];
+                        NSString *message = [NSString stringWithFormat:@"%@%@,%@？",Babel(@"最新版本为"),lastVersion,Babel(@"是否前往更新")];
                         _updateURL = [[resultDic objectForKey:@"trackViewUrl"] copy];
                         [hud hide:YES];
-                        _updateAlert = [[UIAlertView alloc] initWithTitle:@"提醒" message:message delegate:self cancelButtonTitle:@"暂时不要" otherButtonTitles:@"前往更新", nil];
+                        _updateAlert = [[UIAlertView alloc] initWithTitle:Babel(@"提示") message:message delegate:self cancelButtonTitle:Babel(@"暂时不要") otherButtonTitles:Babel(@"前往更新"), nil];
                         [_updateAlert show];
                     }else if ([lastVersion doubleValue]<[currentVersion doubleValue]) {
                         NSString *message = [NSString stringWithFormat:@"您使用的是测试版本,无法检查更新\n是否前往最新测试本下载页面？"];
                         _testUpdateURL = @"http://fir.im/ccam2/";
                         [hud hide:YES];
-                        _testUpdateAlert = [[UIAlertView alloc] initWithTitle:@"提醒" message:message delegate:self cancelButtonTitle:@"暂时不要" otherButtonTitles:@"打开页面", nil];
+                        _testUpdateAlert = [[UIAlertView alloc] initWithTitle:Babel(@"提示") message:message delegate:self cancelButtonTitle:Babel(@"暂时不要") otherButtonTitles:Babel(@"前往更新"), nil];
                         [_testUpdateAlert show];
                     }else{
                         hud.mode = MBProgressHUDModeText;
-                        [hud setLabelText:@"您使用的是最新版本！"];
+                        [hud setLabelText:Babel(@"您使用的已经是最新版本")];
                         [hud hide:YES afterDelay:2.0f];
                     }
                 }
             }
         }else{
-            [hud setLabelText:@"检查更新失败！"];
+            [hud setLabelText:Babel(@"检查更新失败")];
             [hud hide:YES afterDelay:1.0f];
         }
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [hud setLabelText:@"网络故障"];
+        [hud setLabelText:Babel(@"网络故障")];
         [hud hide:YES afterDelay:1.0f];
     }];
 
@@ -334,7 +341,7 @@
 #pragma mark - Aboutus page
 - (void)callAboutusPage{
     AboutUsViewController *about = [[AboutUsViewController alloc] init];
-    about.vcTitle = @"关于我们";
+    about.vcTitle = Babel(@"关于角色相机");
     about.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
@@ -344,7 +351,7 @@
 #pragma mark - Feedback page
 - (void)callFeedbackPage{
     FeedbackViewController *about = [[FeedbackViewController alloc] init];
-    about.vcTitle = @"意见反馈";
+    about.vcTitle = Babel(@"意见反馈");
     about.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";
