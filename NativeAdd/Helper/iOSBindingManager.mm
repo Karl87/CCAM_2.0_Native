@@ -20,12 +20,16 @@
 
 #import <MBProgressHUD/MBProgressHUD.h>
 
+#import "ChangeSceneViewController.h"
+
 void UnitySendMessage( const char * className, const char * methodName, const char * param );
 void UnityPause( bool pause );
 
 UIViewController *UnityGetGLViewController();
 @interface iOSBindingManager ()
 
+@property (nonatomic,strong) UIWindow * changeSceneTransitionWidow;
+@property (nonatomic,strong) ChangeSceneViewController *changeSceneTransitionView;
 
 @property (nonatomic,strong) KLTabBarController *tabVC;
 @property (nonatomic,strong) KLImagePickerViewController *imagePicker;
@@ -46,6 +50,7 @@ UIViewController *UnityGetGLViewController();
     self = [super init];
     if (self) {
         _showLauchScreen = YES;
+        _currentSerieID = @"0";
     }
     return self;
 }
@@ -54,6 +59,31 @@ UIViewController *UnityGetGLViewController();
     
     UnitySendMessage(UnityController.UTF8String, "InitUnityScene", rectStr.UTF8String);
 
+}
+- (void)callNativeScene{
+    UnitySendMessage(UnityController.UTF8String, "CallHomeScene", "");
+}
+- (void)showChangeSceneTransition{
+    if (_changeSceneTransitionWidow == nil) {
+        _changeSceneTransitionWidow = [[UIWindow alloc] initWithFrame:[UIApplication sharedApplication].keyWindow.bounds];
+        [_changeSceneTransitionWidow setWindowLevel:UIWindowLevelNormal +1];
+        
+        ChangeSceneViewController * ani = [[ChangeSceneViewController alloc] init];
+        _changeSceneTransitionView = ani;
+        [_changeSceneTransitionWidow setRootViewController:_changeSceneTransitionView];
+    }
+    [_changeSceneTransitionWidow makeKeyAndVisible];
+    [self performSelector:@selector(callNativeScene) withObject:nil afterDelay:0.25];
+
+}
+- (void)hideChangeSceneTransition{
+    [_changeSceneTransitionWidow setHidden:YES];
+    [_changeSceneTransitionWidow removeFromSuperview];
+    [_changeSceneTransitionWidow resignKeyWindow];
+    _changeSceneTransitionView = nil;
+    _changeSceneTransitionWidow = nil;
+    NSLog(@"window count = %lu",(unsigned long)[UIApplication sharedApplication].windows.count);
+    [[UIApplication sharedApplication].windows[0] makeKeyAndVisible];
 }
 - (void)homeAddNativeSurface{
     
@@ -80,7 +110,7 @@ UIViewController *UnityGetGLViewController();
 }
 - (void)editAddNativeSurface{
     
-    if (!_editSurface) {
+    if (_showEditNative) {
         KLImagePickerViewController *vc = [[KLImagePickerViewController alloc] init];
         UINavigationController *nv = [[UINavigationController alloc] initWithRootViewController:vc];
         [nv beginAppearanceTransition:YES animated:YES];
@@ -88,19 +118,30 @@ UIViewController *UnityGetGLViewController();
         [UnityGetGLViewController().view addSubview:nv.view];
         [nv didMoveToParentViewController:UnityGetGLViewController()];
         [nv endAppearanceTransition];
-//        _imagePicker = vc;
         _editSurface = nv;
+    }else{
+        _showEditNative = YES;
     }
 }
 - (void)editRemoveNativeSurface{
-    if (!_editSurface) {
-        return;
-    }
-    [_editSurface willMoveToParentViewController:nil];
-    [_editSurface.view removeFromSuperview];
-    [_editSurface removeFromParentViewController];
-    _editSurface =nil;
+//    if (!_editSurface) {
+//        return;
+//    }
+//    for (UIViewController *vc in _editSurface.viewControllers) {
+//        [vc.view removeFromSuperview];
+//        
+//    }
+    
     [self editAddNativeSurface];
+    
+    if (_editSurface) {
+        [_editSurface willMoveToParentViewController:nil];
+        [_editSurface.view removeFromSuperview];
+        [_editSurface removeFromParentViewController];
+        _editSurface =nil;
+    }
+    
+    
 }
 - (void)setSubmitCharactersList:(NSString *)info{
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -116,6 +157,9 @@ UIViewController *UnityGetGLViewController();
     return str;
 }
 - (void)setContestSerieID:(NSString *)info{
+    NSLog(@"超原始%@",info);
+    _currentSerieID = info;
+    
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:info forKey:@"contestserieid"];
 }
@@ -157,26 +201,33 @@ UIViewController *UnityGetGLViewController();
     CGFloat yPos = [[infoDic objectForKey:@"yPos"] floatValue];
     [[DataHelper sharedManager].ccamVC setHeadDirectionAvilable:hasFunction X:xPos andY:yPos];
 }
-- (void)setLightStrength:(NSString *)strength{
-    NSLog(@"SetLightData first");
-    UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
-    _serie = [[CoreDataHelper sharedManager] getSerie:[self getContestSerieID]];
-    
-    if (_serie) {
-        NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
-        [lightDic setObject:_serie.environmentMin forKey:@"environmentMin"];
-        [lightDic setObject:_serie.environmentMax forKey:@"environmentMax"];
-        [lightDic setObject:_serie.mainLightMin forKey:@"mainLightMin"];
-        [lightDic setObject:_serie.mainLightMax forKey:@"mainLightMax"];
-        [lightDic setObject:_serie.hdrAdd forKey:@"hdrAdd"];
-        [lightDic setObject:_serie.addThread forKey:@"addThread"];
-
-        NSLog(@"灯光参数设置：%@",lightDic);
-        
-        NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
-        NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        UnitySendMessage(UnityController.UTF8String, "SetLightData", jsonString.UTF8String);
+- (void)setHeadDirectionState:(NSString *)state{
+    if ([state isEqualToString:@"true"]) {
+        [[DataHelper sharedManager].ccamVC setHeadDirectionAvilable:YES X:0.0 andY:0.0];
+    }else{
+        [[DataHelper sharedManager].ccamVC setHeadDirectionAvilable:NO X:0.0 andY:0.0];
     }
+}
+- (void)setLightStrength:(NSString *)strength{
+    NSLog(@"SetLightData first:%@",strength);
+//    UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
+//    _serie = [[CoreDataHelper sharedManager] getSerie:[self getContestSerieID]];
+//
+//    if (_serie) {
+//        NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
+//        [lightDic setObject:_serie.environmentMin forKey:@"environmentMin"];
+//        [lightDic setObject:_serie.environmentMax forKey:@"environmentMax"];
+//        [lightDic setObject:_serie.mainLightMin forKey:@"mainLightMin"];
+//        [lightDic setObject:_serie.mainLightMax forKey:@"mainLightMax"];
+//        [lightDic setObject:_serie.hdrAdd forKey:@"hdrAdd"];
+//        [lightDic setObject:_serie.addThread forKey:@"addThread"];
+//        [lightDic setObject:_serie.reflectionMax forKey:@"reflectionMax"];
+//        NSLog(@"灯光参数设置：%@",lightDic);
+//        
+//        NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
+//        NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+//        UnitySendMautoessage(UnityController.UTF8String, "SetLightData", jsonString.UTF8String);
+//    }
     
     
 
@@ -211,7 +262,7 @@ UIViewController *UnityGetGLViewController();
 - (void)cannotAddDifferentSerieCharacter{
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view.window animated:YES];
     [[[ViewHelper sharedManager] getCurrentVC].view.window addSubview:hud];
-    hud.labelText = Babel(@"无法添加其他系列角色");
+    hud.detailsLabelText = Babel(@"无法添加其他系列角色");
     hud.mode = MBProgressHUDModeText;
     hud.removeFromSuperViewOnHide = YES;
     hud.margin = 15.0f;
@@ -234,7 +285,11 @@ UIViewController *UnityGetGLViewController();
         _imagePicker = nil;
     }
 }
-
+- (void)touchCharacterInOtherState{
+    if ([DataHelper sharedManager].ccamVC.characterTitleShaker) {
+        [[DataHelper sharedManager].ccamVC.characterTitleShaker shake];
+    }
+}
 - (void)saveCroppedImageWith:(UIImage *)image{
     NSData *imageData = UIImageJPEGRepresentation(image, 0.4);//UIImagePNGRepresentation(image);
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);

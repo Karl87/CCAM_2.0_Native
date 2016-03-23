@@ -17,6 +17,8 @@
 #import "KLWebViewController.h"
 #import "CCPhotoViewController.h"
 
+#import "CCamRefreshFooter.h"
+#import "CCamRefreshHeader.h"
 @interface MessageViewController ()<UITableViewDataSource,UITableViewDelegate>
 @property(nonatomic,strong) NSMutableArray *messages;
 @property (nonatomic,strong) UITableView *message;
@@ -42,19 +44,19 @@
         [_message setContentInset:UIEdgeInsetsMake(0, 0, 64+49, 0)];
         
     }
-    MJRefreshNormalHeader *messageHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadAllMessage)];
+    CCamRefreshHeader *messageHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadAllMessage)];
     messageHeader.automaticallyChangeAlpha = YES;
     messageHeader.lastUpdatedTimeLabel.hidden = YES;
-    [messageHeader setTitle:@"下拉召唤消息" forState:MJRefreshStateIdle];
-    [messageHeader setTitle:@"释放开始召唤消息" forState:MJRefreshStatePulling];
-    [messageHeader setTitle:@"一大波消息正在赶来" forState:MJRefreshStateRefreshing];
+    messageHeader.stateLabel.hidden = YES;
     _message.mj_header = messageHeader;
-    MJRefreshAutoNormalFooter *messageFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreMessage)];
+    CCamRefreshFooter *messageFooter = [CCamRefreshFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreMessage)];
     messageFooter.automaticallyChangeAlpha = YES;
     messageFooter.automaticallyHidden = YES;
-    [messageFooter setTitle:@"更多消息" forState:MJRefreshStateIdle];
-    [messageFooter setTitle:@"一大波消息正在赶来" forState:MJRefreshStateRefreshing];
-    [messageFooter setTitle:@"亲，没有更多消息了" forState:MJRefreshStateNoMoreData];
+    messageFooter.refreshingTitleHidden = YES;
+    messageFooter.stateLabel.hidden = YES;
+//    [messageFooter setTitle:@"更多消息" forState:MJRefreshStateIdle];
+//    [messageFooter setTitle:@"一大波消息正在赶来" forState:MJRefreshStateRefreshing];
+//    [messageFooter setTitle:@"亲，没有更多消息了" forState:MJRefreshStateNoMoreData];
     _message.mj_footer = messageFooter;
     
     if (_showLastest) {

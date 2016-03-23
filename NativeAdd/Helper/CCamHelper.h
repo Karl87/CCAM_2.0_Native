@@ -20,5 +20,6 @@
 #import "SettingHelper.h"
 #import "FileHelper.h"
 #import "MessageHelper.h"
+#import "TutorialHelper.h"
 
 #endif /* CCamHelper_h */

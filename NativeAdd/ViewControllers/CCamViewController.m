@@ -37,6 +37,7 @@
 
 @interface CCamViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,CCamCircleViewDelegat>
 
+@property (nonatomic,assign) BOOL allowShowEraseTutorial;
 @property (nonatomic,assign) BOOL allowSelectTargetSerie;
 
 @property (nonatomic,strong) NSMutableArray *segments;
@@ -63,6 +64,7 @@
 @property (nonatomic,strong) CCamCircleView *lightCircle;
 @property (nonatomic,strong) CCamCircleView *poseCircle;
 @property (nonatomic,strong) CCamCircleView *headCircle;
+@property (nonatomic,strong) UIView *headCircleMask;
 @property (nonatomic,strong) CCamCircleView *faceCircle;
 @property (nonatomic,strong) UIButton * lastPoseBtn;
 @property (nonatomic,strong) UIButton * nextPoseBtn;
@@ -72,6 +74,7 @@
 @property (nonatomic,strong) UIButton * currentFaceBtn;
 @property (nonatomic,strong) WCCircularSlider *lightSlider;
 @property (nonatomic,strong) WCCircularSlider *shadowSlider;
+
 @end
 
 @implementation CCamViewController
@@ -88,6 +91,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+//    _allowShowEraseTutorial = YES;
+    
     [self.view setBackgroundColor:[UIColor clearColor]];
     [self setNavigationView];
 
@@ -103,8 +108,7 @@
     
     [self setLightControlView];
     [self setAnimationControlView];
-    
-    
+
 }
 
 - (void)setAnimationControlView{
@@ -152,7 +156,9 @@
     
     if (!_lastPoseBtn && !_nextPoseBtn && !_currentPoseBtn) {
         _currentPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_currentPoseBtn setFrame:CGRectMake(0, 0, 88, 40)];
+        [_currentPoseBtn setImage:[UIImage imageNamed:@"poseIcon"] forState:UIControlStateNormal];
+        [_currentPoseBtn setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
+        [_currentPoseBtn setFrame:CGRectMake(0, 0, 100, 40)];
         [_currentPoseBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
         [_currentPoseBtn.layer setCornerRadius:_currentPoseBtn.bounds.size.height/2];
         [_currentPoseBtn.layer setMasksToBounds:YES];
@@ -163,7 +169,7 @@
         
         _lastPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_lastPoseBtn setFrame:CGRectMake(0, 0, 40, 40)];
-        [_lastPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x-10-(_currentPoseBtn.bounds.size.width+_lastPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_lastPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x-5-(_currentPoseBtn.bounds.size.width+_lastPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
         [_lastPoseBtn setBackgroundColor:[UIColor clearColor]];
         [_lastPoseBtn setImage:[[UIImage imageNamed:@"lastIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
         [_lastPoseBtn setTintColor:CCamRedColor];
@@ -172,7 +178,7 @@
         
         _nextPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_nextPoseBtn setFrame:CGRectMake(0, 0, 40, 40)];
-        [_nextPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x+10+(_currentPoseBtn.bounds.size.width+_nextPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_nextPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x+5+(_currentPoseBtn.bounds.size.width+_nextPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
         [_nextPoseBtn setBackgroundColor:[UIColor clearColor]];
         [_nextPoseBtn setImage:[[UIImage imageNamed:@"nextIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
         [_nextPoseBtn setTintColor:CCamRedColor];        [_nextPoseBtn addTarget:self action:@selector(changeNextPose) forControlEvents:UIControlEventTouchUpInside];
@@ -182,7 +188,9 @@
     
     if (!_lastFaceBtn && !_nextFaceBtn && !_currentFaceBtn) {
         _currentFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_currentFaceBtn setFrame:CGRectMake(0, 0, 88, 40)];
+        [_currentFaceBtn setImage:[UIImage imageNamed:@"lookIcon"] forState:UIControlStateNormal];
+        [_currentFaceBtn setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
+        [_currentFaceBtn setFrame:CGRectMake(0, 0, 100, 40)];
         [_currentFaceBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
         [_currentFaceBtn.layer setCornerRadius:_currentFaceBtn.bounds.size.height/2];
         [_currentFaceBtn.layer setMasksToBounds:YES];
@@ -193,7 +201,7 @@
         
         _lastFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_lastFaceBtn setFrame:CGRectMake(0, 0, 40, 40)];
-        [_lastFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x-10-(_currentFaceBtn.bounds.size.width+_lastFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_lastFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x-5-(_currentFaceBtn.bounds.size.width+_lastFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
         [_lastFaceBtn setBackgroundColor:[UIColor clearColor]];
         [_lastFaceBtn setImage:[[UIImage imageNamed:@"lastIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
         [_lastFaceBtn setTintColor:CCamRedColor];
@@ -203,7 +211,7 @@
         
         _nextFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_nextFaceBtn setFrame:CGRectMake(0, 0, 40, 40)];
-        [_nextFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x+10+(_currentFaceBtn.bounds.size.width+_nextFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_nextFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x+5+(_currentFaceBtn.bounds.size.width+_nextFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
         [_nextFaceBtn setBackgroundColor:[UIColor clearColor]];
         [_nextFaceBtn setImage:[[UIImage imageNamed:@"nextIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
         [_nextFaceBtn setTintColor:CCamRedColor];        [_animationControl addSubview:_nextFaceBtn];
@@ -217,6 +225,13 @@
         [_headCircle.circleBG setImage:[UIImage imageNamed:@"headCircle"]];
         [_animationControl addSubview:_headCircle];
         [_headCircle setDelegate:self];
+        
+        _headCircleMask = [[UIView alloc] initWithFrame:_headCircle.frame];
+        [_headCircleMask.layer setMasksToBounds:YES];
+        [_headCircleMask.layer setCornerRadius:_headCircleMask.frame.size.height/2];
+        [_headCircleMask setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.4]];
+        [_animationControl addSubview:_headCircleMask];
+        [_headCircleMask setHidden:YES];
     }
 }
 - (void)SetAnimationControlAppear{
@@ -256,11 +271,14 @@
         [_nextPoseBtn setHidden:NO];
     }
     
-    [_currentPoseBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectPose"] forState:UIControlStateNormal];
+    NSString *poseTitle = [[_currentAnimationInfo objectForKey:@"mSelectPose"] stringByReplacingOccurrencesOfString:@"pose" withString:Babel(@"动作")];
+    NSString *lookTitle = [[_currentAnimationInfo objectForKey:@"mSelectFace"] stringByReplacingOccurrencesOfString:@"face" withString:Babel(@"表情")];
+    
+    [_currentPoseBtn setTitle:poseTitle forState:UIControlStateNormal];
     if ([[infoDic objectForKey:@"mSelectFace"] isEqualToString:@""]) {
         [_currentAnimationInfo setObject:@"face1" forKey:@"mSelectFace"];
     }
-    [_currentFaceBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectFace"] forState:UIControlStateNormal];
+    [_currentFaceBtn setTitle:lookTitle forState:UIControlStateNormal];
 }
 
 - (void)changeNextPose{
@@ -270,7 +288,10 @@
         index = 0;
     }
     [_currentAnimationInfo setObject:[_currentPoses objectAtIndex:index] forKey:@"mSelectPose"];
-    [_currentPoseBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectPose"] forState:UIControlStateNormal];
+    
+    NSString *btnTitle = [[_currentAnimationInfo objectForKey:@"mSelectPose"] stringByReplacingOccurrencesOfString:@"pose" withString:Babel(@"动作")];
+    
+    [_currentPoseBtn setTitle:btnTitle forState:UIControlStateNormal];
     [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectPose"]];
 
 }
@@ -281,7 +302,10 @@
         index = [_currentPoses count]-1;
     }
     [_currentAnimationInfo setObject:[_currentPoses objectAtIndex:index] forKey:@"mSelectPose"];
-    [_currentPoseBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectPose"] forState:UIControlStateNormal];
+    
+    NSString *btnTitle = [[_currentAnimationInfo objectForKey:@"mSelectPose"] stringByReplacingOccurrencesOfString:@"pose" withString:Babel(@"动作")];
+    
+    [_currentPoseBtn setTitle:btnTitle forState:UIControlStateNormal];
     [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectPose"]];
 
 }
@@ -292,7 +316,10 @@
         index = 0;
     }
     [_currentAnimationInfo setObject:[_currentFaces objectAtIndex:index] forKey:@"mSelectFace"];
-    [_currentFaceBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectFace"] forState:UIControlStateNormal];
+    
+    NSString *btnTitle = [[_currentAnimationInfo objectForKey:@"mSelectFace"] stringByReplacingOccurrencesOfString:@"face" withString:Babel(@"表情")];
+    
+    [_currentFaceBtn setTitle:btnTitle forState:UIControlStateNormal];
     [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectFace"]];
 
 }
@@ -303,7 +330,10 @@
         index = [_currentFaces count]-1;
     }
     [_currentAnimationInfo setObject:[_currentFaces objectAtIndex:index] forKey:@"mSelectFace"];
-    [_currentFaceBtn setTitle:[_currentAnimationInfo objectForKey:@"mSelectFace"] forState:UIControlStateNormal];
+    
+    NSString *btnTitle = [[_currentAnimationInfo objectForKey:@"mSelectFace"] stringByReplacingOccurrencesOfString:@"face" withString:Babel(@"表情")];
+    
+    [_currentFaceBtn setTitle:btnTitle forState:UIControlStateNormal];
     [self changePoseOrFace:[_currentAnimationInfo objectForKey:@"mSelectFace"]];
 }
 - (void)changePoseOrFace:(NSString*)info{
@@ -321,10 +351,12 @@
 }
 - (void)setHeadDirectionAvilable:(BOOL)avilable X:(CGFloat)x andY:(CGFloat)y{
     if (avilable) {
+        [_headCircleMask setHidden:YES];
         [_headCircle setUserInteractionEnabled:YES];
         [_headCircle.circlePoint setUserInteractionEnabled:YES];
         [_headCircle.circlePoint setCenter:CGPointMake(_headCircle.bounds.size.width/2+x*0.9*0.5*_headCircle.bounds.size.width, _headCircle.bounds.size.height/2+y*0.9*0.5*_headCircle.bounds.size.height)];
     }else{
+        [_headCircleMask setHidden:NO];
         [_headCircle setUserInteractionEnabled:NO];
         [_headCircle.circlePoint setUserInteractionEnabled:NO];
         [_headCircle.circlePoint setCenter:CGPointMake(_headCircle.bounds.size.width/2, _headCircle.bounds.size.height/2)];
@@ -338,6 +370,14 @@
     ani.toValue = [NSValue valueWithCGRect:frame];
     ani.beginTime = CACurrentMediaTime();
     ani.duration = 0.25f;
+    [ani setCompletionBlock:^(POPAnimation *ani, BOOL finish) {
+        if (finish) {
+            if ([TutorialHelper sharedManager].autoShowLightTutorial) {
+                [[TutorialHelper sharedManager] callLightTutorialView];
+            }
+
+        }
+    }];
     [_lightControl pop_addAnimation:ani forKey:@"position"];
     [_navigationSurface setHidden:NO];
 }
@@ -371,13 +411,6 @@
         [lightControlBar setBackgroundColor:CCamViewBackgroundColor];
         [_lightControl addSubview:lightControlBar];
         
-//        UIButton *lightControlLeftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        [lightControlLeftBtn setImage:[[UIImage imageNamed:@"albumClose"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-//        [lightControlLeftBtn setTintColor:CCamRedColor];
-//        [lightControlLeftBtn sizeToFit];
-//        [lightControlBar addSubview:lightControlLeftBtn];
-//        [lightControlLeftBtn setCenter:CGPointMake(10+lightControlLeftBtn.bounds.size.width/2, lightControlBar.bounds.size.height/2)];
-        
         UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, lightControlBar.bounds.size.width, lightControlBar.bounds.size.height)];
         [title setBackgroundColor:[UIColor clearColor]];
         [title setText:Babel(@"灯光阴影调节")];
@@ -393,6 +426,14 @@
         [lightControlBar addSubview:lightControlRightBtn];
         [lightControlRightBtn setCenter:CGPointMake(lightControlBar.bounds.size.width-10-lightControlRightBtn.bounds.size.width/2, lightControlBar.bounds.size.height/2)];
         [lightControlRightBtn addTarget:self action:@selector(SetLightControlDisappear) forControlEvents:UIControlEventTouchUpInside];
+        
+        UIButton *lightHelp = [UIButton new];
+        [lightHelp setImage:[[UIImage imageNamed:@"helpIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [lightHelp setTintColor:CCamRedColor];
+        [lightHelp setFrame:CGRectMake(0, 0, 44, 44)];
+        [lightHelp setCenter:CGPointMake(_lightControl.bounds.size.width-22,22)];
+        [_lightControl addSubview:lightHelp];
+        [lightHelp addTarget:self action:@selector(callLightTutorial) forControlEvents:UIControlEventTouchUpInside];
     }
     if (!_lightCircle) {
         _lightCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
@@ -435,7 +476,7 @@
         [_shadowSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
         [_shadowSlider setStartAngle:-90];
         [_shadowSlider setCutoutAngle:90];
-        [_shadowSlider setProgress:0.5];
+        [_shadowSlider setProgress:0.0];
         [_shadowSlider setLineWidth:5];
         [_shadowSlider setGuideLineColor:CCamBackgoundGrayColor];
         [_shadowSlider setTintColor:CCamRedColor];
@@ -520,13 +561,16 @@
     
     if ([userGroup isEqualToString:versionGroup]) {
         if ([DataHelper sharedManager].series.count == 0) {
+            [[DataHelper sharedManager] getLocalSeriesInfo];
             [[DataHelper sharedManager] updateSeriesInfo];
         }
         if ([DataHelper sharedManager].stickerSets.count == 0) {
+            [[DataHelper sharedManager] getLocalStickerSetsInfo];
             [[DataHelper sharedManager] updateStickerSetsInfo];
         }
     }else{
         [[DataHelper sharedManager] updateSeriesInfo];
+        [[DataHelper sharedManager] updateStickerSetsInfo];
     }
     
     
@@ -593,8 +637,20 @@
     [[iOSBindingManager sharedManager] editRemoveNativeSurface];
 }
 - (void)goToSubmit{
-    UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", "none");
-    [self performSelector:@selector(delayToSubmit) withObject:nil afterDelay:0.1f];
+    UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
+    UnitySendMessage(UnityController.UTF8String, "GetAllCharacterList", "");
+    [self performSelector:@selector(test) withObject:nil afterDelay:0.1];
+    
+    
+    //    UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", "none");
+//    [self performSelector:@selector(delayToSubmit) withObject:nil afterDelay:0.1f];
+}
+- (void)test{
+    NSString* currentSerieID = [[iOSBindingManager sharedManager] getContestSerieID];
+    NSString* currentCharacters = [[iOSBindingManager sharedManager] getSubmitCharactersList];
+    
+    NSLog(@"原始%@ *** %@",currentSerieID,currentCharacters);
+
 }
 - (void)delayToSubmit{
     UnitySendMessage(UnityController.UTF8String, "OnClickConfirmToCaptureImage", "");
@@ -728,6 +784,9 @@
         cellIdentifer = @"segmentCell";
         CCamSegmentCell *segCell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifer forIndexPath:indexPath];
         [segCell.titleLabel setText:[_segmentsShow objectAtIndex:indexPath.row]];
+        if (indexPath.row == 0) {
+            _characterTitleShaker = segCell.shaker;
+        }
         return segCell;
     }else if (collectionView.tag == CCamSegmentContentCollectionView){
         CCamSegmentContentCell *segContentCell;
@@ -902,6 +961,14 @@
                 [segContentCell.contentView addSubview:segContentCell.eraseBrushSlider];
                 [segContentCell.eraseBrushSlider setValue:2 animated:YES];
                 
+                segContentCell.eraseHelpButton = [UIButton new];
+                [segContentCell.eraseHelpButton setImage:[[UIImage imageNamed:@"helpIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+                [segContentCell.eraseHelpButton setTintColor:CCamRedColor];
+                [segContentCell.eraseHelpButton setFrame:CGRectMake(0, 0, 44, 44)];
+                [segContentCell.eraseHelpButton setCenter:CGPointMake(sliderBG.center.x+sliderBG.frame.size.width/2+30, sliderBG.center.y)];
+                [segContentCell.contentView addSubview:segContentCell.eraseHelpButton];
+                [segContentCell.eraseHelpButton addTarget:self action:@selector(callEraseTutorial) forControlEvents:UIControlEventTouchUpInside];
+                
                 self.eraseSize = 2.0;
                 [self setEraseOptions];
             }
@@ -997,6 +1064,11 @@
         CCamFilterCell *filterCell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifer forIndexPath:indexPath];
         [filterCell layoutFilterCell];
         [filterCell.filterLabel setText:[_filters objectAtIndex:indexPath.row]];
+        if (indexPath.row == 0) {
+            [filterCell.filterLabel setTextColor:CCamGrayTextColor];
+        }else{
+            [filterCell.filterLabel setTextColor:[UIColor whiteColor]];
+        }
         [filterCell.filterImage setImage:[UIImage imageNamed:[NSString stringWithFormat:@"%@",[_filters objectAtIndex:indexPath.row]]]];
         return filterCell;
     }
@@ -1076,6 +1148,11 @@
         [_segmentContentCollection setContentOffset:CGPointMake(CCamViewWidth*indexPath.row, 0) animated:YES];
         UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", note.UTF8String);
        
+        if (indexPath.row == 3) {
+            if ([TutorialHelper sharedManager].autoShowEraserTutorial) {
+                [[TutorialHelper sharedManager] callEraseTutorialView];
+            }
+        }
         
     }else if (collectionView.tag == CCamFilterCollectionView){
         [_filterCollection scrollRectToVisible:CGRectMake(_filterCollection.bounds.size.height*indexPath.row, 0, _filterCollection.bounds.size.height,  _filterCollection.bounds.size.height) animated:YES];
@@ -1147,5 +1224,12 @@
 }
 - (void)updateStickerSets{
     [[DataHelper sharedManager] updateStickerSetsInfo];
+}
+#pragma mark - 
+- (void)callEraseTutorial{
+    [[TutorialHelper sharedManager] callEraseTutorialView];
+}
+- (void)callLightTutorial{
+    [[TutorialHelper sharedManager] callLightTutorialView];
 }
 @end

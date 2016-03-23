@@ -79,7 +79,7 @@
 }
 - (void)initFuncButton{
     if ( _ifFollow== 0) {
-        [_funcBtn setTitle:Babel(@"关注") forState:UIControlStateNormal];
+        [_funcBtn setTitle:Babel(@"未关注") forState:UIControlStateNormal];
         [_funcBtn setBackgroundColor:[UIColor whiteColor]];
         [_funcBtn setTitleColor:CCamRedColor forState:UIControlStateNormal];
         [_funcBtn.layer setBorderColor:CCamRedColor.CGColor];
@@ -95,7 +95,7 @@
     }
 }
 - (void)followBtnOnClick{
-    if ([_funcBtn.currentTitle isEqualToString:Babel(@"关注")]) {
+    if ([_funcBtn.currentTitle isEqualToString:Babel(@"未关注")]) {
         [self followUser];
     }else if ([_funcBtn.currentTitle isEqualToString:Babel(@"已关注")]){
         NSString *alertMsg = [NSString stringWithFormat:@"%@%@%@？",Babel(@"是否取消对"),[_user objectForKey:@"name"],Babel(@"的关注")];

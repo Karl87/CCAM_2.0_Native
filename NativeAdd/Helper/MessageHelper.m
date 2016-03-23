@@ -66,6 +66,11 @@
     
     if (![[AuthorizeHelper sharedManager] checkToken]) {
         NSLog(@"User not login, cancel update message!");
+        _messageCount =@"0";
+        NSLog(@"%@",_messageCount);
+        
+        [self updateMessageUI];
+        return;
     }
     NSLog(@"update Message!");
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];

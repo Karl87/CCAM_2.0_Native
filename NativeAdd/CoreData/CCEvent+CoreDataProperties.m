@@ -15,7 +15,9 @@
 
 @dynamic eventCount;
 @dynamic eventCountDown;
-@dynamic eventDescription;
+@dynamic eventDescriptionCn;
+@dynamic eventDescriptionEn;
+@dynamic eventDescriptionZh;
 @dynamic eventImageURLCn;
 @dynamic eventImageURLEn;
 @dynamic eventImageURLZh;

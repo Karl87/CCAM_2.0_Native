@@ -9,11 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "ShareViewController.h"
 #import "CCTimeLine.h"
+#import "TimelineCell.h"
 
 @interface ShareHelper : NSObject
 + (ShareHelper*)sharedManager;
 - (void)initShareSDK;
 
-- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine*)timeline indexPath:(NSIndexPath*)indexPath onlyShare:(BOOL)onlyShare shareImage:(BOOL)shareImage;
+- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine*)timeline timelineCell:(TimelineCell*)cell indexPath:(NSIndexPath*)indexPath onlyShare:(BOOL)onlyShare shareImage:(BOOL)shareImage;
 - (void)dismissShareView;
 @end

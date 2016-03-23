@@ -11,6 +11,9 @@
 #import "EventCell.h"
 #import <MJRefresh/MJRefresh.h>
 #import "KLWebViewController.h"
+#import <SDAutoLayout/UITableView+SDAutoTableViewCellHeight.h>
+
+#import "CCamRefreshHeader.h"
 
 @interface CCEventViewController ()<UITableViewDataSource,UITableViewDelegate>
 @property (nonatomic,assign) BOOL needUpdate;
@@ -41,11 +44,11 @@
 
     [_eventTable setSeparatorColor:CCamViewBackgroundColor];
     
-    MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshEvent)];
+    CCamRefreshHeader *header = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshEvent)];
+    header.stateLabel.hidden = YES;
     header.automaticallyChangeAlpha = YES;
     header.lastUpdatedTimeLabel.hidden = YES;
-    _eventTable.refresh = header;
-    _eventTable.mj_header = _eventTable.refresh;
+    _eventTable.mj_header = header;
 
     [self.eventTable setDelegate:self];
     [self.eventTable setDataSource:self];
@@ -123,11 +126,11 @@
         NSLog(@"%ld",(unsigned long)[_events count]);
         
         [self getLocalEventsInfo];
-        [_eventTable.refresh endRefreshing];
+        [_eventTable.mj_header endRefreshing];
 
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
 
-        [_eventTable.refresh endRefreshing];
+        [_eventTable.mj_header endRefreshing];
     }];
 }
 
@@ -151,19 +154,7 @@
         
         EventCell *cell = [[EventCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         
-        [cell.eventImage setContentMode:UIViewContentModeScaleAspectFit];
-        [cell.eventImage sd_setImageWithURL:[NSURL URLWithString:event.eventImageURLCn] placeholderImage:[[UIImage alloc] init]];
-
-        [cell.eventTitle setTitle:[NSString stringWithFormat:@"  # %@ #    ",event.eventName] forState:UIControlStateNormal];
-        [cell.eventTitle sizeToFit];
-        [cell.eventTitle setCenter:CGPointMake(cell.eventTitle.frame.size.width/2+5, cell.eventImage.frame.size.height+5+cell.eventTitle.frame.size.height/2)];
-        
-        [cell.eventPicNum setTitle:event.eventCount forState:UIControlStateNormal];
-        [cell.eventPicNum sizeToFit];
-        [cell.eventPicNum setCenter:CGPointMake(cell.bounds.size.width-15-cell.eventPicNum.bounds.size.width/2, cell.eventImage.frame.size.height+5+cell.eventPicNum.frame.size.height/2)];
-        
-        [cell.eventDescriptrion setText:event.eventDescription];
-        
+        cell.event = event;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         return cell;
@@ -193,7 +184,8 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 
 {
-    return (CCamViewWidth-10)*285/640+50;
+    id event = [_events objectAtIndex:indexPath.row];
+    return [_eventTable cellHeightForIndexPath:indexPath model:event keyPath:@"event" cellClass:[EventCell class] contentViewWidth:CCamViewWidth];
 }
 
 @end

@@ -14,6 +14,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CCSerie (CoreDataProperties)
+@property (nullable, nonatomic, retain) NSString *reflectionMax;
 @property (nullable, nonatomic, retain) NSString *environmentMin;
 @property (nullable, nonatomic, retain) NSString *environmentMax;
 @property (nullable, nonatomic, retain) NSString *mainLightMin;

@@ -23,6 +23,23 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
 }
+- (void)UILoadingSticker{
+    if (_mask) {
+        [_mask setHidden:NO];
+        if (_loading) {
+            [_loading startAnimating];
+        }
+    }
+    [self performSelector:@selector(UIEndLoading) withObject:nil afterDelay:0.5];
+}
+- (void)UIEndLoading{
+    if (_mask) {
+        [_mask setHidden:YES];
+        if (_loading) {
+            [_loading stopAnimating];
+        }
+    }
+}
 - (void)layoutStickerCell{
     if(!_stickerImage){
         _stickerImage = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width/8, self.bounds.size.height/8, self.bounds.size.width*3/4, self.bounds.size.height*3/4)];
@@ -49,6 +66,24 @@
         [_downloadProgress setSuccessColor:CCamRedColor];
         [_downloadProgress setFailureColor:CCamRedColor];
         [self.contentView addSubview:_downloadProgress];
+    }
+    
+    if (!_mask) {
+        _mask = [UIView new];
+        [_mask setFrame:_stickerImage.frame];
+        [self.contentView addSubview:_mask];
+        [_mask setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.6]];
+        [_mask setHidden:YES];
+    }
+    
+    if (!_loading) {
+        _loading = [UIActivityIndicatorView new];
+        [_loading setFrame:CGRectMake(0, 0, 44, 44)];
+        [self.contentView addSubview:_loading];
+        [_loading setCenter:self.contentView.center];
+        [_loading setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhite];
+        [_loading setTintColor:CCamRedColor];
+        _loading.hidesWhenStopped = YES;
     }
 }
 @end

@@ -8,6 +8,7 @@
 
 #import "KLViewController.h"
 #import "CCTimeLine.h"
+#import "TimelineCell.h"
 
 @protocol ShareViewDelegate <NSObject>
 
@@ -23,4 +24,5 @@
 @property (nonatomic,strong) NSIndexPath *indexPath;
 @property (nonatomic,assign) BOOL onlyShare;
 @property (nonatomic,assign) BOOL isShareImage;
+@property (nonatomic,strong) TimelineCell *timelineCell;
 @end

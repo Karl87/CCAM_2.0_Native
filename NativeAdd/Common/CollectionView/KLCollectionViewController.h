@@ -10,7 +10,8 @@
 #import "KLCollectionView.h"
 #import "KLCollectionLayout.h"
 #import "KLCollectionCell.h"
-
+#import "CCamRefreshHeader.h"
+#import "CCamRefreshFooter.h"
 
 @interface KLCollectionViewController : KLViewController
 

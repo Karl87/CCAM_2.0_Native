@@ -14,7 +14,9 @@
 - (void)initEventWith:(NSDictionary *)dic{
     self.eventCount = GetValidString([dic objectForKey:@"count"]);
     self.eventCountDown = GetValidString([dic objectForKey:@"count_down"]);
-    self.eventDescription = GetValidString([dic objectForKey:@"description"]);
+    self.eventDescriptionCn = GetValidString([dic objectForKey:@"description"]);
+    self.eventDescriptionEn = GetValidString([dic objectForKey:@"description_en"]);
+    self.eventDescriptionZh = GetValidString([dic objectForKey:@"description_zh"]);
     self.eventImageURLCn = GetValidString([dic objectForKey:@"image_url"]);
     self.eventImageURLEn = GetValidString([dic objectForKey:@"image_url_en"]);
     self.eventImageURLZh = GetValidString([dic objectForKey:@"image_url_zh"]);

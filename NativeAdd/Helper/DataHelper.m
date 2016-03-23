@@ -183,6 +183,9 @@
             NSDictionary *receiveDic = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
             NSString *currentVersion = [receiveDic objectForKey:@"version"];
             [[SettingHelper sharedManager] setSettingAttributeWithKey:CCamSettingTagInfoVersion andValue:currentVersion];
+            NSString *currentZone = [receiveDic objectForKey:@"country"];
+            [[AuthorizeHelper sharedManager] setUserZone:currentZone];
+            
             NSArray * tempSeries = (NSArray*)[receiveDic objectForKey:@"series"];
             NSLog(@"tempSeris count = %lu",(unsigned long)tempSeries.count);
             for (int i = 0; i<[tempSeries count]; i++) {
@@ -246,7 +249,7 @@
         [self getLocalSeriesInfo];
         self.serieUpdating = NO;
         if (_serieVC) {
-            [self.serieVC.serieTable.refresh endRefreshing];
+            [self.serieVC.serieTable.mj_header endRefreshing];
         }
         [_updateSeriesHud hide:YES afterDelay:1.0];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
@@ -256,7 +259,7 @@
         [self getLocalSeriesInfo];
         self.serieUpdating = NO;
         if (_serieVC) {
-            [self.serieVC.serieTable.refresh endRefreshing];
+            [self.serieVC.serieTable.mj_header endRefreshing];
         }
         [_updateSeriesHud hide:YES afterDelay:1.0];
     }];
@@ -270,7 +273,13 @@
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
 //    NSString *version = character.version;
+    
+    if (!character.characterID) {
+        return;
+    }
+    
     NSString *characterID = character.characterID;
+    
     NSDictionary *parameters = @{@"token" :token,@"version":@"",@"character_id":characterID};
     
     [[DownloadHelper sharedManager].downloadInfos setObject:@"0.001" forKey:[NSString stringWithFormat:@"Character%@",character.characterID]];
@@ -296,6 +305,7 @@
             [request setPredicate:predicate];
             
             NSArray *datas = [context executeFetchRequest:request error:&error];
+            
             NSLog(@"动画数量为%lu",(unsigned long)[datas count]);
             if (!error && datas && [datas count])
             {

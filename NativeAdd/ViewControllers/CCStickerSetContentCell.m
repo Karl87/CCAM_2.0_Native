@@ -162,6 +162,10 @@
             [alert show];
         }
     }else{
+        
+        CCStickerCell * cell = (CCStickerCell*)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.row inSection:indexPath.section]];
+        [cell UILoadingSticker];
+        
         CCSticker *sticker = cell.sticker;
         NSString *sticker_url = [[FileHelper sharedManager] getStickerFilePath:sticker];
         NSString *sticker_type = sticker.type;
@@ -169,6 +173,7 @@
         NSString *sticker_text_font = sticker.textFont;
         NSString *sticker_text_color = sticker.textColor;
         NSString *sticker_text_coordinates = sticker.text_Coordinates;
+        NSString *sticker_text_size = sticker.textSize;
         
         NSMutableDictionary *stickerJson = [[NSMutableDictionary alloc] init];
         [stickerJson setObject:sticker_url forKey:@"sticker_url"];
@@ -177,6 +182,8 @@
         [stickerJson setObject:sticker_text_font forKey:@"sticker_text_font"];
         [stickerJson setObject:sticker_text_color forKey:@"sticker_text_color"];
         [stickerJson setObject:sticker_text_coordinates forKey:@"sticker_text_coordinates"];
+        [stickerJson setObject:sticker_text_size forKey:@"sticker_text_size"];
+        
         NSData * jsonData = [NSJSONSerialization dataWithJSONObject:stickerJson options:0 error:nil];
         NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 

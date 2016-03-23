@@ -15,7 +15,7 @@
 #import <TencentOpenAPI/TencentOAuth.h>
 #import <TencentOpenAPI/QQApiInterface.h>
 
-@interface ShareViewController ()<UIScrollViewDelegate>
+@interface ShareViewController ()<UIScrollViewDelegate,UIAlertViewDelegate>
 @property (nonatomic,strong) UIView *optionPop;
 @property (nonatomic,strong) UIScrollView *optionView;
 @property (nonatomic,strong) UIPageControl *optionPageControl;
@@ -24,6 +24,7 @@
 @property (nonatomic,strong) UIPageControl *sharePageControl;
 @property (nonatomic,strong) NSMutableArray *optionBtns;
 @property (nonatomic,strong) NSMutableArray *optionLabs;
+@property (nonatomic,strong) UIAlertView *privacyAlert;
 @end
 
 @implementation ShareViewController
@@ -331,21 +332,60 @@
         
     }];
 }
+- (void)setContestPhotoPrivacyWithIndex:(NSInteger)index{
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    NSString *photoID = _timeline.timelineID;
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
+    NSString *contestID = @"-1";
+    NSDictionary *parameters = @{@"workid" :photoID,@"token":token,@"contestid":contestID};
+    [manager POST:CCamPrivacyURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        NSString *result = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        NSLog(@"---->%@",result);
+        UILabel *lab = (UILabel*)[_optionLabs objectAtIndex:index];
+        UIButton *btn = (UIButton*)[_optionBtns objectAtIndex:index];
+
+        _timeline.timelineContestID = @"-1";
+        _timeline.cNameCN = @"";
+
+        [btn setTitle:Babel(@"全部人可见") forState:UIControlStateNormal];
+        [lab setText:Babel(@"全部人可见")];
+        [btn setBackgroundImage:[UIImage imageNamed:@"sheetOpen"] forState:UIControlStateNormal];
+        if (_timelineCell) {
+            if (_timelineCell.privateBlock) {
+                _timelineCell.privateBlock(_timelineCell.indexPath);
+            }
+        }
+
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        
+    }];
+}
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (alertView == _privacyAlert) {
+        if (buttonIndex ==1) {
+            [self setContestPhotoPrivacyWithIndex:alertView.tag];
+        }
+    }
+}
 - (void)setPrivacy:(id)sender state:(BOOL)state{
     
     if (_timeline.timelineContestID) {
         NSLog(@"*****%@",_timeline.timelineContestID);
     }
     //修改
+    
+    UIButton *btn = (UIButton *)sender;
+    
     if(![_timeline.timelineContestID isEqualToString:@""]&&![_timeline.timelineContestID isEqualToString:@"0"]&&![_timeline.timelineContestID isEqualToString:@"-1"]&&![_timeline.timelineContestID isEqualToString:@"<null>"]&&![_timeline.timelineContestID isEqualToString:@"null"]){
         
-        NSString *message = [NSString stringWithFormat:@"您的照片已经参加了比赛'%@', 无法设为仅自己可见, 敬请谅解",_timeline.cNameCN];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:nil cancelButtonTitle:@"我知道了" otherButtonTitles:nil];
-        [alert show];
+        NSString *message = [NSString stringWithFormat:@"您的照片已经参加了比赛'%@',设置为仅自己可见将放弃参加比赛且无法恢复参赛状态, 确定取消？",_timeline.cNameCN];
+        _privacyAlert = [[UIAlertView alloc] initWithTitle:@"提示" message:message delegate:self cancelButtonTitle:Babel(@"暂时不要") otherButtonTitles:Babel(@"确定"),nil];
+        _privacyAlert.tag = [_optionBtns indexOfObject:btn];
+        [_privacyAlert show];
         return;
     }
     
-    UIButton *btn = (UIButton *)sender;
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString *photoID = _timeline.timelineID;
@@ -366,11 +406,21 @@
             [btn setTitle:Babel(@"全部人可见") forState:UIControlStateNormal];
             [lab setText:Babel(@"全部人可见")];
             [btn setBackgroundImage:[UIImage imageNamed:@"sheetOpen"] forState:UIControlStateNormal];
+            if (_timelineCell) {
+                if (_timelineCell.privateBlock) {
+                    _timelineCell.privateBlock(_timelineCell.indexPath);
+                }
+            }
         }else{
             _timeline.timelineContestID = @"0";
             [btn setTitle:Babel(@"仅自己可见") forState:UIControlStateNormal];
             [lab setText:Babel(@"仅自己可见")];
             [btn setBackgroundImage:[UIImage imageNamed:@"sheetMyself"] forState:UIControlStateNormal];
+            if (_timelineCell) {
+                if (_timelineCell.privateBlock) {
+                    _timelineCell.privateBlock(_timelineCell.indexPath);
+                }
+            }
         }
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {

@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WLCircleProgressView.h"
 
 @interface SerieCell : UITableViewCell
 @property (nonatomic,strong) UIImageView *serieImage;
-
+@property (nonatomic,strong) WLCircleProgressView *imageProgress;
 @end

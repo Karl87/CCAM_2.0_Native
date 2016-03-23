@@ -29,15 +29,15 @@
 "最新" = "New";
 //登录
 "登录" = "Login";
-"注册" = "Register";
+"注册" = "Sign Up";
 "修改密码" = "Forgot password";
 "请输入手机号码" = "Mobile Number";
 "请输入密码" = "Password";
-"请输入验证码" = "Verification Code";
-"获取验证码" = "Verify";
+"请输入验证码" = "Enter Code";
+"获取验证码" = "Get Code";
 "秒" = "sec";
 "社交平台账户登录" = "Sign in with SNS account";
-"我同意《角色相机使用协议》" = "you are agreeing to the 《Character Cam Terms of Service》";
+"我同意《角色相机使用协议》" = "By logging in, you are agreeing to the 《Character Cam Terms of Service》";
 "角色相机用户协议" = "Character Cam Terms of Service";
 "完善用户信息" = "Complete Profile";
 "登录角色相机中" = "Logging in...";
@@ -88,15 +88,15 @@
 "全部" = "All ";
 "条评论" = " comments";
 
-"分享拉赞" = "Share link";
-"分享照片" = "Share photo";
+"分享拉赞" = "Share Link";
+"分享照片" = "Share Photo";
 "举报照片" = "Report";
-"取消举报" = "Cancel report";
+"取消举报" = "Dis-Report";
 "下载照片" = "Download";
 "删除照片" = "Delete";
-"仅自己可见" = "Set private";
-"全部人可见" = "Set pubulic";
-"管理员工具" = "Admin tools";
+"仅自己可见" = "Set Private";
+"全部人可见" = "Set Pubulic";
+"管理员工具" = "Admin";
 
 "微信" = "WeChat";
 "朋友圈" = "Moment";
@@ -125,7 +125,7 @@
 "照片详情" = "Photo";
 
 //系列
-"推荐" = "Highlight";
+"推荐" = "Best";
 "是否前往制作页面" = "Create photo";
 "使用" = "use";
 "制作照片" = "make photo";
@@ -135,16 +135,17 @@
 "关注" = "Following";
 "编辑个人主页" = "Edit Profile";
 "取消关注" = "Unfollow";
+"未关注" = "Unfollow";
 "已关注" = "Following";
 "是否取消对" = "Unfollow ";
 "的关注" = "?";
 "保持关注" = "Cancel";
 "取消关注" = "Unfollow";
-"关注用户中" = "Following";
-"关注成功" ="Follow success";
-"关注失败" = "Follow failed";
-"取消关注中" = "Unfollowing";
-"取消关注失败" = "Unfollow failed";
+"关注用户中" = "Following user";
+"关注成功" ="User followed";
+"关注失败" = "Unfollowing user";
+"取消关注中" = "Unfollowing user";
+"取消关注失败" = "User unfollowed";
 //评论页
 "照片评论" = "Comments";
 "加载更多评论" = "Show more comments";
@@ -155,13 +156,13 @@
 //设置
 "设置" = "Settings";
 
-"清理缓存" = "Clear cache";
+"清理缓存" = "Clear Cache";
 "清理缓存文件中" = "Cleaning cache";
 
 "缓存文件清理完成" = "Cache cleared";
 "缓存文件清理失败" = "Clear cache failed";
 "暂无缓存" = "Cache is empty";
-"检查更新" = "Check for update";
+"检查更新" = "Check for Update";
 "检查更新中" = "Checking for update";
 "最新版本为" = "New version is ";
 "是否前往更新" = " update now";
@@ -170,8 +171,8 @@
 "检查更新失败" = "Checking for update failed";
 
 
-"给个好评" = "Rate us";
-"意见反馈" = "Report a problem";
+"给个好评" = "Like Us? Rate us!";
+"意见反馈" = "Report a Problem";
 "请留下您的联系方式" = "Please leave a contact";
 "请填写您的意见或反馈" = "Let us know what you like, or what could improve";
 
@@ -180,17 +181,17 @@
 
 "关于角色相机" = "About Charact Cam";
 "版本" = "Version ";
-"官方网站" = "Website";
+"官方网站" = "Homepage";
 "查看用户协议" = "Terms of services";
 "Licenses" = "License";
-"版权声明" = "Copyright© 2015 i-Craftsmen Limited. All rights reserved.";//Copyright© 2015 i-Craftsmen Limited. All rights reserved.
+"版权声明" = "Copyright© i-Craftsmen Limited.";//Copyright© 2015 i-Craftsmen Limited. All rights reserved.
 
 //制作部分
 "下一步" = "Next";
 "3D角色" = "3D";
 "贴纸" = "Sticker";
 "滤镜" = "Filter";
-"擦除" = "Mask";
+"擦除" = "Eraser";
 
 "更新角色信息中" = "Fetching new characters...";
 "当前角色信息已是最新版本" = "All characters are already here!";
@@ -212,13 +213,13 @@
 "正在下载" = "Downloading";
 
 "免费下载" = "Free download";
-"动作表情调节" = "Pose & expression";
-"灯光阴影调节" = "Lighting and shadow";
+"动作表情调节" = "Pose & Look";
+"灯光阴影调节" = "Light & Shadow";
 "阴影强度" = "Shadow";
 "灯光强度" = "Light";
-"恢复" = "Unmask";
+"恢复" = "Recover";
 "重置" = "Reset";
-"擦除区域" = "Masked area";
+"擦除区域" = "Show Erased";
 "发布照片" = "Submit";
 "加载活动列表" = "Loading events";
 "点击重新加载活动列表" = "Click to reload events";
@@ -237,14 +238,16 @@
 "活动详情" = "Event";
 "系统消息" = "System message";
 "棒棒哒，您的作品被选为精选！" = "Great work! Spotlight Photo has been awarded!";
-"赞了你的照片！" = " like your photo!";
+"赞了你的照片！" = " liked your photo!";
 
 //关注者页面
 "的关注者列表" = "'s followers";
 //关注页面
 "的关注列表" = "'s followings";
 
-
+//
+"表情" = "Look";
+"动作" = "Pose";
 
 
 

@@ -40,6 +40,8 @@
 @property (nonatomic, strong) NSIndexPath *indexPath;
 @property (nonatomic, copy) void (^likeButtonBlock)(NSIndexPath *indexPath);
 @property (nonatomic, copy) void (^deleteBlock)(NSIndexPath *indexPath);
+@property (nonatomic, copy) void (^privateBlock)(NSIndexPath *indexPath);
+
 - (void)reloadComments;
 
 @end

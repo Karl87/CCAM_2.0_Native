@@ -187,8 +187,16 @@
 }
 
 - (void)loadComments{
+    
+    if (!_photoID || [_photoID isEqualToString:@""]) {
+        return;
+    }
+    
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    
+    
+    
     NSDictionary *parameters = @{@"workid":_photoID};
     [manager POST:CCamGetCommentURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
@@ -363,13 +371,23 @@
 
 - (void)didPressRightButton:(id)sender{
     
+    [self.textView resignFirstResponder];
+    
+    
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString *comment = [NSString stringWithFormat:@"%@",[self.textView.text copy]];
     NSDictionary *parameters = @{@"workid":_photoID,@"comment":comment,@"token":[[AuthorizeHelper sharedManager] getUserToken]};
     NSLog(@"%@",parameters);
     [manager POST:CCamSendCommentURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-//        NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
+        NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
+        NSString * result =[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        
+        if ([result isEqualToString:@"-1"]) {
+            [[AuthorizeHelper sharedManager] loginStateError];
+            return;
+        }
+        
         NSManagedObjectContext *context = [[CoreDataHelper sharedManager] managedObjectContext];
         CCComment *commentObj = [NSEntityDescription insertNewObjectForEntityForName:@"CCComment" inManagedObjectContext:context];
         commentObj.commentID = @"";

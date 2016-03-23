@@ -7,11 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CCEvent.h"
 
 @interface EventCell : UITableViewCell
-@property (nonatomic,strong) UIView *eventBG;
-@property (nonatomic,strong) UIImageView *eventImage;
-@property (nonatomic,strong) UIButton *eventTitle;
-@property (nonatomic,strong) UIButton *eventPicNum;
-@property (nonatomic,strong) UILabel *eventDescriptrion;
+@property (nonatomic,strong) CCEvent *event;
+
 @end

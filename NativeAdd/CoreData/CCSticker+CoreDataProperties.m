@@ -24,5 +24,5 @@
 @dynamic textColor;
 @dynamic text_Coordinates;
 @dynamic stickerset;
-
+@dynamic textSize;
 @end

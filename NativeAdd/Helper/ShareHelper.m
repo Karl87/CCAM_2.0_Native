@@ -93,7 +93,7 @@
          }
      }];
 }
-- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine *)timeline indexPath:(NSIndexPath *)indexPath onlyShare:(BOOL)onlyShare shareImage:(BOOL)shareImage{
+- (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine *)timeline timelineCell:(TimelineCell*)cell indexPath:(NSIndexPath *)indexPath onlyShare:(BOOL)onlyShare shareImage:(BOOL)shareImage{
     if (!_shareWindow) {
         _shareWindow = [[UIWindow alloc] initWithFrame:[UIApplication sharedApplication].keyWindow.bounds];
         [_shareWindow setUserInteractionEnabled:YES];
@@ -108,6 +108,7 @@
         }else{
             ani.onlyShare = NO;
         }
+        ani.timelineCell = cell;
         ani.isShareImage = shareImage;
         ani.timeline = timeline;
         ani.indexPath = indexPath;

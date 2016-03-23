@@ -18,6 +18,10 @@
 @property (nonatomic,strong) UIImageView *stateImage;
 @property (nonatomic,strong) M13ProgressViewBorderedBar *downloadProgress;
 
+@property (nonatomic,strong) UIView *mask;
+@property (nonatomic,strong) UIActivityIndicatorView *loading;
+
 - (void)layoutStickerCell;
+- (void)UILoadingSticker;
 
 @end

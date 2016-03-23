@@ -25,9 +25,14 @@
 #import <SDAutoLayout/UITableView+SDAutoTableViewCellHeight.h>
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
+#import "CCamRefreshHeader.h"
+#import "CCamRefreshFooter.h"
+
 @interface CCUserViewController()<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UICollectionViewDataSource,DZNEmptyDataSetDelegate,DZNEmptyDataSetSource,UIScrollViewDelegate>
 
 @property (nonatomic,strong) UIButton *topBtn;
+
+@property (nonatomic,strong) UILabel *titleLab;
 
 @property (nonatomic,strong)UIScrollView *userBG;
 @property (nonatomic,strong)UIView * userTopView;
@@ -135,6 +140,14 @@
 - (void)initUserUI{
     
     _needUpdate = NO;
+    
+    _titleLab = [UILabel new];
+    [_titleLab setBackgroundColor:CCamRedColor];
+    [_titleLab setFont:[UIFont fontWithName:@"HelveticaNeue-CondensedBlack" size:21.0]];
+    [_titleLab setTextColor:[UIColor whiteColor]];
+    [_titleLab setTextAlignment:NSTextAlignmentCenter];
+    [_titleLab setFrame:CGRectMake(0, 0, 200, self.navigationController.navigationBar.frame.size.height)];
+    [self.navigationItem setTitleView:_titleLab];
     
     [_userBG setBackgroundColor:CCamRedColor];
     
@@ -252,16 +265,19 @@
     
     [_timeline setHidden:YES];
     
-    MJRefreshNormalHeader *timelineHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(initUserPage)];
+    CCamRefreshHeader *timelineHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(initUserPage)];
+    timelineHeader.stateLabel.hidden = YES;
     timelineHeader.automaticallyChangeAlpha = YES;
     timelineHeader.lastUpdatedTimeLabel.hidden = YES;
-    timelineHeader.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
-    [timelineHeader.arrowView setImage:nil];
-    timelineHeader.stateLabel.textColor = [UIColor whiteColor];
+//    timelineHeader.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+//    [timelineHeader.arrowView setImage:nil];
+//    timelineHeader.stateLabel.textColor = [UIColor whiteColor];
     _userBG.mj_header = timelineHeader;
 
 //    _timeline.mj_header = timelineHeader;
-    MJRefreshAutoNormalFooter *timelineFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePhotos)];
+    CCamRefreshFooter *timelineFooter = [CCamRefreshFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePhotos)];
+    timelineFooter.refreshingTitleHidden = YES;
+    timelineFooter.stateLabel.hidden = YES;
     timelineFooter.automaticallyChangeAlpha = YES;
     //    timelineFooter.automaticallyHidden = YES;
     _timeline.mj_footer = timelineFooter;
@@ -270,11 +286,13 @@
 //    collectionHeader.automaticallyChangeAlpha = YES;
 //    collectionHeader.lastUpdatedTimeLabel.hidden = YES;
 //    _photoCollection.mj_header = collectionHeader;
-    MJRefreshAutoNormalFooter *collectionFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePhotos)];
+    CCamRefreshFooter *collectionFooter = [CCamRefreshFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePhotos)];
     collectionFooter.automaticallyChangeAlpha = YES;
-    [collectionFooter setTitle:@"加载更多照片" forState:MJRefreshStateIdle];
-    [collectionFooter setTitle:@"一大波照片正在赶来" forState:MJRefreshStateRefreshing];
-    [collectionFooter setTitle:@"亲，没有更多照片了" forState:MJRefreshStateNoMoreData];
+    collectionFooter.refreshingTitleHidden = YES;
+    collectionFooter.stateLabel.hidden = YES;
+//    [collectionFooter setTitle:@"加载更多照片" forState:MJRefreshStateIdle];
+//    [collectionFooter setTitle:@"一大波照片正在赶来" forState:MJRefreshStateRefreshing];
+//    [collectionFooter setTitle:@"亲，没有更多照片了" forState:MJRefreshStateNoMoreData];
     collectionFooter.hidden = NO;
 //    collectionFooter.automaticallyHidden = NO;
     _photoCollection.mj_footer = collectionFooter;
@@ -517,17 +535,28 @@
         NSError *error;
         NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
        NSDictionary *receiveDic =[NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
-        if (!_showSetting) {
-            self.title =[[receiveDic objectForKey:@"member"] objectForKey:@"name"];
+        
+        if(![GetValidString([receiveDic objectForKey:@"member"]) isEqualToString:@""]){
+            
+            [_titleLab setText:GetValidString([[receiveDic objectForKey:@"member"] objectForKey:@"name"])];
+            [_userProfile sd_setImageWithURL:[NSURL URLWithString:[[receiveDic objectForKey:@"member"] objectForKey:@"image_url"]]];
+            [_photoCount setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"workNums"] andSubtitle:Babel(@"提交照片")] forState:UIControlStateNormal];
+            [_followerBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"byfollowNum"] andSubtitle:Babel(@"关注者")] forState:UIControlStateNormal];
+            [_followBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"followNum"] andSubtitle:Babel(@"关注")] forState:UIControlStateNormal];
+            _ifFollow = [[receiveDic objectForKey:@"ifFollow"] integerValue];
+            [self initPageFuncBtn];
+        }else{
+            [_titleLab setText:@""];
+            [_userProfile sd_setImageWithURL:[NSURL URLWithString:@""]];
+            [_photoCount setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"提交照片")] forState:UIControlStateNormal];
+            [_followerBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"关注者")] forState:UIControlStateNormal];
+            [_followBtn setAttributedTitle:[self returnStrWithTitle:@"0" andSubtitle:Babel(@"关注")] forState:UIControlStateNormal];
+            _ifFollow = [[receiveDic objectForKey:@"ifFollow"] integerValue];
+            [self initPageFuncBtn];
         }
-        [_userProfile sd_setImageWithURL:[NSURL URLWithString:[[receiveDic objectForKey:@"member"] objectForKey:@"image_url"]]];
-        [_photoCount setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"workNums"] andSubtitle:Babel(@"提交照片")] forState:UIControlStateNormal];
-//        [_photoCountLab setAttributedText:[self returnStrWithTitle:[receiveDic objectForKey:@"workNums"] andSubtitle:@"提交照片"]];
-
-        [_followerBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"byfollowNum"] andSubtitle:Babel(@"关注者")] forState:UIControlStateNormal];
-        [_followBtn setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"followNum"] andSubtitle:Babel(@"关注")] forState:UIControlStateNormal];
-        _ifFollow = [[receiveDic objectForKey:@"ifFollow"] integerValue];
-        [self initPageFuncBtn];
+        
+        
+        
         
         [_photos removeAllObjects];
         
@@ -597,6 +626,10 @@
         [_photoCollection.mj_footer endRefreshing];
         return;
     }
+    
+//    if ([_timeline.mj_footer isRefreshing] || [_photoCollection.mj_footer isRefreshing]) {
+//        return;
+//    }
     
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -722,6 +755,14 @@
             [weakSelf.timeline endUpdates];
             [weakSelf.timeline reloadData];
             [weakSelf.photoCollection reloadData];
+        }];
+    }
+    
+    if (!cell.privateBlock) {
+        [cell setPrivateBlock:^(NSIndexPath *indexPath) {
+            [weakSelf.timeline beginUpdates];
+            [weakSelf.timeline reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [weakSelf.timeline endUpdates];
         }];
     }
     

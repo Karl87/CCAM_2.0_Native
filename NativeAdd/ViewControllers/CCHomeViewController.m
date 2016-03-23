@@ -7,6 +7,7 @@
 //
 
 #import "CCHomeViewController.h"
+
 #import "CCPhoto.h"
 
 #import <MJRefresh/MJRefresh.h>
@@ -105,7 +106,6 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 }
 - (void)viewDidLoad{
     [super viewDidLoad];
-    
     _reloadIndexs = [NSMutableArray new];
     
     UIBarButtonItem *messageBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"messageIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(loadMessage)];
@@ -221,37 +221,51 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
                                                         Identifier:@"DiscoveryCell"
                                                         parentView:self.photoBGView];
     
-    MJRefreshNormalHeader *selectHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshSelection)];
+    CCamRefreshHeader *selectHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshSelection)];
+    selectHeader.stateLabel.hidden = YES;
     selectHeader.automaticallyChangeAlpha = YES;
     selectHeader.lastUpdatedTimeLabel.hidden = YES;
     _selectionCollection.mj_header = selectHeader;
-    MJRefreshNormalHeader *popularHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshPopular)];
+    CCamRefreshHeader *popularHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshPopular)];
+    popularHeader.stateLabel.hidden = YES;
     popularHeader.automaticallyChangeAlpha = YES;
     popularHeader.lastUpdatedTimeLabel.hidden = YES;
     _popularCollection.mj_header = popularHeader;
-    MJRefreshNormalHeader *lastHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshLast)];
+    CCamRefreshHeader *lastHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshLast)];
+    lastHeader.stateLabel.hidden = YES;
     lastHeader.automaticallyChangeAlpha = YES;
     lastHeader.lastUpdatedTimeLabel.hidden = YES;
     _lastCollection.mj_header = lastHeader;
     
-    MJRefreshAutoNormalFooter *selectFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreSelection)];
+    CCamRefreshFooter *selectFooter = [CCamRefreshFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreSelection)];
+    selectFooter.stateLabel.hidden = YES;
+    selectFooter.refreshingTitleHidden = YES;
     selectFooter.automaticallyChangeAlpha = YES;
     _selectionCollection.mj_footer = selectFooter;
     
-    MJRefreshAutoNormalFooter *popluarFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePopular)];
+    CCamRefreshFooter *popluarFooter = [CCamRefreshFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMorePopular)];
+    popluarFooter.refreshingTitleHidden = YES;
+    popluarFooter.stateLabel.hidden = YES;
     popluarFooter.automaticallyChangeAlpha = YES;
     _popularCollection.mj_footer = popluarFooter;
     
-    MJRefreshAutoNormalFooter *lastFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreLast)];
+    CCamRefreshFooter *lastFooter = [CCamRefreshFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreLast)];
+    lastFooter.refreshingTitleHidden = YES;
+    lastFooter.stateLabel.hidden = YES;
     lastFooter.automaticallyChangeAlpha = YES;
     _lastCollection.mj_footer = lastFooter;
     
-    MJRefreshNormalHeader *timelineHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadTimeline)];
+    CCamRefreshHeader *timelineHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadTimeline)];
+    timelineHeader.stateLabel.hidden = YES;
     timelineHeader.automaticallyChangeAlpha = YES;
     timelineHeader.lastUpdatedTimeLabel.hidden = YES;
     _timeline.mj_header = timelineHeader;
+
     
-    MJRefreshAutoNormalFooter *timelineFooter = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreTimeline)];
+    
+    CCamRefreshFooter *timelineFooter = [CCamRefreshFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMoreTimeline)];
+    timelineFooter.stateLabel.hidden  = YES;
+    timelineFooter.refreshingTitleHidden = YES;
     timelineFooter.automaticallyChangeAlpha = YES;
     _timeline.mj_footer = timelineFooter;
 
@@ -285,14 +299,28 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         [divier setBackgroundColor:CCamPhotoSegLightGray];
         [_photoSegView addSubview:divier];
     }
+    [self loadLocalData];
+    if ([iOSBindingManager sharedManager].showLauchScreen) {
+//        [self performSelector:@selector(loadLocalData) withObject:nil afterDelay:3.0];
+        [self performSelector:@selector(autoRefreshData) withObject:nil afterDelay:3.5];
+    }else{
+        
+    }
     
     
+}
+- (void)loadLocalData{
     [self loadLocalTimeline];
     [self loadLocalPhotoWithOrder:@"selection"];
     [self loadLocalPhotoWithOrder:@"like"];
     [self loadLocalPhotoWithOrder:@""];
 }
-
+- (void)autoRefreshData{
+    [self viewDidAppearRefreshData];
+    [[MessageHelper sharedManager] initTimer];
+    [[MessageHelper sharedManager] updateMessage];
+    [iOSBindingManager sharedManager].showLauchScreen = NO;
+}
 - (void)loadTimeline{
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -308,6 +336,8 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         
         [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCTimeLine"];
 
+        [_timeline reloadData];
+        
         NSError *error;
         NSArray *receiveArray = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
         NSLog(@"%ld",(unsigned long)receiveArray.count);
@@ -532,11 +562,11 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    [self viewDidAppearRefreshData];
     
-    [[MessageHelper sharedManager] initTimer];
-    [[MessageHelper sharedManager] updateMessage];
-    
+    if (![iOSBindingManager sharedManager].showLauchScreen) {
+        [self autoRefreshData];
+    }
+
     if (_reloadIndexs && [_reloadIndexs count]) {
         NSLog(@"*****%lu",(unsigned long)_reloadIndexs.count);
         [_timeline reloadRowsAtIndexPaths:_reloadIndexs withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -612,7 +642,14 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     UIButton *likeButton = (UIButton*)sender;
     
     KLCollectionCell *collectionCell = (KLCollectionCell*)[[likeButton superview] superview];
-    
+   
+    if (!collectionCell) {
+        return;
+    }else{
+        if (!collectionCell.photo) {
+            return;
+        }
+    }
    
     if ([collectionCell.photo.liked isEqualToString:@"1"]) {
         return;
@@ -646,6 +683,7 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
             [collectionCell.likeButton sizeToFit];
             [collectionCell.likeButton setFrame:CGRectMake(0, 0, collectionCell.likeButton.frame.size.width+2, 44)];
             [collectionCell.likeButton setCenter:CGPointMake(collectionCell.bounds.size.width-10-collectionCell.likeButton.frame.size.width/2, collectionCell.userName.center.y)];
+            [[AuthorizeHelper sharedManager] loginStateError];
         }else if ([likeResult isEqualToString:@"-2"]){
             NSLog(@"likephoto result is has been liked!");
             collectionCell.photo.like = [NSString stringWithFormat:@"%d",collectionCell.photo.like.intValue-1];
@@ -712,6 +750,20 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         parameters = @{@"order":order,@"token":[[AuthorizeHelper sharedManager] getUserToken]};
     }else{
         url = CCamGetDiscoveryMoreURL;
+        
+        if (!lastid||[lastid isKindOfClass:[NSNull class]]) {
+            if([order isEqualToString:@"selection"]){
+                [_selectionCollection.mj_footer endRefreshing];
+                return;
+            }else if ([order isEqualToString:@"like"]){
+                [_popularCollection.mj_footer endRefreshing];
+                return;
+            }else{
+                [_lastCollection.mj_footer endRefreshing];
+                return;
+            }
+        }
+        
         if ([order isEqualToString:@"like"]) {
             parameters = @{@"order":order,@"lastid":lastid,@"lastlike":lastlike,@"ids":ids,@"token":[[AuthorizeHelper sharedManager] getUserToken]};
         }else{
@@ -1167,6 +1219,14 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
             [weakSelf.timeline deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
             [weakSelf.timeline endUpdates];
             [weakSelf.timeline reloadData];
+        }];
+    }
+    
+    if (!cell.privateBlock) {
+        [cell setPrivateBlock:^(NSIndexPath *indexPath) {
+            [weakSelf.timeline beginUpdates];
+            [weakSelf.timeline reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [weakSelf.timeline endUpdates];
         }];
     }
     

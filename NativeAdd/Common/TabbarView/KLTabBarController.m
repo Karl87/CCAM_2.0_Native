@@ -129,7 +129,6 @@
     if ([iOSBindingManager sharedManager].showLauchScreen) {
         _launchScreen = [[LaunchScreenViewController alloc] init];
         [self.view addSubview:_launchScreen.view];
-        [iOSBindingManager sharedManager].showLauchScreen = NO;
     }
 }
 

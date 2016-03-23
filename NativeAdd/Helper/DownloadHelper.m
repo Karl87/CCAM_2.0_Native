@@ -53,12 +53,16 @@
     NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:^(NSProgress * _Nonnull downloadProgress) {
         
         [_downloadInfos setObject:[NSString stringWithFormat:@"%f",(CGFloat)downloadProgress.fractionCompleted] forKey:[NSString stringWithFormat:@"Sticker%@",sticker.stickerID]];
-        M13ProgressViewBorderedBar *cellBar = (M13ProgressViewBorderedBar*)[[DataHelper sharedManager].ccamVC.stickerSetContentCollection viewWithTag:9000+[sticker.stickerID intValue]];
-        [cellBar setHidden:NO];
-        [cellBar setProgress:(CGFloat)downloadProgress.fractionCompleted animated:YES];
-        if(downloadProgress.fractionCompleted == 1.0){
-            [cellBar setHidden:YES];
+        
+        if ([DataHelper sharedManager].ccamVC.stickerSetContentCollection) {
+            M13ProgressViewBorderedBar *cellBar = (M13ProgressViewBorderedBar*)[[DataHelper sharedManager].ccamVC.stickerSetContentCollection viewWithTag:9000+[sticker.stickerID intValue]];
+            [cellBar setHidden:NO];
+            [cellBar setProgress:(CGFloat)downloadProgress.fractionCompleted animated:YES];
+            if(downloadProgress.fractionCompleted == 1.0){
+                [cellBar setHidden:YES];
+            }
         }
+        
     } destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
         
         NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
@@ -106,21 +110,22 @@
         [_downloadInfos setObject:[NSString stringWithFormat:@"%f",(CGFloat)downloadProgress.fractionCompleted] forKey:[NSString stringWithFormat:@"Character%@",character.characterID]];
 //        NSLog(@"=========>Character%@ progress = %@",character.characterID,[_downloadInfos objectForKey:[NSString stringWithFormat:@"Character%@",character.characterID]]);
 //        [[NSNotificationCenter defaultCenter] postNotificationName:character.characterID object:nil];
-        if ([[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:8000+[character.characterID intValue]] isKindOfClass:[M13ProgressViewBorderedBar class]]) {
-            M13ProgressViewBorderedBar *cellBar = (M13ProgressViewBorderedBar*)[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:8000+[character.characterID intValue]];
-            [cellBar setHidden:NO];
-            [cellBar setProgress:(CGFloat)downloadProgress.fractionCompleted animated:YES];
-            if(downloadProgress.fractionCompleted == 1.0){
-                [cellBar setHidden:YES];
+        if ([DataHelper sharedManager].ccamVC.serieContentCollection) {
+            if ([[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:8000+[character.characterID intValue]] isKindOfClass:[M13ProgressViewBorderedBar class]]) {
+                M13ProgressViewBorderedBar *cellBar = (M13ProgressViewBorderedBar*)[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:8000+[character.characterID intValue]];
+                [cellBar setHidden:NO];
+                [cellBar setProgress:(CGFloat)downloadProgress.fractionCompleted animated:YES];
+                if(downloadProgress.fractionCompleted == 1.0){
+                    [cellBar setHidden:YES];
+                }
+            }
+            
+            if ([[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:7000+[character.characterID intValue]] isKindOfClass:[CCamSerieContentSurfaceView class]]) {
+                CCamSerieContentSurfaceView *surface = (CCamSerieContentSurfaceView*)[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:7000+[character.characterID intValue]];
+                [surface.surfaceProgress setHidden:NO];
+                [surface.surfaceProgress setProgress:(CGFloat)downloadProgress.fractionCompleted animated:YES];
             }
         }
-
-        if ([[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:7000+[character.characterID intValue]] isKindOfClass:[CCamSerieContentSurfaceView class]]) {
-            CCamSerieContentSurfaceView *surface = (CCamSerieContentSurfaceView*)[[DataHelper sharedManager].ccamVC.serieContentCollection viewWithTag:7000+[character.characterID intValue]];
-            [surface.surfaceProgress setHidden:NO];
-            [surface.surfaceProgress setProgress:(CGFloat)downloadProgress.fractionCompleted animated:YES];
-        }
-        
     } destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
 
         NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];

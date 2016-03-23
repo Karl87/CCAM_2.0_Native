@@ -7,6 +7,7 @@
 //
 
 #import "KLViewController.h"
+#import "AFViewShaker.h"
 
 @interface CCamViewController : KLViewController
 
@@ -17,6 +18,7 @@
 @property (nonatomic,strong) UICollectionView *stickerSetCollection;
 @property (nonatomic,strong) UICollectionView *stickerSetContentCollection;
 @property (nonatomic,strong) UICollectionView *filterCollection;
+@property (nonatomic,strong) AFViewShaker *characterTitleShaker;
 
 - (void)scrollToTargetSerie;
 - (void)updateSerieCollection;

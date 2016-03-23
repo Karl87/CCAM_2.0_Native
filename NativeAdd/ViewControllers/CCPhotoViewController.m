@@ -15,6 +15,8 @@
 #import <MJRefresh/MJRefresh.h>
 #import <MBProgressHUD/MBProgressHUD.h>
 #import <SDAutoLayout/UITableView+SDAutoTableViewCellHeight.h>
+#import "CCamRefreshHeader.h"
+
 @interface CCPhotoViewController ()<UITableViewDelegate,UITableViewDataSource>
 @property (nonatomic,strong) UITableView *timeline;
 @property (nonatomic,strong) NSMutableArray *photos;
@@ -37,7 +39,8 @@
         [_timeline setContentInset:UIEdgeInsetsMake(0, 0, 64+49, 0)];
     }
     [self.view addSubview:_timeline];
-    MJRefreshNormalHeader *timelineHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(initPhotoPage)];
+    CCamRefreshHeader *timelineHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(initPhotoPage)];
+    timelineHeader.stateLabel.hidden = YES;
     timelineHeader.automaticallyChangeAlpha = YES;
     timelineHeader.lastUpdatedTimeLabel.hidden = YES;
     _timeline.mj_header = timelineHeader;
@@ -173,6 +176,14 @@
             [weakSelf.timeline deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
             [weakSelf.timeline endUpdates];
             [weakSelf.timeline reloadData];
+        }];
+    }
+    
+    if (!cell.privateBlock) {
+        [cell setPrivateBlock:^(NSIndexPath *indexPath) {
+            [weakSelf.timeline beginUpdates];
+            [weakSelf.timeline reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [weakSelf.timeline endUpdates];
         }];
     }
     

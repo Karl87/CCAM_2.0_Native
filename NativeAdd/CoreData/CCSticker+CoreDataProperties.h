@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CCSticker (CoreDataProperties)
 
+@property (nullable, nonatomic, retain) NSString *textSize;
 @property (nullable, nonatomic, retain) NSString *stickerID;
 @property (nullable, nonatomic, retain) NSString *stickersetID;
 @property (nullable, nonatomic, retain) NSString *name;

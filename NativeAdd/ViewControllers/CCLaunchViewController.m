@@ -51,6 +51,7 @@
 @property (nonatomic,strong) UIButton *regBtn;
 
 @property (nonatomic,strong) UIButton *wechatBtn;
+@property (nonatomic,strong) AFViewShaker *wechatShaker;
 @property (nonatomic,strong) UIButton *qqBtn;
 @property (nonatomic,strong) UIButton *facebookBtn;
 @property (nonatomic,strong) UIButton *weiboBtn;
@@ -64,6 +65,9 @@
 
 @implementation CCLaunchViewController
 - (void)callMobileLogin{
+    
+    [self.view endEditing:YES];
+    
     if (![self checkLoginPhoneNumIsAvailable]||![self checkLoginPswIsAvailable]) {
         if (![self checkLoginPswIsAvailable]) {
             [_loginPswShaker shake];
@@ -148,6 +152,8 @@
 }
 - (void)checkPhoneNumIsReged{
     
+    [self.view endEditing:YES];
+    
     if (![self checkRegPhoneNumIsAvailable] || ![self checkRegPswIsAvailable]) {
         if (![self checkRegPhoneNumIsAvailable]) {
             [_regPhoneShaker shake];
@@ -192,16 +198,22 @@
     [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"5" shareType:SSDKPlatformTypeFacebook isLogin:YES];
 }
 - (void)segItemOnClick:(id)sender{
+    [self.view endEditing:YES];
     UIButton *button  = (UIButton*)sender;
     [_mobileBG setContentOffset:CGPointMake(_mobileBG.bounds.size.width*button.tag, _mobileBG.contentOffset.y) animated:NO];
 }
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    
+//    [self.view endEditing:YES];
+    
     if (scrollView == _mobileBG){
         [_segmentSlider setFrame:CGRectMake(scrollView.contentOffset.x * _segmentView.frame.size.width /scrollView.contentSize.width, _segmentSlider.frame.origin.y, _segmentSlider.frame.size.width, _segmentSlider.frame.size.height)];
     }
 }
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
+//    [self.view endEditing:YES];
+    
     if (scrollView == _mobileBG){
         if (scrollView.contentOffset.x == 0) {
             [_pageControl setCurrentPage:0];
@@ -215,9 +227,12 @@
 
 - (void)pageTurn:(UIPageControl*)sender
 {
+    [self.view endEditing:YES];
     [_mobileBG setContentOffset:CGPointMake(_mobileBG.bounds.size.width*sender.currentPage, _mobileBG.contentOffset.y) animated:NO];
 }
 - (void)callZone{
+    
+    [self.view endEditing:YES];
     
     NSString *china = [NSString stringWithFormat:@"+86 %@",Babel(@"中国")];
     NSString *hk = [NSString stringWithFormat:@"+852 %@",Babel(@"中国香港")];
@@ -280,6 +295,8 @@
     [_regAlert show];
 }
 - (void)verifiSMSCode{
+    
+    [self.view endEditing:YES];
     
     if (![self checkRegPhoneNumIsAvailable] || ![self checkRegPswIsAvailable] || ![self checkRegCodeIsAvailable]) {
         if (![self checkRegCodeIsAvailable]) {
@@ -370,8 +387,8 @@
 - (void)viewDidLoad{
     [super viewDidLoad];
     
-    [SMSSDK registerApp:@"f269cf5b9066"
-             withSecret:@"df01bb5c144912cc405810d5d47aeafb"];
+    [SMSSDK registerApp:SMSAppKey
+             withSecret:SMSAppSecret];
     
     show = NO;
     
@@ -443,6 +460,7 @@
     [_loginPhone setTextColor:CCamGrayTextColor];
     [_loginPhone.layer setCornerRadius:8.0];
     [_loginPhone.layer setMasksToBounds:YES];
+    [_loginPhone setKeyboardType:UIKeyboardTypePhonePad];
     _loginZone = [UIButton buttonWithType:UIButtonTypeCustom];
     [_loginZone setFrame:CGRectMake(0, 0, 60, 40)];
     [_loginZone setTitle:@"+86" forState:UIControlStateNormal];
@@ -580,6 +598,25 @@
     [_wechatBtn.layer setCornerRadius:_wechatBtn.frame.size.height/2];
     [_platformsBG addSubview:_wechatBtn];
     [_wechatBtn addTarget:self action:@selector(wechatLogin) forControlEvents:UIControlEventTouchUpInside];
+    _wechatShaker = [[AFViewShaker alloc] initWithView:_wechatBtn];
+    
+    [_wechatShaker shakeWithDuration:1.0 completion:^{
+        [self performSelector:@selector(wechatIconShake) withObject:nil afterDelay:3.0];
+    }];
+    
+    UILabel *wechatLab = [UILabel new];
+    [wechatLab setFont:[UIFont systemFontOfSize:11.0]];
+    [wechatLab setBackgroundColor:CCamRedColor];
+    [wechatLab setTextAlignment:NSTextAlignmentCenter];
+    [wechatLab setTextColor:[UIColor whiteColor]];
+    [wechatLab setText:Babel(@"推荐")];
+    [wechatLab sizeToFit];
+    [wechatLab setFrame:CGRectMake(0, 0, wechatLab.frame.size.width+10, wechatLab.frame.size.height+2)];
+    [wechatLab setCenter:CGPointMake(_wechatBtn.center.x, _wechatBtn.center.y-_wechatBtn.frame.size.height/2-12)];
+    [wechatLab.layer setCornerRadius:wechatLab.frame.size.height/2];
+    [wechatLab.layer setBorderColor:[UIColor whiteColor].CGColor];
+    [wechatLab.layer setBorderWidth:1.0];
+    [_platformsBG addSubview:wechatLab];
     
     _weiboBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_weiboBtn setFrame:CGRectMake(0, 0, 44, 44)];
@@ -634,6 +671,11 @@
     [_launchSquare setFrame:CGRectMake(_launchSquare.frame.origin.x, -_launchSquare.frame.size.height, _launchSquare.frame.size.width, _launchSquare.frame.size.height)];
     
 }
+- (void)wechatIconShake{
+    [_wechatShaker shakeWithDuration:1.0 completion:^{
+        [self performSelector:@selector(wechatIconShake) withObject:nil afterDelay:3.0];
+    }];
+}
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [self.view endEditing:YES];
@@ -671,6 +713,7 @@
 }
 - (void)hideBouncesAnimation:(id)sender{
     NSLog(@"hide animation");
+    [self.view endEditing:YES];
     if (sender) {
         UIButton *btn = (UIButton*)sender;
         if (btn == _agreementBtn) {

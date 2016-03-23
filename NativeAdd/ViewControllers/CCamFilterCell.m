@@ -16,7 +16,10 @@
         [self setBackgroundColor:[UIColor whiteColor]];
         
         UIView *selectedBG = [[UIView alloc] initWithFrame:self.bounds];
-        [selectedBG setBackgroundColor:CCamExLightGrayColor];
+        [selectedBG setBackgroundColor:CCamViewBackgroundColor];
+        UIView *selectedSign = [[UIView alloc] initWithFrame:CGRectMake(0, self.bounds.size.height-2, self.bounds.size.width, 2)];
+        [selectedSign setBackgroundColor:CCamRedColor];
+        [selectedBG addSubview:selectedSign];
         
         self.selectedBackgroundView = selectedBG;
         
@@ -27,7 +30,7 @@
     
     
     if (_filterImage == nil) {
-        _filterImage = [[UIImageView alloc] initWithFrame:self.bounds];
+        _filterImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.width-2)];
         [_filterImage setBackgroundColor:[UIColor clearColor]];
         [_filterImage setContentMode:UIViewContentModeScaleAspectFill];
         [_filterImage setClipsToBounds:YES];
@@ -35,8 +38,9 @@
     }
     
     if (_filterLabel == nil) {
-        _filterLabel = [[UILabel alloc] initWithFrame:self.bounds];
-        [_filterLabel setTextColor:CCamGrayTextColor];
+        _filterLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, self.bounds.size.width-22, self.bounds.size.width, 20)];
+        [_filterLabel setTextColor:[UIColor whiteColor]];
+        [_filterLabel setFont:[UIFont boldSystemFontOfSize:13.0]];
         [_filterLabel setTextAlignment:NSTextAlignmentCenter];
         [_filterLabel setBackgroundColor:[UIColor clearColor]];
         [_filterLabel setClipsToBounds:YES];

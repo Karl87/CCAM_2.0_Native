@@ -10,6 +10,8 @@
 #import "CCSerie.h"
 #import "CCEvent.h"
 #import "CCPhoto.h"
+#import "Constants.h"
+#import "CCamHelper.h"
 
 @implementation CoreDataHelper
 
@@ -95,6 +97,14 @@
     }
     _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
     [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+    
+    NSString *sqlite = [NSString stringWithFormat:@"%@/CCam.sqlite",CCamDocPath];
+    NSString *shm = [NSString stringWithFormat:@"%@/CCam.sqlite-shm",CCamDocPath];
+    NSString *wal = [NSString stringWithFormat:@"%@/CCam.sqlite-wal",CCamDocPath];
+    [[FileHelper sharedManager] addSkipBackupAttributeToItemAtPath:sqlite];
+    [[FileHelper sharedManager] addSkipBackupAttributeToItemAtPath:shm];
+    [[FileHelper sharedManager] addSkipBackupAttributeToItemAtPath:wal];
+    
     return _managedObjectContext;
 }
 

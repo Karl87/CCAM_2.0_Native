@@ -25,9 +25,23 @@
     self = [super init];
     if (self) {
         _fileManager = [NSFileManager defaultManager];
+        [self ccamSkipBackUp];
     }
     return self;
 }
+
+- (void)ccamSkipBackUp{
+    NSString *dirPath = [NSString stringWithFormat:@"%@/CharacterCamera/",CCamDocPath];
+    
+    BOOL isDir;
+    
+    if (![_fileManager fileExistsAtPath:dirPath isDirectory:&isDir]) {
+        [_fileManager createDirectoryAtPath:dirPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
+    [self addSkipBackupAttributeToItemAtPath:dirPath];
+}
+
 - (NSString *)getCharacterFilePath:(CCCharacter *)character{
     NSString *filePath = [NSString stringWithFormat:@"%@/CharacterCamera/S%@C%@/%@.assetbundle",CCamDocPath,character.serieID,character.characterID,character.version];
     return filePath;
@@ -52,9 +66,12 @@
 }
 - (void)checkCharacterDirectory:(CCCharacter *)character{
     NSString* dirPath = [NSString stringWithFormat:@"%@/CharacterCamera/S%@C%@",CCamDocPath,character.serieID,character.characterID];
-    if (![_fileManager fileExistsAtPath:dirPath isDirectory:YES]) {
+    BOOL isDir;
+    
+    if (![_fileManager fileExistsAtPath:dirPath isDirectory:&isDir]) {
         [_fileManager createDirectoryAtPath:dirPath withIntermediateDirectories:YES attributes:nil error:nil];
     }
+    
 }
 - (NSString *)checkStickDirectory{
     NSString* dirPath = [NSString stringWithFormat:@"%@/CharacterCamera/Sticker",CCamDocPath];
@@ -109,5 +126,21 @@
     BOOL isExist = NO;
     isExist = [[NSFileManager defaultManager] fileExistsAtPath:fileFullPath];
     return isExist;
+}
+
+- (BOOL)addSkipBackupAttributeToItemAtPath:(NSString *) filePathString
+{
+    NSURL* URL= [NSURL fileURLWithPath: filePathString];
+    assert([[NSFileManager defaultManager] fileExistsAtPath: [URL path]]);
+    
+    NSError *error = nil;
+    BOOL success = [URL setResourceValue: [NSNumber numberWithBool: YES]
+                                  forKey: NSURLIsExcludedFromBackupKey error: &error];
+    if(!success){
+        NSLog(@"Error excluding %@ from backup %@", [URL lastPathComponent], error);
+    }
+    
+     NSLog(@"ADD_SKIP_BACKUP %@ ", filePathString);
+    return success;
 }
 @end

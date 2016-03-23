@@ -31,8 +31,11 @@
 
 #define CCamAppStoreID @"1015887314"
 
-#define SMSAppKey @"8a2dbed04384"
-#define SMSAppSecret @"67cc96b7048ed6bc91d7dd8090192935"
+#define SMSAppKey @"10ce0a213690f"
+#define SMSAppSecret @"7611d7211dcaff2f29a6b017e9ee97c0"
+
+#define UMengKey @"5598da7367e58e4243001b46"
+#define UMessageKey @"5598da7367e58e4243001b46"
 
 #define CCamHost @"http://www.c-cam.cc/"
 #define CCamString @"CCAM"
@@ -84,7 +87,7 @@
 #define CCamGetAnimationURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_animations_json.html"
 #define CCamGetStickersURL @"http://www.c-cam.cc/index.php/Api_new/Getsticker/get_sticker_json.html"
 
-#define CCamGetSerieURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_series_list.html"
+//#define CCamGetSerieURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_series_list.html"
 #define CCamGetEventURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_index.html"
 #define CCamGetDiscoveryURL @"http://www.c-cam.cc/index.php/Api/Discover/index.html"
 #define CCamGetDiscoveryMoreURL @"http://www.c-cam.cc/index.php/Api/Discover/load_work.html"
@@ -102,10 +105,9 @@
 
 #define CCamCheckPhoneNumURL @"http://www.c-cam.cc/index.php/Api_new/Login/is_new_number.html"
 
-
 #define CCamLoginURL @"http://www.c-cam.cc/index.php/Api_new/Login/login_new.html"
 #define CCamResetPswURL @"http://www.c-cam.cc/index.php/Api_new/Login/changepwd.html"
-#define CCamLogoutURL @"http://www.c-cam.cc/index.php/First/Member/logout.html"
+#define CCamLogoutURL @"http://www.c-cam.cc/index.php/First/Member/logout_new.html"
 
 #define CCamGetUserHomePageURL @"http://www.c-cam.cc/index.php/Api_new/Member/member_home.html"
 #define CCamGetPhotoPageURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_photo_info.html"
@@ -132,6 +134,8 @@
 #define CCamLicensesURL @""
 
 #define CCamPrivacyURL @"http://www.c-cam.cc/index.php/Api_new/Uploadphoto/change_contestid.html"
+
+#define CCamUpdateDeviceToeknURL @"http://www.c-cam.cc/index.php/Api_new/Login/update_device_token.html"
 
 #define CCamPullUpdate @"下拉列表刷新数据"
 #define CCamReleaseUpdate @"释放列表进行刷新"

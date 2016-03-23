@@ -24,4 +24,5 @@
 @property (nonatomic,strong) UISwitch *eraseZoneSwitch;
 @property (nonatomic,strong) UISlider *eraseBrushSlider;
 @property (nonatomic,strong) UIButton *eraserResetButton;
+@property (nonatomic,strong) UIButton *eraseHelpButton;
 @end

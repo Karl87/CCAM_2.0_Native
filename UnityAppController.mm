@@ -13,7 +13,7 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
-#import "ShareHelper.h"
+#import "CCamHelper.h"
 #import <ShareSDK/ShareSDK.h>
 #import <TencentOpenAPI/QQApiInterface.h>
 #import <TencentOpenAPI/TencentOAuth.h>
@@ -148,12 +148,16 @@ bool	_supportsMSAA			= false;
 {
 	AppController_SendNotificationWithArg(kUnityDidReceiveRemoteNotification, userInfo);
 	UnitySendRemoteNotification(userInfo);
+    
+    [[SettingHelper sharedManager] didReceiveRemoteNotification:userInfo];
 }
 
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
 	AppController_SendNotificationWithArg(kUnityDidRegisterForRemoteNotificationsWithDeviceToken, deviceToken);
 	UnitySendDeviceToken(deviceToken);
+    
+    [[SettingHelper sharedManager]registerDeviceToken:deviceToken];
 }
 
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
@@ -220,7 +224,15 @@ bool	_supportsMSAA			= false;
 	// if you wont use keyboard you may comment it out at save some memory
 	[KeyboardDelegate Initialize];
 
+    [iOSBindingManager sharedManager].showEditNative = NO;
+    
+    [TutorialHelper sharedManager].autoShowEraserTutorial = [[TutorialHelper sharedManager] showEraserTutorial];
+    [TutorialHelper sharedManager].autoShowLightTutorial = [[TutorialHelper sharedManager] showLightTutorial];
+    
     [[ShareHelper sharedManager] initShareSDK];
+    
+    [[SettingHelper sharedManager] initUMengAnalytics];
+    [[SettingHelper sharedManager] initUMessage:launchOptions];
     
 	return YES;
 }

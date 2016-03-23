@@ -61,7 +61,7 @@
             _surfaceProgress  = [[M13ProgressViewImage alloc] initWithFrame:CGRectMake(self.bounds.size.width/2-65, self.bounds.size.height/2 + 32, 175, 20)];
             [_surfaceProgress setProgressImage:[UIImage imageNamed:@"serieDownloadProgress"]];
             [_surfaceProgress setProgressDirection:M13ProgressViewImageProgressDirectionLeftToRight];
-            [_surfaceProgress setProgress:0.8 animated:NO];
+//            [_surfaceProgress setProgress:0.8 animated:NO];
             [self addSubview:_surfaceProgress];
             [_surfaceProgress setHidden:YES];
         }

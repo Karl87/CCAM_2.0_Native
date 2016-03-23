@@ -22,6 +22,7 @@
     self.text_Coordinates = GetValidString([dic objectForKey:@"sticker_text_coordinates"]);
     self.textColor = GetValidString([dic objectForKey:@"sticker_text_color"]);
     self.textFont = GetValidString([dic objectForKey:@"sticker_text_font"]);
+    self.textSize = GetValidString([dic objectForKey:@"sticker_text_size"]);
     self.type = GetValidString([dic objectForKey:@"sticker_type"]);
 }
 @end

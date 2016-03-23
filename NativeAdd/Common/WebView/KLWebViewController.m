@@ -21,6 +21,8 @@
 #import <MBProgressHUD/MBProgressHUD.h>
 #import "WebViewJavascriptBridge.h"
 
+#import "CCamRefreshHeader.h"
+
 @interface KLWebViewController () <UIWebViewDelegate,UIScrollViewDelegate,UIAlertViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIActionSheetDelegate>
 
 @property (nonatomic,strong) UIWebView *webView;
@@ -216,7 +218,7 @@
         
         _timeline = timeline;
         
-        [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline indexPath:nil onlyShare:YES shareImage:shareImage];
+        [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline timelineCell:nil indexPath:nil onlyShare:YES shareImage:shareImage];
         
         responseCallback(@"Response from call_share");
     }];
@@ -281,7 +283,8 @@
     
     UIBarButtonItem * refreshBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"moreIcon"] style:UIBarButtonItemStylePlain target:self action:@selector(callMoreActivityViewController)];
     self.navigationItem.rightBarButtonItem = refreshBtn;
-    MJRefreshNormalHeader *webHeader = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(webRefresh)];
+    CCamRefreshHeader *webHeader = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(webRefresh)];
+    webHeader.stateLabel.hidden = YES;
     webHeader.automaticallyChangeAlpha = YES;
     webHeader.lastUpdatedTimeLabel.hidden = YES;
     _webView.scrollView.mj_header = webHeader;
@@ -289,13 +292,13 @@
     
     [_webView.scrollView setDelegate:self];
     NSLog(@"%@",self.webURL);
-    NSURL *url = [NSURL URLWithString:self.webURL];
-    NSString *body = [NSString stringWithFormat: @"token=%@",[[AuthorizeHelper sharedManager] getUserToken]];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL: url];
-    [request setHTTPMethod: @"POST"];
-    [request setHTTPBody: [body dataUsingEncoding: NSUTF8StringEncoding]];
-    [_webView loadRequest: request];
-
+//    NSURL *url = [NSURL URLWithString:self.webURL];
+//    NSString *body = [NSString stringWithFormat: @"token=%@",[[AuthorizeHelper sharedManager] getUserToken]];
+//    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL: url];
+//    [request setHTTPMethod: @"POST"];
+//    [request setHTTPBody: [body dataUsingEncoding: NSUTF8StringEncoding]];
+//    [_webView loadRequest: request];
+    [_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.webURL]]];
 }
 - (void)dissmisShareViewWith:(NSIndexPath *)indexPath{
     NSLog(@"%ld-%ld打开了ShareView",(long)indexPath.section,(long)indexPath.row);
@@ -469,7 +472,7 @@
     
     _timeline = timeline;
     
-    [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline indexPath:nil onlyShare:YES shareImage:NO];
+    [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline timelineCell:nil indexPath:nil onlyShare:YES shareImage:NO];
 
 }
 

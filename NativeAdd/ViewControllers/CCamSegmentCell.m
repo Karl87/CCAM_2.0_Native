@@ -36,6 +36,8 @@
     [_titleLabel setTextColor:[UIColor whiteColor]];
     [_titleLabel setFont:[UIFont boldSystemFontOfSize:17.]];
     [self.contentView addSubview:_titleLabel];
+    _shaker = [[AFViewShaker alloc]initWithView:_titleLabel];
+    
     return _titleLabel;
 }
 @end

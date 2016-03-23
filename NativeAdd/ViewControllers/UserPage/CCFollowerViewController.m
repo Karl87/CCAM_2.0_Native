@@ -24,6 +24,13 @@
     [_followTable setDelegate: self];
     [_followTable setDataSource:self];
     [self.view addSubview:_followTable];
+    if (self.hidesBottomBarWhenPushed) {
+        [_followTable setContentInset:UIEdgeInsetsMake(0, 0, 64, 0)];
+        
+    }else{
+        [_followTable setContentInset:UIEdgeInsetsMake(0, 0, 64+49, 0)];
+        
+    }
     [self loadFollowers];
 }
 - (void)loadFollowers{

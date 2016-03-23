@@ -188,7 +188,7 @@
         NSLog(@"JSON: %@", jsonStr);
         NSString *hubMessage = @"";
         
-        if ([jsonStr isEqualToString:@"1"]) {
+//        if ([jsonStr isEqualToString:@"1"]) {
             hubMessage = Babel(@"登出成功");
             [[AuthorizeHelper sharedManager] setUserToken:@""];
             [[AuthorizeHelper sharedManager] setUserID:@""];
@@ -197,10 +197,10 @@
                 CCUserViewController *user = (CCUserViewController*)_parent;
                 user.needUpdate = YES;
             }
-            
-        }else{
-            hubMessage = Babel(@"登出失败");
-        }
+//            
+//        }else{
+//            hubMessage = Babel(@"登出失败");
+//        }
         
         hud.labelText = hubMessage;
         [hud hide:YES afterDelay:1.0f];

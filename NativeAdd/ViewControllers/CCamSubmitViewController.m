@@ -177,7 +177,9 @@
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     if (_submitImage != nil) {
-        UIImage*img = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/screenshot.jpg",CCamDocPath]];
+        NSString *photoPath = [NSString stringWithFormat:@"%@/screenshot.jpg",CCamDocPath];
+        [[FileHelper sharedManager] addSkipBackupAttributeToItemAtPath:photoPath];
+        UIImage*img = [UIImage imageWithContentsOfFile:photoPath];
         [_submitImage setImage:img];
     }
     if ([_contests count] && [_contests count]>0) {
@@ -308,8 +310,8 @@
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
 //        [self setConestButtonWithState:NO];
         [self.contests removeAllObjects];
-        NSDictionary *notPrivacyItem = @{@"contestid":@"0",@"name":@"分享到角色相机",@"en_name":@"Share to Character Camera",@"zh_name":@"分享到角色相機"};
-        NSDictionary *privacyItem = @{@"contestid":@"-1",@"name":@"仅自己可见",@"en_name":@"",@"zh_name":@"僅自己可見"};
+        NSDictionary *notPrivacyItem = @{@"contestid":@"0",@"name":@"分享到角色相机",@"en_name":@"Share to Character Camera",@"zh_name":@"分享到角色相機",@"url":@""};
+        NSDictionary *privacyItem = @{@"contestid":@"-1",@"name":@"仅自己可见",@"en_name":@"",@"zh_name":@"僅自己可見",@"url":@""};
         [self.contests addObject:notPrivacyItem];
         [self.contests addObject:privacyItem];
         [self getcontestsAnimation];
@@ -387,10 +389,16 @@
     [self performSelector:@selector(goToHomePage) withObject:nil afterDelay:1.0];
 }
 - (void)goToHomePage{
-    [self.navigationController popToRootViewControllerAnimated:NO];
-    UnitySendMessage(UnityController.UTF8String, "CallHomeScene", "");
+//    [self.navigationController popToRootViewControllerAnimated:NO];
+    
+    [[iOSBindingManager sharedManager] showChangeSceneTransition];
+    [self performSelector:@selector(removeSubmitView) withObject:nil afterDelay:0.25];
 }
+- (void)removeSubmitView{
+    [self.navigationController removeFromParentViewController];
+    [self.navigationController.view removeFromSuperview];
 
+}
 - (void)backToController{
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -415,7 +423,19 @@
         [cell.textLabel setHighlightedTextColor:CCamRedColor];
         [cell.textLabel setFont:[UIFont systemFontOfSize:14.0]];
         [cell.textLabel setTextColor:CCamGrayTextColor];
-        cell.textLabel.text = [[_contests objectAtIndex:indexPath.row] objectForKey:@"name"];
+        
+        NSString *language = [[SettingHelper sharedManager] getCurrentLanguage];
+        NSString *contestNote;
+        
+        if ([language hasPrefix:@"zh-Hans"]) {
+            contestNote = [[_contests objectAtIndex:indexPath.row] objectForKey:@"name"];
+        }else if ([language hasPrefix:@"zh-Hant"]){
+            contestNote = [[_contests objectAtIndex:indexPath.row] objectForKey:@"zh_name"];
+        }else{
+            contestNote = [[_contests objectAtIndex:indexPath.row] objectForKey:@"en_name"];
+        }
+        
+        cell.textLabel.text = contestNote;
 //        [cell layoutCell];
         
         if (!cell.cellButton) {
@@ -423,7 +443,7 @@
             [cell.cellButton setBackgroundColor:[UIColor clearColor]];
             [cell.contentView addSubview:cell.cellButton];
             [cell.cellButton setFrame:CGRectMake(0, 0, 150, 44)];
-            cell.cellButton.tag = [[[_contests objectAtIndex:indexPath.row] objectForKey:@"contestid"] intValue];
+            cell.cellButton.tag =indexPath.row;//[[[_contests objectAtIndex:indexPath.row] objectForKey:@"contestid"] intValue];
             [cell.cellButton addTarget:self action:@selector(callRulePage:) forControlEvents:UIControlEventTouchUpInside];
         }
     }
@@ -435,12 +455,16 @@
     
     UIButton *button = (UIButton *)sender;
     
-    if(button.tag == 0 || button.tag == -1){
+    if ([[[_contests objectAtIndex:button.tag] objectForKey:@"url"] isEqualToString:@""]) {
         return;
     }
     
+//    if(button.tag == 0 || button.tag == -1){
+//        return;
+//    }
+    
     KLWebViewController *agree = [[KLWebViewController alloc] init];
-    agree.webURL = [NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Contest/rule/contestid/%ld/nobottom/1.html",(long)button.tag];
+    agree.webURL = [[_contests objectAtIndex:button.tag] objectForKey:@"url"];
     agree.vcTitle = Babel(@"比赛规则");
     agree.setNavigationBar = YES;
     KLNavigationController *nv = [[KLNavigationController alloc] initWithRootViewController:agree];

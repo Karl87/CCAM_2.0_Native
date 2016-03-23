@@ -13,6 +13,10 @@
 
 + (AuthorizeHelper*)sharedManager;
 
+- (NSString *)getDeviceToken;
+- (void)setDeviceToken:(NSString *)deviceToken;
+- (void)updateDeviceToken;
+
 - (NSString *)getUserToken;
 - (void)setUserToken:(NSString *)token;
 
@@ -37,6 +41,7 @@
 - (BOOL)checkToken;
 //logout
 - (void)logout;
+- (void)loginStateError;
 //social login
 - (void)getSocialPlatformInfoWithTypeID:(NSString*)typeID shareType:(SSDKPlatformType)type isLogin:(BOOL)isLogin;
 - (void)loginWithTypeID:(NSString *)typeID shareType:(SSDKPlatformType)type userInfo:(SSDKUser *)user isLogin:(BOOL)login;

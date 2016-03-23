@@ -13,6 +13,7 @@
 
 @implementation CCSerie (CoreDataProperties)
 
+@dynamic reflectionMax;
 @dynamic environmentMax;
 @dynamic environmentMin;
 @dynamic mainLightMax;

@@ -25,15 +25,17 @@
 
 #import "KLWebViewController.h"
 #import "CCUserViewController.h"
-#import "CCCommentViewController.h"
 #import "CCPhotoViewController.h"
 #import "CommentViewController.h"
 #import <SDAutoLayout/UITableView+SDAutoTableViewCellHeight.h>
 
 #import "ShareViewController.h"
 
+#import "WLCircleProgressView.h"
+
 @interface TimelineCell ()<UIGestureRecognizerDelegate,UIActionSheetDelegate,ShareViewDelegate,UIAlertViewDelegate>
 @property (nonatomic,strong) UIAlertView *deleteAlert;
+@property (nonatomic,strong) WLCircleProgressView *photoProgress;
 @end
 
 @implementation TimelineCell
@@ -72,6 +74,7 @@
     [_privacySign setTintColor:CCamRedColor];
     
     _photo = [UIImageView new];
+//    [_photo setBackgroundColor:[UIColor lightGrayColor]];
     
     _photoLomo = [UIImageView new];
     [_photoLomo setBackgroundColor:[UIColor clearColor]];
@@ -85,11 +88,20 @@
     [_photoSpotlight setImage:[UIImage imageNamed:@"timelineSpotlight"]];
     [_photoSpotlight setHidden:YES];
     
+    _photoProgress = [WLCircleProgressView viewWithFrame:CGRectMake(0, 0, 100, 100) circlesSize:CGRectMake(30, 5, 30, 5)];
+    [_photoProgress setBackgroundColor:[UIColor clearColor]];
+    _photoProgress.backCircle.shadowColor = [UIColor grayColor].CGColor;
+    _photoProgress.backCircle.shadowRadius = 3;
+    _photoProgress.backCircle.shadowOffset = CGSizeMake(0, 0);
+    _photoProgress.progressValue = 0.0;
+    _photoProgress.backCircle.shadowOpacity = 1;
+    
     _photoTitle = [UIButton new];
     [_photoTitle setBackgroundColor:[UIColor whiteColor]];
     [_photoTitle setImage:[UIImage imageNamed:@"joinEventIcon"] forState:UIControlStateNormal];
     [_photoTitle setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
-    [_photoTitle setBackgroundImage:[[[UIImage imageNamed:@"eventTitleBG"] stretchableImageWithLeftCapWidth:30.0 topCapHeight:0.0] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+//    [_photoTitle setBackgroundImage:[[[UIImage imageNamed:@"eventTitleBG"] stretchableImageWithLeftCapWidth:30.0 topCapHeight:0.0] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [_photoTitle setBackgroundColor:CCamRedColor];
     [_photoTitle setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_photoTitle setTintColor:CCamRedColor];
     [_photoTitle.titleLabel setFont:[UIFont systemFontOfSize:13.0]];
@@ -143,7 +155,7 @@
     [_commentTable setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     [_commentTable setBackgroundColor:[UIColor whiteColor]];
     
-    NSArray *views = @[_cellBG,_profileImage,_userName,_userButton,_photoTime,_privacySign,_photo,_photoLomo,_photoSpotlight,_photoInput,_photoLike,_photoMore,_likeBorder,_likeView,_contestDes,_photoTitle,_commentBorder,_photoDes,_commentTable];
+    NSArray *views = @[_cellBG,_profileImage,_userName,_userButton,_photoTime,_privacySign,_photo,_photoLomo,_photoSpotlight,_photoInput,_photoLike,_photoMore,_likeBorder,_likeView,_contestDes,_photoTitle,_commentBorder,_photoDes,_commentTable,_photoProgress];
     [views enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.contentView addSubview:obj];
     }];
@@ -245,9 +257,11 @@
 - (void)setCellUI{
     
 }
+
 - (void)setTimeline:(CCTimeLine *)timeline{
     
     _timeline = timeline;
+    
     UIView *contentView = self.contentView;
     
     if (_timeline == nil) {
@@ -316,6 +330,10 @@
     .topSpaceToView(_photoTitle,5)
     .heightEqualToWidth();
     
+    _photoProgress.sd_layout
+    .centerXEqualToView(_photo)
+    .centerYEqualToView(_photo);
+    
     _photoLomo.sd_layout
     .leftEqualToView(_photo)
     .rightEqualToView(_photo)
@@ -377,16 +395,30 @@
     
     [_userName setText:_timeline.timelineUserName];
     
-    [_photo sd_setImageWithURL:[NSURL URLWithString:_timeline.image_fullsize] placeholderImage:nil];
+//    [_photo sd_setImageWithURL:[NSURL URLWithString:_timeline.image_fullsize] placeholderImage:nil];
+    
+    [_photoProgress setHidden:NO];
+    
+    [_photo sd_setImageWithURL:[NSURL URLWithString:_timeline.image_fullsize] placeholderImage:nil options:nil progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        CGFloat progress = (CGFloat)receivedSize/(CGFloat)expectedSize;
+        _photoProgress.progressValue =progress ;
+    } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+        [_photoProgress setHidden:YES];
+    }];
     
     NSDate* timeDate = [NSDate dateWithTimeIntervalSince1970:[_timeline.dateline integerValue]];
     [_photoTime setText:[self compareCurrentTime:timeDate]];
     
     [_userButton addTarget:self action:@selector(callUserPage:) forControlEvents:UIControlEventTouchUpInside];
     
+    if(_indexPath.row==0&&![_timeline.timelineContestID isEqualToString:@"-1"]&&[_timeline.timelineUserID isEqualToString:[[AuthorizeHelper sharedManager] getUserID]]){
+        [_photoMore setTintColor:CCamRedColor];
+    }
+
+    
     if (![_timeline.timelineContestID isEqualToString:@"-1"]) {
         [_privacySign setHidden:YES];
-    }
+            }
     
     if ([_timeline.checked isEqualToString:@"3"]) {
         _photoLomo.hidden = NO;
@@ -401,8 +433,8 @@
         [_photoTitle sizeToFit];
         [_photoTitle setTag:[_timeline.timelineContestID intValue]];
         [_photoTitle addTarget:self action:@selector(callContestWeb:) forControlEvents:UIControlEventTouchUpInside];
-        _photoTitle.sd_layout.widthIs(_photoTitle.bounds.size.width+24);
-        _photoTitle.sd_layout.heightIs(_photoTitle.bounds.size.height+4);
+        _photoTitle.sd_layout.widthIs(_photoTitle.bounds.size.width+28);
+        _photoTitle.sd_layout.heightIs(_photoTitle.bounds.size.height+8);
         
     }else{
         
@@ -605,7 +637,11 @@
 
 - (void)drawRect:(CGRect)rect{
     [super drawRect:rect];
-    
+    UIBezierPath *btnMaskPath = [UIBezierPath bezierPathWithRoundedRect:_photoTitle.bounds byRoundingCorners:UIRectCornerBottomLeft | UIRectCornerTopRight cornerRadii:CGSizeMake(_photoTitle.bounds.size.height/2, _photoTitle.bounds.size.height/2)];
+    CAShapeLayer *btnMaskLayer = [[CAShapeLayer alloc] init];
+    btnMaskLayer.frame = _photoTitle.bounds;
+    btnMaskLayer.path = btnMaskPath.CGPath;
+    _photoTitle.layer.mask = btnMaskLayer;
 }
 
 - (void)awakeFromNib {
@@ -755,9 +791,9 @@
     }
     
     if ([[[AuthorizeHelper sharedManager] getUserID]isEqualToString:_timeline.timelineUserID]) {
-        [[ShareHelper sharedManager] callShareViewIsMyself:YES delegate:self timeline:_timeline indexPath:_indexPath onlyShare:NO shareImage:NO];
+        [[ShareHelper sharedManager] callShareViewIsMyself:YES delegate:self timeline:_timeline timelineCell:self indexPath:_indexPath onlyShare:NO shareImage:NO];
     }else{
-        [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline indexPath:_indexPath onlyShare:NO shareImage:NO];
+        [[ShareHelper sharedManager] callShareViewIsMyself:NO delegate:self timeline:_timeline timelineCell:self indexPath:_indexPath onlyShare:NO shareImage:NO];
     }
     
     return;
@@ -773,6 +809,15 @@
             [self deletePhoto];
         }else if ([title isEqualToString:Babel(@"下载照片")]){
             [self savePhoto];
+        }else if ([title isEqualToString:Babel(@"管理员工具")]){
+            KLWebViewController *admin = [[KLWebViewController alloc] init];
+            admin.webURL = [NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Robot/Pdetail/workid/%@/token/%@.html",_timeline.timelineID,[[AuthorizeHelper sharedManager] getUserToken]];
+            admin.vcTitle = Babel(@"管理员工具");
+            admin.hidesBottomBarWhenPushed = YES;
+            UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+            backItem.title=@"";
+            _parent.navigationItem.backBarButtonItem=backItem;
+            [_parent.navigationController pushViewController:admin animated:YES];
         }
     }else if ([type isEqualToString:@"Share"]){
         
@@ -822,6 +867,11 @@
             shareType = SSDKPlatformSubTypeWechatTimeline;
         }else if ([title isEqualToString:Babel(@"新浪微博")]){
             shareType = SSDKPlatformTypeSinaWeibo;
+            [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL]
+                                             images:imageArray
+                                                url:[NSURL URLWithString:_timeline.shareURL]
+                                              title:_timeline.shareTitle
+                                               type:SSDKContentTypeAuto];
             [ShareSDK showShareEditor:shareType otherPlatformTypes:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
                 if (!error) {
                     switch (state) {
@@ -851,6 +901,35 @@
             shareType = SSDKPlatformSubTypeQZone;
         }else if ([title isEqualToString:Babel(@"Facebook")]){
            shareType = SSDKPlatformTypeFacebook;
+            [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL]
+                                             images:imageArray
+                                                url:[NSURL URLWithString:_timeline.shareURL]
+                                              title:_timeline.shareTitle
+                                               type:SSDKContentTypeAuto];
+            [ShareSDK showShareEditor:shareType otherPlatformTypes:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
+                if (!error) {
+                    switch (state) {
+                        case SSDKResponseStateSuccess:
+                            NSLog(@"分享成功！");
+                            break;
+                        case SSDKResponseStateCancel:
+                            NSLog(@"取消分享！");
+                            break;
+                        case SSDKResponseStateFail:
+                            NSLog(@"分享失败！");
+                            break;
+                        default:
+                            break;
+                    }
+                }else{
+                    NSLog(@"%@",error.description);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败" message:error.description delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil];
+                    [alert show];
+                    [ShareSDK cancelAuthorize:shareType];
+                }
+            }];
+            return;
+            
         }
         [ShareSDK share:shareType parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
             if (!error) {
@@ -988,6 +1067,10 @@
         return;
     }
     
+    if (!_timeline) {
+        return;
+    }
+    
     if ([_timeline.liked isEqualToString:@"1"]) {
         return;
     }
@@ -1012,6 +1095,7 @@
             NSLog(@"likephoto result is failed!");
             [_photoLike setTintColor:CCamPhotoSegLightGray];
             _timeline.liked = @"0";
+            [[AuthorizeHelper sharedManager] loginStateError];
         }else if ([likeResult isEqualToString:@"-2"]){
             NSLog(@"likephoto result is has been liked!");
         }else{

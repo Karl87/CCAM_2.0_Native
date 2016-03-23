@@ -37,9 +37,20 @@
 -(void)prepareLayout
 {
 //    NSLog(@"Prepare layout!");
+    BOOL isPad = NO;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        isPad = YES;
+    }
+
+    
     
     _frameSize = self.collectionView.frame.size;
     self.itemSize = CGSizeMake(_frameSize.width/5, _frameSize.width/5);
+    
+    if (isPad) {
+        self.itemSize = CGSizeMake(_frameSize.width/10, _frameSize.width/10);
+    }
+    
     _cellCount = [[self collectionView] numberOfItemsInSection:0];
     
     long time;
@@ -62,15 +73,27 @@
 }
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)path
 {
+    
+    BOOL isPad = NO;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        isPad = YES;
+    }
+    
     UICollectionViewLayoutAttributes* attributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:path];
     attributes.size = self.itemSize;
     NSInteger i = path.row%10;
     NSInteger j = path.row/10;
-    if (i<5) {
+    
+    if (isPad) {
         attributes.center = CGPointMake(self.itemSize.width/2+i*self.itemSize.width+j*_frameSize.width, self.itemSize.height/2);
     }else{
-        attributes.center = CGPointMake(self.itemSize.width/2+(i-5)*self.itemSize.width+j*_frameSize.width, self.itemSize.height*3/2);
+        if (i<5) {
+            attributes.center = CGPointMake(self.itemSize.width/2+i*self.itemSize.width+j*_frameSize.width, self.itemSize.height/2);
+        }else{
+            attributes.center = CGPointMake(self.itemSize.width/2+(i-5)*self.itemSize.width+j*_frameSize.width, self.itemSize.height*3/2);
+        }
     }
+    
     
     return attributes;
 }

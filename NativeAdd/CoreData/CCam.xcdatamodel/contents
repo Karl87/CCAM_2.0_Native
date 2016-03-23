@@ -51,7 +51,9 @@
     <entity name="CCEvent" representedClassName="CCEvent" syncable="YES">
         <attribute name="eventCount" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventCountDown" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="eventDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventDescriptionCn" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventDescriptionEn" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventDescriptionZh" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventImageURLCn" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventImageURLEn" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="eventImageURLZh" optional="YES" attributeType="String" syncable="YES"/>
@@ -141,6 +143,7 @@
         <attribute name="nameJP" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="nameZH" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="redirectURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="reflectionMax" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="regionInfo" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="regionType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="serieID" optional="YES" attributeType="String" syncable="YES"/>
@@ -156,6 +159,7 @@
         <attribute name="text_Coordinates" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="textColor" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="textFont" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="textSize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="stickerset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CCStickerSet" inverseName="stickers" inverseEntity="CCStickerSet" syncable="YES"/>
     </entity>
@@ -235,12 +239,12 @@
         <element name="CCAnimation" positionX="-416" positionY="540" width="128" height="283"/>
         <element name="CCCharacter" positionX="-468" positionY="414" width="126" height="300"/>
         <element name="CCComment" positionX="-459" positionY="153" width="128" height="180"/>
-        <element name="CCEvent" positionX="-108" positionY="9" width="128" height="225"/>
+        <element name="CCEvent" positionX="-108" positionY="9" width="128" height="255"/>
         <element name="CCLike" positionX="-450" positionY="162" width="128" height="135"/>
         <element name="CCMessage" positionX="-450" positionY="162" width="128" height="255"/>
         <element name="CCPhoto" positionX="-459" positionY="153" width="128" height="450"/>
-        <element name="CCSerie" positionX="-659" positionY="9" width="128" height="480"/>
-        <element name="CCSticker" positionX="-450" positionY="162" width="128" height="210"/>
+        <element name="CCSerie" positionX="-659" positionY="9" width="128" height="495"/>
+        <element name="CCSticker" positionX="-450" positionY="162" width="128" height="225"/>
         <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
         <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="450"/>
         <element name="CCUser" positionX="-108" positionY="180" width="128" height="495"/>

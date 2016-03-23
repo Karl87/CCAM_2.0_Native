@@ -14,10 +14,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CCEvent (CoreDataProperties)
-
+@property (nullable, nonatomic, retain) NSString *eventDescriptionEn;
+@property (nullable, nonatomic, retain) NSString *eventDescriptionZh;
 @property (nullable, nonatomic, retain) NSString *eventCount;
 @property (nullable, nonatomic, retain) NSString *eventCountDown;
-@property (nullable, nonatomic, retain) NSString *eventDescription;
+@property (nullable, nonatomic, retain) NSString *eventDescriptionCn;
 @property (nullable, nonatomic, retain) NSString *eventImageURLCn;
 @property (nullable, nonatomic, retain) NSString *eventImageURLEn;
 @property (nullable, nonatomic, retain) NSString *eventImageURLZh;

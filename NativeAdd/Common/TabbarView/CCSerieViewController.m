@@ -11,6 +11,7 @@
 #import "CCSerie.h"
 #import "CCamHelper.h"
 #import <pop/POP.h>
+#import "CCamRefreshHeader.h"
 
 @interface CCSerieViewController ()<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate>
 @property (nonatomic,assign) BOOL needUpdate;
@@ -82,11 +83,11 @@
     
     [_serieTable setSeparatorColor:CCamViewBackgroundColor];
     
-    MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshSerie)];
+    CCamRefreshHeader *header = [CCamRefreshHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshSerie)];
+    header.stateLabel.hidden = YES;
     header.automaticallyChangeAlpha = YES;
     header.lastUpdatedTimeLabel.hidden = YES;
-    _serieTable.refresh = header;
-    _serieTable.mj_header = _serieTable.refresh;
+    _serieTable.mj_header = header;
 
     [self.serieTable setDelegate:self];
     [self.serieTable setDataSource:self];
@@ -162,7 +163,16 @@
         }
         
         SerieCell *cell = [[SerieCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-        [cell.serieImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serie.image_List]] placeholderImage:[[UIImage alloc] init]];
+//        [cell.serieImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serie.image_List]] placeholderImage:[[UIImage alloc] init]];
+        
+        [cell.imageProgress setHidden:NO];
+        
+        [cell.serieImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",CCamHost,serie.image_List]] placeholderImage:nil options:nil progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+            CGFloat progress = (CGFloat)receivedSize/(CGFloat)expectedSize;
+            cell.imageProgress.progressValue =progress ;
+        } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+            [cell.imageProgress setHidden:YES];
+        }];
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
@@ -211,10 +221,11 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 
 {
-    return (CCamViewWidth-10)*150/640;
+    return (CCamViewWidth-10)*150/640+10;
 }
 #pragma mark - SegmentControl
 - (void)segItemOnClick:(id)sender{
+    
     UIButton *button  = (UIButton*)sender;
     self.serieOrderType = button.tag;
     POPBasicAnimation *anim = [POPBasicAnimation animationWithPropertyNamed:kPOPViewFrame];

@@ -75,9 +75,39 @@
     }
     return NO;
 }
+- (void)loginStateError{
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
+    hud.labelText = Babel(@"登录状态失效，请重新登录");
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    
+    [manager POST:CCamLogoutURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        NSString *jsonStr = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        NSLog(@"JSON: %@", jsonStr);
+        NSString *hubMessage = @"";
+        
+//        if ([jsonStr isEqualToString:@"1"]) {
+            hubMessage = Babel(@"登出成功");
+            [self setUserToken:@""];
+            [self setUserID:@""];
+            
+            [self callAuthorizeView];
+//        }else{
+//            hubMessage = Babel(@"登出失败");
+//        }
+        
+        hud.labelText = hubMessage;
+        [hud hide:YES afterDelay:1.0f];
+        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        [hud setLabelText:Babel(@"网络故障")];
+        [hud hide:YES afterDelay:1.0f];
+    }];
 
+}
 - (void)logout{
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view animated:YES];
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
     hud.labelText = Babel(@"登出角色相机中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -88,7 +118,7 @@
         NSLog(@"JSON: %@", jsonStr);
         NSString *hubMessage = @"";
         
-        if ([jsonStr isEqualToString:@"1"]) {
+//        if ([jsonStr isEqualToString:@"1"]) {
             hubMessage = Babel(@"登出成功");
             [self setUserToken:@""];
             [self setUserID:@""];
@@ -97,9 +127,9 @@
                 [[MessageHelper sharedManager].tabVC reloadWhenLogin];
             }
             
-        }else{
-            hubMessage = Babel(@"登出失败");
-        }
+//        }else{
+//            hubMessage = Babel(@"登出失败");
+//        }
         
         hud.labelText = hubMessage;
         [hud hide:YES afterDelay:1.0f];
@@ -122,6 +152,32 @@
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:userid forKey:@"userid"];
     NSLog(@"%@",[self getUserID]);
+}
+- (NSString *)getDeviceToken{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* str = [NSString stringWithFormat:@"%@",[userDefaults stringForKey:@"devicetoken"]];
+    if([str isKindOfClass:[NSNull class]]||[str isEqualToString:@""]|| str == NULL||[str isEqualToString:@"(null)"]){
+        str = @"";
+    }
+    
+    return str;
+}
+- (void)setDeviceToken:(NSString *)deviceToken{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:deviceToken forKey:@"devicetoken"];
+    NSLog(@"%@",[self getDeviceToken]);
+}
+- (void)updateDeviceToken{
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    NSString *token = [[AuthorizeHelper sharedManager] getUserToken];
+    NSString *deviceToken = [[AuthorizeHelper sharedManager] getDeviceToken];
+    NSDictionary *parameters =@{@"device_token":deviceToken,@"token":token};
+    [manager GET:CCamUpdateDeviceToeknURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        
+    }];
 }
 - (NSString *)getUserToken{
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -387,6 +443,7 @@
             [[AuthorizeHelper sharedManager] setUserName:userName];
             [[AuthorizeHelper sharedManager] setUserImage:userImage];
 
+            [self updateDeviceToken];
             
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
         }else{
@@ -469,6 +526,8 @@
             [[AuthorizeHelper sharedManager] setUserZone:userZone];
             [[AuthorizeHelper sharedManager] setUserName:userName];
             [[AuthorizeHelper sharedManager] setUserImage:userImage];
+            
+            [self updateDeviceToken];
             
             if (!login) {
                 _authorizeView.dismissType = @"userinfo";

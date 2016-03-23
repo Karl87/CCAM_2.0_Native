@@ -79,6 +79,13 @@
     }else{
         self.mainLightMax = mainLightMax;
     }
+    NSString *reflectionMax = GetValidString([dic objectForKey:@"reflectionMax"]);
+    if ([reflectionMax isEqualToString:@""]) {
+        self.reflectionMax = @"0";
+    }else{
+        self.reflectionMax = reflectionMax;
+    }
+    
     
 }
 - (NSComparisonResult)compareSerieWithPopular:(CCSerie*)serie{

@@ -57,6 +57,9 @@ void _removeAnimationControl(){
 void _getHeadDirection(const char* _direction){
     
 }
+void _getHeadDirectionState(const char* _state){
+    [[iOSBindingManager sharedManager] setHeadDirectionState:GetStringParam(_state)];
+}
 void _getPoseInformation(const char* _info){
     
 }
@@ -69,6 +72,10 @@ void _getAddedCharacterList(const char *_info){
 }
 void _getAddedCharacterSerieID(const char *_info){
     [[iOSBindingManager sharedManager] setContestSerieID:GetStringParam(_info)];
+}
+
+void _touchCharacterInOtherState(){
+    [[iOSBindingManager sharedManager] touchCharacterInOtherState];
 }
 void  _submitPhoto(const char* _contestid,const char* _description,const char* _characterid,const char*_sharelist){
    

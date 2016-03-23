@@ -62,6 +62,8 @@
 @property (nonatomic,strong) UIButton *captureShupBtn;
 @property (nonatomic,strong) UIButton *captureBtn;
 @property (nonatomic,strong) UIImageView *captureShup;
+
+@property (nonatomic,assign) BOOL *autoLoadWhenDidAppear;
 @end
 
 @implementation KLImagePickerViewController
@@ -310,6 +312,7 @@
     }
     
     NSString *photoPath = [NSString stringWithFormat:@"file://%@/Choosed.jpg",CCamDocPath];
+    [[FileHelper sharedManager] addSkipBackupAttributeToItemAtPath:[NSString stringWithFormat:@"%@/Choosed.jpg",CCamDocPath]];
     NSLog(@"Check Path : %@",photoPath);
     UnitySendMessage(UnityController.UTF8String, "SelectAPicture", photoPath.UTF8String);
 //    [self presentViewController:show animated:YES completion:nil];
@@ -319,14 +322,29 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 - (void)exitPicker{
-//    [[iOSBindingManager sharedManager] editRemoveNativeSurface];
     
-    UnitySendMessage(UnityController.UTF8String,"CallHomeScene","");
-//    [self.navigationController popViewControllerAnimated:YES];
+//    UnitySendMessage(UnityController.UTF8String,"CallHomeScene","");
+
+    [[iOSBindingManager sharedManager] showChangeSceneTransition];
+    [self performSelector:@selector(removeImagePickerView) withObject:nil afterDelay:0.25];
+}
+
+- (void)removeImagePickerView{
+    [self.navigationController removeFromParentViewController];
+    [self.navigationController.view removeFromSuperview];
+    
+}
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    if (_autoLoadWhenDidAppear) {
+        [self getAlbumsData];
+        _autoLoadWhenDidAppear = NO;
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+
+    _autoLoadWhenDidAppear = YES;
     fitSize = NO;
     
     _assetsFilter = [ALAssetsFilter allPhotos];
@@ -521,14 +539,15 @@
     [_showAlbumBtn.layer setMasksToBounds:YES];
     [_showAlbumBtn addTarget:self action:@selector(backToAlbum) forControlEvents:UIControlEventTouchUpInside];
     
-    _albumCollection = [[UITableView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight, self.view.frame.size.width, self.view.frame.size.height-CCamThinNaviHeight) style:UITableViewStylePlain];
+    _albumCollection = [[UITableView alloc] initWithFrame:CGRectMake(0, -self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height-64) style:UITableViewStylePlain];
     [_albumCollection setDelegate:self];
     [_albumCollection setDataSource:self];
     [_albumCollection setHidden:YES];
     [_albumCollection setBounces:NO];
+    [_albumCollection setBackgroundColor:CCamViewBackgroundColor];
     [_albumBG addSubview:_albumCollection];
     
-    [self getAlbumsData];
+    [self.albumBG addSubview:_albumNavi];
 }
 - (void)changeImageToFitSize{
     
@@ -557,31 +576,36 @@
     }
 }
 - (void)showAlbums{
+    [_albumNaviChoose setEnabled:NO];
     if (_albumCollection.hidden == YES) {
         [_albumCollection setHidden:NO];
         [_albumBG setScrollEnabled:NO];
-        POPSpringAnimation *anim = [POPSpringAnimation animationWithPropertyNamed:kPOPViewFrame];
-        anim.fromValue =[NSValue valueWithCGRect:CGRectMake(0, -self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height-CCamThinNaviHeight)];
+        POPBasicAnimation *anim = [POPBasicAnimation animationWithPropertyNamed:kPOPViewFrame];
+        anim.fromValue =[NSValue valueWithCGRect:_albumCollection.frame];
         anim.toValue = [NSValue valueWithCGRect:CGRectMake(0, CCamThinNaviHeight, self.view.frame.size.width, self.view.frame.size.height-CCamThinNaviHeight)];
         anim.beginTime = CACurrentMediaTime();
-        anim.springBounciness = 10.0f;
+        anim.duration = 0.2;
+//        anim.springBounciness = 10.0f;
         [anim setCompletionBlock:^(POPAnimation *anim,BOOL finish){
             if(finish) {
                 NSLog(@"!");
+                [_albumNaviChoose setEnabled:YES];
             }
         }];
         [self.albumCollection pop_addAnimation:anim forKey:@"position"];
     }else{
-        POPSpringAnimation *anim = [POPSpringAnimation animationWithPropertyNamed:kPOPViewFrame];
-        anim.fromValue =[NSValue valueWithCGRect:CGRectMake(0, 64, self.view.frame.size.width, self.view.frame.size.height-64)];
+        POPBasicAnimation *anim = [POPBasicAnimation animationWithPropertyNamed:kPOPViewFrame];
+        anim.fromValue =[NSValue valueWithCGRect:_albumCollection.frame];
         anim.toValue = [NSValue valueWithCGRect:CGRectMake(0, -self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height-64)];
         anim.beginTime = CACurrentMediaTime();
-        anim.springBounciness = 10.0f;
+        anim.duration = 0.2;
+//        anim.springBounciness = 10.0f;
         [anim setCompletionBlock:^(POPAnimation *anim,BOOL finish){
             if(finish) {
                 NSLog(@"!");
                 [_albumCollection setHidden:YES];
                 [_albumBG setScrollEnabled:YES];
+                [_albumNaviChoose setEnabled:YES];
             }
         }];
         [self.albumCollection pop_addAnimation:anim forKey:@"position"];

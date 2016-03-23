@@ -22,4 +22,6 @@
 
 - (BOOL)checkStickerExist:(CCSticker *)sticker;
 - (NSString *)getStickerFilePath:(CCSticker *)sticker;
+
+- (BOOL)addSkipBackupAttributeToItemAtPath:(NSString *) filePathString;
 @end
