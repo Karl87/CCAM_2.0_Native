@@ -27,7 +27,9 @@
     [_eventTable.mj_header beginRefreshing];
 }
 - (void)returnTopPosition{
-    [_eventTable scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    if ([_events count]&&[_events count]>0) {
+        [_eventTable scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -56,8 +58,8 @@
     self.events = [NSMutableArray new];
     [self getLocalEventsInfo];
 
-    UIBarButtonItem *test = [[UIBarButtonItem alloc] initWithTitle:@"测试" style:UIBarButtonItemStylePlain target:self action:@selector(testWeb)];
-    [self.navigationItem setLeftBarButtonItem:test];
+//    UIBarButtonItem *test = [[UIBarButtonItem alloc] initWithTitle:@"测试" style:UIBarButtonItemStylePlain target:self action:@selector(testWeb)];
+//    [self.navigationItem setLeftBarButtonItem:test];
 }
 - (void)testWeb{
     KLWebViewController *detail = [[KLWebViewController alloc] init];

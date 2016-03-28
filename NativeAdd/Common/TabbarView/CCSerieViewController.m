@@ -27,7 +27,9 @@
 
 @implementation CCSerieViewController
 - (void)returnTopPosition{
-    [_serieTable scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    if ([_orderSeries count]&&[_orderSeries count]>0) {
+        [_serieTable scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    }
 }
 
 - (void)viewDidLoad {

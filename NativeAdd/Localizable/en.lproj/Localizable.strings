@@ -15,7 +15,8 @@
 "发布" = "Submit";
 "提交" = "Submit";
 "加载中" = "Loading...";
-
+"重试" = "Retry";
+"马上分享" = "Share Now";
 //底部导航栏
 "首页" = "Home";
 "活动" = "Event";
@@ -226,10 +227,11 @@
 "比赛规则" = "Event rules";
 "字数已满" = "Too long!";
 "说点什么吧" = "Say something...";//submit text placeholder
-"保存照片至系统相册" = "High rest photo saved to album";
+"保存照片至系统相册" = "Saving photo...";
 "保存照片成功" = "Photo saved";
 "保存照片失败" = "Photo saving failed";
-
+"重新发布" = "Yes";
+"噢？上传有点问题..." = "Ooops, upload failed...";
 //消息
 "消息" = "Message";
 "您有" = "You have ";

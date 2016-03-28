@@ -260,7 +260,7 @@
         }
     }
     [[SDImageCache sharedImageCache] clearDiskOnCompletion:^{
-        hud.labelText =Babel(@"缓存我呢见清理完成");
+        hud.labelText =Babel(@"缓存文件清理完成");
         hud.mode = MBProgressHUDModeText;
         [hud hide:YES afterDelay:1.0];
         [_setting reloadData];

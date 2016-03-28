@@ -75,6 +75,8 @@
 @property (nonatomic,strong) WCCircularSlider *lightSlider;
 @property (nonatomic,strong) WCCircularSlider *shadowSlider;
 
+@property (nonatomic,strong) UISegmentedControl *eraseSeg;
+
 @end
 
 @implementation CCamViewController
@@ -220,8 +222,20 @@
     
     
     if (!_headCircle) {
-        _headCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _animationControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
-        [_headCircle setCenter:CGPointMake(_animationControl.bounds.size.width*0.75, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        
+        BOOL isPad = NO;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            isPad = YES;
+        }
+        
+        if (isPad) {
+            _headCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, (_animationControl.bounds.size.height-CCamThinNaviHeight)-10,(_animationControl.bounds.size.height-CCamThinNaviHeight)-10)];
+            [_headCircle setCenter:CGPointMake(_animationControl.bounds.size.width*0.75, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }else{
+            _headCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _animationControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
+            [_headCircle setCenter:CGPointMake(_animationControl.bounds.size.width*0.75, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }
+        
         [_headCircle.circleBG setImage:[UIImage imageNamed:@"headCircle"]];
         [_animationControl addSubview:_headCircle];
         [_headCircle setDelegate:self];
@@ -435,9 +449,22 @@
         [_lightControl addSubview:lightHelp];
         [lightHelp addTarget:self action:@selector(callLightTutorial) forControlEvents:UIControlEventTouchUpInside];
     }
+    
+    BOOL isPad = NO;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        isPad = YES;
+    }
+
+    
     if (!_lightCircle) {
-        _lightCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
-        [_lightCircle setCenter:CGPointMake(_lightControl.bounds.size.width*0.75, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        
+        if (isPad) {
+            _lightCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, (_lightControl.bounds.size.height-CCamThinNaviHeight)-10,(_lightControl.bounds.size.height-CCamThinNaviHeight)-10)];
+            [_lightCircle setCenter:CGPointMake(_lightControl.bounds.size.width*0.75, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }else{
+            _lightCircle = [[CCamCircleView alloc] initWithFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
+            [_lightCircle setCenter:CGPointMake(_lightControl.bounds.size.width*0.75, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }
         [_lightCircle.circleBG setImage:[UIImage imageNamed:@"lightCircle"]];
         [_lightControl addSubview:_lightCircle];
         [_lightCircle setDelegate:self];
@@ -447,8 +474,16 @@
 
         _lightSlider = [[WCCircularSlider alloc] init];
         [_lightSlider setBackgroundColor:[UIColor clearColor]];
-        [_lightSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
-        [_lightSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        
+        if (isPad) {
+            [_lightSlider setFrame:CGRectMake(0, 0, (_lightControl.bounds.size.height-CCamThinNaviHeight)-10,(_lightControl.bounds.size.height-CCamThinNaviHeight)-10)];
+            [_lightSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }else{
+            [_lightSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/2*0.8,_lightControl.bounds.size.width/2*0.8)];
+            [_lightSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }
+        
+        
         [_lightSlider setStartAngle:-90];
         [_lightSlider setCutoutAngle:60];
         [_lightSlider setProgress:0.5];
@@ -472,8 +507,15 @@
 
         _shadowSlider = [[WCCircularSlider alloc] init];
         [_shadowSlider setBackgroundColor:[UIColor clearColor]];
-        [_shadowSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/3*0.8,_lightControl.bounds.size.width/3*0.8)];
-        [_shadowSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        if (isPad) {
+            [_shadowSlider setFrame:CGRectMake(0, 0, (_lightControl.bounds.size.height-CCamThinNaviHeight)-40,(_lightControl.bounds.size.height-CCamThinNaviHeight)-40)];
+            [_shadowSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }else{
+            [_shadowSlider setFrame:CGRectMake(0, 0, _lightControl.bounds.size.width/3*0.8,_lightControl.bounds.size.width/3*0.8)];
+            [_shadowSlider setCenter:CGPointMake(_lightControl.bounds.size.width*0.25, (_lightControl.bounds.size.height-CCamThinNaviHeight)/2)];
+        }
+        
+        
         [_shadowSlider setStartAngle:-90];
         [_shadowSlider setCutoutAngle:90];
         [_shadowSlider setProgress:0.0];
@@ -625,7 +667,7 @@
     [_nextButton setTitleColor:CCamRedColor forState:UIControlStateNormal];
     [_nextButton.titleLabel setFont:[UIFont systemFontOfSize:14.]];
     [_nextButton sizeToFit];
-    [_nextButton setFrame:CGRectMake(0, 0, _nextButton.frame.size.width+24, _navigationView.frame.size.height-16)];
+    [_nextButton setFrame:CGRectMake(0, 0, _nextButton.frame.size.width+24, _nextButton.frame.size.height+2)];
     [_nextButton setCenter:CGPointMake(_navigationView.frame.size.width-15-_nextButton.frame.size.width/2, _navigationView.frame.size.height/2)];
     [_nextButton.layer setCornerRadius:_nextButton.frame.size.height/2];
     [_nextButton addTarget:self action:@selector(goToSubmit) forControlEvents:UIControlEventTouchUpInside];
@@ -637,21 +679,10 @@
     [[iOSBindingManager sharedManager] editRemoveNativeSurface];
 }
 - (void)goToSubmit{
-    UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
-    UnitySendMessage(UnityController.UTF8String, "GetAllCharacterList", "");
-    [self performSelector:@selector(test) withObject:nil afterDelay:0.1];
-    
-    
-    //    UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", "none");
-//    [self performSelector:@selector(delayToSubmit) withObject:nil afterDelay:0.1f];
+            UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", "none");
+    [self performSelector:@selector(delayToSubmit) withObject:nil afterDelay:0.1f];
 }
-- (void)test{
-    NSString* currentSerieID = [[iOSBindingManager sharedManager] getContestSerieID];
-    NSString* currentCharacters = [[iOSBindingManager sharedManager] getSubmitCharactersList];
-    
-    NSLog(@"原始%@ *** %@",currentSerieID,currentCharacters);
 
-}
 - (void)delayToSubmit{
     UnitySendMessage(UnityController.UTF8String, "OnClickConfirmToCaptureImage", "");
     UnitySendMessage("_plantFormInteractions", "OnClickTabBtn", "none");
@@ -868,6 +899,11 @@
             cellIdentifer = @"segmentContentCell_Erase";
             segContentCell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifer forIndexPath:indexPath];
             
+            BOOL isPad = NO;
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                isPad = YES;
+            }
+            
             if (segContentCell.eraseView == nil) {
                 segContentCell.eraseView = [[UIView alloc] initWithFrame:CGRectMake(0, segContentCell.bounds.size.height-CCamThinSerieHeight, segContentCell.bounds.size.width, CCamThinSerieHeight)];
                 [segContentCell.eraseView setBackgroundColor:CCamBackgoundGrayColor];
@@ -916,32 +952,53 @@
                 [segContentCell.eraseZoneLabel setCenter:CGPointMake(segContentCell.eraseView.frame.size.width-40-segContentCell.eraseZoneSwitch.frame.size.width-segContentCell.eraseZoneLabel.frame.size.width/2, segContentCell.eraseView.frame.size.height/2)];
                 [segContentCell.eraseView addSubview:segContentCell.eraseZoneLabel];
                 
-                            NSArray *segAry = @[Babel(@"擦除"),Babel(@"恢复")];
-                            UISegmentedControl *seg = [[UISegmentedControl alloc] initWithItems:segAry];
-                            [seg setFrame:CGRectMake(0, 0, 200, CCamThinSerieHeight)];
-                            [seg setCenter:CGPointMake(segContentCell.bounds.size.width/2 , segContentCell.bounds.size.height/2-44)];
-                            [seg setSelectedSegmentIndex:0];
-                            [seg setTintColor:CCamRedColor];
-                            [seg setImage:[UIImage imageNamed:@"eraseButton"] forSegmentAtIndex:0];
-                            [seg setTitle:Babel(@"擦除") forSegmentAtIndex:0];
-                            [seg setImage:[UIImage imageNamed:@"unEraseButton"] forSegmentAtIndex:1];
-                            [seg setTitle:Babel(@"恢复") forSegmentAtIndex:1];
-                            [segContentCell.contentView addSubview:seg];
+                NSArray *segAry = @[Babel(@"擦除"),Babel(@"恢复")];
+                UISegmentedControl *seg = [[UISegmentedControl alloc] initWithItems:segAry];
+                
+                if(isPad){
+                    [seg setFrame:CGRectMake(0, 0, 140, CCamThinSerieHeight)];
+                    [seg setCenter:CGPointMake(90 , (segContentCell.bounds.size.height-CCamThinSerieHeight)/2)];
+                }else{
+                    [seg setFrame:CGRectMake(0, 0, 200, CCamThinSerieHeight)];
+                    [seg setCenter:CGPointMake(segContentCell.bounds.size.width/2 , segContentCell.bounds.size.height/2-44)];
+                }
+                
+                
+                [seg setSelectedSegmentIndex:0];
+                [seg setTintColor:CCamRedColor];
+                [seg setImage:[UIImage imageNamed:@"eraseButton"] forSegmentAtIndex:0];
+                [seg setTitle:Babel(@"擦除") forSegmentAtIndex:0];
+                [seg setImage:[UIImage imageNamed:@"unEraseButton"] forSegmentAtIndex:1];
+                [seg setTitle:Babel(@"恢复") forSegmentAtIndex:1];
+                [segContentCell.contentView addSubview:seg];
                 
                 self.eraseType = 1;
                 
                 [seg addTarget:self action:@selector(didClicksegmentedControlAction:)forControlEvents:UIControlEventValueChanged];
                 
+                _eraseSeg = seg;
                 
+                UIView *sliderBG;
                 
-                UIView *sliderBG = [[UIView alloc] initWithFrame:CGRectMake(0, 0, segContentCell.bounds.size.width/2-30, 2)];
+                if (isPad) {
+                    sliderBG = [[UIView alloc] initWithFrame:CGRectMake(0, 0, segContentCell.bounds.size.width/2-30, 2)];
+                    [sliderBG setCenter:CGPointMake(segContentCell.bounds.size.width-(sliderBG.bounds.size.width)/2-60, (segContentCell.bounds.size.height-CCamThinSerieHeight)/2)];
+                }else{
+                    sliderBG = [[UIView alloc] initWithFrame:CGRectMake(0, 0, segContentCell.bounds.size.width/2-30, 2)];
+                    [sliderBG setCenter:CGPointMake(segContentCell.bounds.size.width/2, segContentCell.bounds.size.height-2*CCamThinSerieHeight)];
+                }
+                
                 [sliderBG setBackgroundColor:CCamSwitchNormalColor];
-                [sliderBG setCenter:CGPointMake(segContentCell.bounds.size.width/2, segContentCell.bounds.size.height-2*CCamThinSerieHeight)];
+                
                 [segContentCell.contentView addSubview:sliderBG];
                 
                 for (int i = 0; i<5; i++) {
                     UIImageView *dot = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 7+i*3, 7+i*3)];
-                    [dot setCenter:CGPointMake(segContentCell.bounds.size.width/2-sliderBG.bounds.size.width/2+i*sliderBG.bounds.size.width/4, sliderBG.center.y)];
+                    if (isPad) {
+                        [dot setCenter:CGPointMake(sliderBG.frame.origin.x+i*sliderBG.bounds.size.width/4, sliderBG.center.y)];
+                    }else{
+                        [dot setCenter:CGPointMake(segContentCell.bounds.size.width/2-sliderBG.bounds.size.width/2+i*sliderBG.bounds.size.width/4, sliderBG.center.y)];
+                    }
                     [dot setBackgroundColor:[UIColor whiteColor]];
                     [dot setImage:[[UIImage imageNamed:@"eraseDot"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
                     [dot setTintColor:CCamSwitchNormalColor];
@@ -1151,6 +1208,9 @@
         if (indexPath.row == 3) {
             if ([TutorialHelper sharedManager].autoShowEraserTutorial) {
                 [[TutorialHelper sharedManager] callEraseTutorialView];
+            }
+            if (_eraseSeg) {
+                [_eraseSeg setSelectedSegmentIndex:0];
             }
         }
         

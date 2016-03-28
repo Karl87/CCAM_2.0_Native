@@ -147,6 +147,13 @@
     [_photoMore setTintColor:[UIColor lightGrayColor]];
     [_photoMore addTarget:self action:@selector(callMoreActionSheet) forControlEvents:UIControlEventTouchUpInside];
     
+    _shareSign = [UILabel new];
+    [_shareSign setBackgroundColor:[UIColor whiteColor]];
+    [_shareSign setTextColor:CCamRedColor];
+    [_shareSign setFont:[UIFont boldSystemFontOfSize:14.0]];
+    [_shareSign setTextAlignment:NSTextAlignmentCenter];
+    [_shareSign setHidden:YES];
+    
     _commentBorder = [UIView new];
     [_commentBorder setBackgroundColor:CCamViewBackgroundColor];
     
@@ -155,7 +162,7 @@
     [_commentTable setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     [_commentTable setBackgroundColor:[UIColor whiteColor]];
     
-    NSArray *views = @[_cellBG,_profileImage,_userName,_userButton,_photoTime,_privacySign,_photo,_photoLomo,_photoSpotlight,_photoInput,_photoLike,_photoMore,_likeBorder,_likeView,_contestDes,_photoTitle,_commentBorder,_photoDes,_commentTable,_photoProgress];
+    NSArray *views = @[_cellBG,_profileImage,_userName,_userButton,_photoTime,_privacySign,_photo,_photoLomo,_photoSpotlight,_photoInput,_photoLike,_photoMore,_shareSign,_likeBorder,_likeView,_contestDes,_photoTitle,_commentBorder,_photoDes,_commentTable,_photoProgress];
     [views enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.contentView addSubview:obj];
     }];
@@ -182,7 +189,7 @@
     }
     UIButton *btn = (UIButton*)sender;
     KLWebViewController *detail = [[KLWebViewController alloc] init];
-    detail.webURL = [NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Photo/index/contestid/%ld.html",(long)btn.tag];
+    detail.webURL = _timeline.timelineContestURL;//[NSString stringWithFormat:@"http://www.c-cam.cc/index.php/First/Photo/index/contestid/%ld.html",(long)btn.tag];
     detail.vcTitle =btn.currentTitle;
     detail.hidesBottomBarWhenPushed = YES;
     
@@ -363,6 +370,10 @@
     .heightIs(44)
     .widthIs(44);
     
+    _shareSign.sd_layout
+    .rightSpaceToView(_photoMore,10)
+    .centerYEqualToView(_photoMore);
+    
     _likeBorder.sd_layout
     .leftSpaceToView(contentView,15)
     .rightSpaceToView(contentView,15)
@@ -412,7 +423,22 @@
     [_userButton addTarget:self action:@selector(callUserPage:) forControlEvents:UIControlEventTouchUpInside];
     
     if(_indexPath.row==0&&![_timeline.timelineContestID isEqualToString:@"-1"]&&[_timeline.timelineUserID isEqualToString:[[AuthorizeHelper sharedManager] getUserID]]){
-        [_photoMore setTintColor:CCamRedColor];
+//        [_photoMore setTintColor:CCamRedColor];
+        [_shareSign setText:[NSString stringWithFormat:@"%@ ➜",Babel(@"马上分享")]];
+        [_shareSign sizeToFit];
+        [_shareSign setFrame:CGRectMake(0, 0, _shareSign.frame.size.width+18, _shareSign.frame.size.height+10)];
+        [_shareSign.layer setCornerRadius:_shareSign.frame.size.height/2];
+        [_shareSign.layer setMasksToBounds:YES];
+        [_shareSign.layer setBorderColor:CCamRedColor.CGColor];
+        [_shareSign.layer setBorderWidth:1.0];
+        _shareSign.sd_layout
+        .centerYEqualToView(_photoMore)
+        .rightSpaceToView(_photoMore,0)
+        .heightIs(_shareSign.frame.size.height)
+        .widthIs(_shareSign.frame.size.width);
+        [_shareSign setHidden:NO];
+    }else{
+        [_shareSign setHidden:YES];
     }
 
     
@@ -431,7 +457,7 @@
 
         [_photoTitle setTitle:[NSString stringWithFormat:@"%@",_timeline.cNameCN] forState:UIControlStateNormal];
         [_photoTitle sizeToFit];
-        [_photoTitle setTag:[_timeline.timelineContestID intValue]];
+//        [_photoTitle setTag:[_timeline.timelineContestID intValue]];
         [_photoTitle addTarget:self action:@selector(callContestWeb:) forControlEvents:UIControlEventTouchUpInside];
         _photoTitle.sd_layout.widthIs(_photoTitle.bounds.size.width+28);
         _photoTitle.sd_layout.heightIs(_photoTitle.bounds.size.height+8);
@@ -790,6 +816,11 @@
         return;
     }
     
+    if (!_shareSign.hidden) {
+        [_shareSign setHidden:YES];
+    }
+    
+    
     if ([[[AuthorizeHelper sharedManager] getUserID]isEqualToString:_timeline.timelineUserID]) {
         [[ShareHelper sharedManager] callShareViewIsMyself:YES delegate:self timeline:_timeline timelineCell:self indexPath:_indexPath onlyShare:NO shareImage:NO];
     }else{
@@ -841,7 +872,7 @@
             _timeline.shareTitle = Babel(@"角色相机");
         }
         if ([_timeline.shareSubTitle isEqualToString:@""]) {
-//            _timeline.shareSubTitle = [NSString stringWithFormat:@"请为%@的照片点赞",_timeline.timelineUserName];
+            //            _timeline.shareSubTitle = [NSString stringWithFormat:@"请为%@的照片点赞",_timeline.timelineUserName];
         }
         
         if (isShare) {
@@ -862,7 +893,7 @@
         SSDKPlatformType shareType;
         
         if ([title isEqualToString:Babel(@"微信")]){
-           shareType = SSDKPlatformSubTypeWechatSession;
+            shareType = SSDKPlatformSubTypeWechatSession;
         }else if ([title isEqualToString:Babel(@"朋友圈")]){
             shareType = SSDKPlatformSubTypeWechatTimeline;
         }else if ([title isEqualToString:Babel(@"新浪微博")]){
@@ -900,7 +931,7 @@
         }else if ([title isEqualToString:Babel(@"QQ空间")]){
             shareType = SSDKPlatformSubTypeQZone;
         }else if ([title isEqualToString:Babel(@"Facebook")]){
-           shareType = SSDKPlatformTypeFacebook;
+            shareType = SSDKPlatformTypeFacebook;
             [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL]
                                              images:imageArray
                                                 url:[NSURL URLWithString:_timeline.shareURL]
@@ -952,7 +983,6 @@
                 [alert show];
             }
         }];
-
     }
 }
 

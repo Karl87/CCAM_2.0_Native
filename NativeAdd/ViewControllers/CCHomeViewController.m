@@ -67,14 +67,22 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
 - (void)returnTopPosition{
     
     if (_backgroundView.contentOffset.x == 0) {
-        [_timeline scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        if ([_timeLines count]&&[_timeLines count]>0) {
+            [_timeline scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        }
     }else{
         if (_photoBGView.contentOffset.x == 0){
-            [_selectionCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+            if ([_selectionPhotos count]&&[_selectionPhotos count]>0) {
+                [_selectionCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+            }
         }else if (_photoBGView.contentOffset.x == CCamViewWidth){
-            [_popularCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+            if ([_popularPhotos count]&&[_popularPhotos count]>0) {
+                [_popularCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+            }
         }else if (_photoBGView.contentOffset.x == CCamViewWidth*2){
-            [_lastCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+            if ([_lastPhotos count]&&[_lastPhotos count]>0) {
+                [_lastCollection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+            }
         }
     }
 }
@@ -120,13 +128,28 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     NSArray* segArray = @[NSLocalizedString(@"订阅", @""),NSLocalizedString(@"广场", @"")];
     _segmegtItems = [NSMutableArray new];
     
-    _segmentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamSegItemWidth*segArray.count, CCamSegItemHeight)];
+    NSString *language = [[SettingHelper sharedManager] getCurrentLanguage];
+    
+    if ([language hasPrefix:@"zh"]) {
+         _segmentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamSegItemWidth*segArray.count, CCamSegItemHeight)];
+    }else{
+         _segmentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CCamSegItemWidthEn*segArray.count, CCamSegItemHeight)];
+    }
+    
+   
     [_segmentView setBackgroundColor:[UIColor clearColor]];
     [self.navigationItem setTitleView:_segmentView];
     
     for (int i = 0 ; i <segArray.count; i++) {
         UIButton *segButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [segButton setFrame:CGRectMake(CCamSegItemWidth*i, 0, CCamSegItemWidth, CCamSegItemHeight)];
+        
+        if ([language hasPrefix:@"zh"]) {
+            [segButton setFrame:CGRectMake(CCamSegItemWidth*i, 0, CCamSegItemWidth, CCamSegItemHeight)];
+        }else{
+            [segButton setFrame:CGRectMake(CCamSegItemWidthEn*i, 0, CCamSegItemWidthEn, CCamSegItemHeight)];
+        }
+        
+        
         [segButton.titleLabel setFont:[UIFont boldSystemFontOfSize:17.]];
         [segButton setTitle:[segArray objectAtIndex:i] forState:UIControlStateNormal];
         if (i == 0) {
@@ -141,13 +164,22 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
         [_segmentView addSubview:segButton];
         [_segmegtItems addObject:segButton];
     }
+    if ([language hasPrefix:@"zh"]) {
+        _segmentSlider = [[UIView alloc] initWithFrame:CGRectMake(0, CCamSegItemHeight-CCamSegSliderHeight-5, CCamSegItemWidth, CCamSegSliderHeight)];
+        [_segmentSlider setBackgroundColor:[UIColor clearColor]];
+        UIView *segmentSlider = [[UIView alloc] initWithFrame:CGRectMake((CCamSegItemWidth-CCamSegSliderWidth)/2, 0, CCamSegSliderWidth, CCamSegSliderHeight)];
+        [segmentSlider setBackgroundColor:[UIColor whiteColor]];
+        [_segmentSlider addSubview:segmentSlider];
+        [_segmentView addSubview:_segmentSlider];
+    }else{
+        _segmentSlider = [[UIView alloc] initWithFrame:CGRectMake(0, CCamSegItemHeight-CCamSegSliderHeight-5, CCamSegItemWidthEn, CCamSegSliderHeight)];
+        [_segmentSlider setBackgroundColor:[UIColor clearColor]];
+        UIView *segmentSlider = [[UIView alloc] initWithFrame:CGRectMake((CCamSegItemWidthEn-CCamSegSliderWidthEn)/2, 0, CCamSegSliderWidthEn, CCamSegSliderHeight)];
+        [segmentSlider setBackgroundColor:[UIColor whiteColor]];
+        [_segmentSlider addSubview:segmentSlider];
+        [_segmentView addSubview:_segmentSlider];
+    }
     
-    _segmentSlider = [[UIView alloc] initWithFrame:CGRectMake(0, CCamSegItemHeight-CCamSegSliderHeight-5, CCamSegItemWidth, CCamSegSliderHeight)];
-    [_segmentSlider setBackgroundColor:[UIColor clearColor]];
-    UIView *segmentSlider = [[UIView alloc] initWithFrame:CGRectMake((CCamSegItemWidth-CCamSegSliderWidth)/2, 0, CCamSegSliderWidth, CCamSegSliderHeight)];
-    [segmentSlider setBackgroundColor:[UIColor whiteColor]];
-    [_segmentSlider addSubview:segmentSlider];
-    [_segmentView addSubview:_segmentSlider];
     
     self.selectionPhotos = [NSMutableArray new];
     self.popularPhotos = [NSMutableArray new];

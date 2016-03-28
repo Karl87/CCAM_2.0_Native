@@ -21,7 +21,7 @@
 
 #import <MBProgressHUD/MBProgressHUD.h>
 
-@interface CCamSubmitViewController ()<UITableViewDataSource,UITableViewDelegate,UITextViewDelegate>
+@interface CCamSubmitViewController ()<UITableViewDataSource,UITableViewDelegate,UITextViewDelegate,UIAlertViewDelegate>
 
 @property (nonatomic,strong) CCamScrollView *submitBG;
 @property (nonatomic,strong) UIView *navi;
@@ -44,7 +44,7 @@
 @property (nonatomic,strong) AFViewShaker *viewShaker;
 
 @property (nonatomic,strong) NSString *currentContestID;
-
+@property (nonatomic,strong) UIAlertView *submitAlert;
 @end
 
 @implementation CCamSubmitViewController
@@ -155,7 +155,7 @@
     [_submitButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_submitButton setBackgroundColor:CCamRedColor];
     [_submitButton setTintColor:CCamRedColor];
-    [_submitButton addTarget:self action:@selector(uploadPhoto) forControlEvents:UIControlEventTouchUpInside];
+    [_submitButton addTarget:self action:@selector(savePhoto) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_submitButton];
     
 //    _personalButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -190,6 +190,7 @@
     UnityPause(1);
 }
 - (void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
     UnityPause(0);
 }
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -321,7 +322,7 @@
 
 
 
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
     hud.mode = MBProgressHUDModeAnnularDeterminate;
     hud.labelText = Babel(@"发布照片中");
     
@@ -350,33 +351,42 @@
                       if (error) {
                           NSLog(@"Error: %@", error);
 
-                          hud.mode = MBProgressHUDModeText;
-                          hud.labelText =Babel(@"发布照片失败");
-                          [hud hide:YES afterDelay:2.0];
+//                          hud.mode = MBProgressHUDModeText;
+//                          hud.labelText =Babel(@"发布照片失败");
+//                          [hud hide:YES afterDelay:2.0];
+                          [hud hide:YES];
                           
                           [_submitButton setEnabled:YES];
+                          
+                          _submitAlert = [[UIAlertView alloc] initWithTitle:Babel(@"提示") message:Babel(@"噢？上传有点问题...") delegate:self cancelButtonTitle:Babel(@"取消") otherButtonTitles:Babel(@"重试"), nil];
+                          [_submitAlert show];
                           
                       } else {
                           NSLog(@"%@ %@", response, responseObject);
 
                           hud.mode = MBProgressHUDModeText;
                           hud.labelText = Babel(@"发布照片成功");
-//                          [hud hide:YES afterDelay:2.0];
-//                          [_submitButton setEnabled:YES];
-                          [self performSelector:@selector(savePhoto) withObject:nil afterDelay:1.0];
+                          [self performSelector:@selector(goToHomePage) withObject:nil afterDelay:1.0];
                       }
                   }];
     
     [uploadTask resume];
 }
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (alertView == _submitAlert) {
+        if (buttonIndex ==1) {
+            [self uploadPhoto];
+        }
+    }
+}
 - (void)savePhoto{
-    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
     hud.mode = MBProgressHUDModeIndeterminate;
     hud.labelText =Babel(@"保存照片至系统相册");
      UIImageWriteToSavedPhotosAlbum(_submitImage.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
 }
 - (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo{
-    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.view];
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:self.navigationController.view];
     hud.mode = MBProgressHUDModeText;
     if (error) {
         hud.labelText = Babel(@"保存照片失败");
@@ -386,7 +396,7 @@
 
     }
     [hud hide:YES afterDelay:1.0];
-    [self performSelector:@selector(goToHomePage) withObject:nil afterDelay:1.0];
+    [self performSelector:@selector(uploadPhoto) withObject:nil afterDelay:1.0];
 }
 - (void)goToHomePage{
 //    [self.navigationController popToRootViewControllerAnimated:NO];

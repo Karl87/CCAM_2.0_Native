@@ -25,6 +25,7 @@
 @property (nonatomic,strong) UIButton *photoInput;
 @property (nonatomic,strong) UIButton *photoLike;
 @property (nonatomic,strong) UIButton *photoMore;
+@property (nonatomic,strong) UILabel *shareSign;
 @property (nonatomic,strong) UIView *likeBorder;
 @property (nonatomic,strong) UIView *likeView;
 @property (nonatomic,strong) UIButton *likesButton;

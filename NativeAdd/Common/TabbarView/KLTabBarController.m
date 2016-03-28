@@ -116,8 +116,9 @@
 
     UIButton *midBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [midBtn setTintColor:CCamRedColor];
-    [midBtn setBackgroundImage:[[UIImage imageNamed:@"tabCaptureIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [midBtn setFrame:CGRectMake(0, 0, 97.0/3, 90.0/3)];
+    [midBtn setImage:[[UIImage imageNamed:@"tabCaptureIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [midBtn.imageView setContentMode:UIViewContentModeScaleAspectFit];
+    [midBtn setFrame:CGRectMake(0, 0, self.tabBar.frame.size.height*2, self.tabBar.frame.size.height)];
     [midBtn addTarget:self action:@selector(customTabbarItemOnClick) forControlEvents:UIControlEventTouchUpInside];
     
     [self.tabBar addSubview:midBtn];

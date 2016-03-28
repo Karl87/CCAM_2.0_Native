@@ -10,7 +10,7 @@
 #import <ShareSDK/ShareSDK.h>
 
 @interface AuthorizeHelper : NSObject
-
+@property (nonatomic,strong) UIViewController *webVC;
 + (AuthorizeHelper*)sharedManager;
 
 - (NSString *)getDeviceToken;

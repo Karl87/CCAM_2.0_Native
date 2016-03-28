@@ -22,7 +22,8 @@
 @implementation KLCollectionLayout
 
 - (instancetype) init{
-    if ([super init]) {
+    self = [super init];
+    if (self) {
         self.columnCount = 2;
         self.columnMargin = 2;
         self.rowMargin = 2;

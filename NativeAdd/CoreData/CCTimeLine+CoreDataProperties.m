@@ -37,6 +37,7 @@
 @dynamic timelineUserID;
 @dynamic timelineUserImage;
 @dynamic timelineUserName;
+@dynamic timelineContestURL;
 @dynamic comments;
 @dynamic likes;
 

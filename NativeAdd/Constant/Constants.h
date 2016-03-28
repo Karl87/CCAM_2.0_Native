@@ -48,10 +48,12 @@
 #define CCamTabBarHeight 49.0
 #define CCamViewWidth [UIScreen mainScreen].bounds.size.width
 #define CCamViewHeight [UIScreen mainScreen].bounds.size.height
+#define CCamSegItemWidthEn 88.0
 #define CCamSegItemWidth 66.0
 #define CCamSegItemHeight 44.0
 #define CCamSegSliderHeight 2.0
 #define CCamSegSliderWidth 44.0
+#define CCamSegSliderWidthEn 66.0
 
 #define CCamThinNaviHeight 38.0 * [UIScreen mainScreen].bounds.size.height/667
 #define CCamThinSegHeight 35.0* [UIScreen mainScreen].bounds.size.height/667//30.0* [UIScreen mainScreen].bounds.size.height/667

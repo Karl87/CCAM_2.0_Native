@@ -213,21 +213,22 @@ UIViewController *UnityGetGLViewController();
 //    UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
 //    _serie = [[CoreDataHelper sharedManager] getSerie:[self getContestSerieID]];
 //
-//    if (_serie) {
-//        NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
-//        [lightDic setObject:_serie.environmentMin forKey:@"environmentMin"];
-//        [lightDic setObject:_serie.environmentMax forKey:@"environmentMax"];
-//        [lightDic setObject:_serie.mainLightMin forKey:@"mainLightMin"];
-//        [lightDic setObject:_serie.mainLightMax forKey:@"mainLightMax"];
-//        [lightDic setObject:_serie.hdrAdd forKey:@"hdrAdd"];
-//        [lightDic setObject:_serie.addThread forKey:@"addThread"];
-//        [lightDic setObject:_serie.reflectionMax forKey:@"reflectionMax"];
-//        NSLog(@"灯光参数设置：%@",lightDic);
-//        
-//        NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
-//        NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-//        UnitySendMautoessage(UnityController.UTF8String, "SetLightData", jsonString.UTF8String);
-//    }
+    if (_serie) {
+        NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
+        [lightDic setObject:_serie.environmentMin forKey:@"environmentMin"];
+        [lightDic setObject:_serie.environmentMax forKey:@"environmentMax"];
+        [lightDic setObject:_serie.mainLightMin forKey:@"mainLightMin"];
+        [lightDic setObject:_serie.mainLightMax forKey:@"mainLightMax"];
+        [lightDic setObject:_serie.hdrAdd forKey:@"hdrAdd"];
+        [lightDic setObject:_serie.addThread forKey:@"addThread"];
+        [lightDic setObject:_serie.reflectionMax forKey:@"reflectionMax"];
+        NSLog(@"灯光参数设置：%@",lightDic);
+        
+        NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
+        NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        UnitySendMessage(UnityController.UTF8String, "SetLightData", jsonString.UTF8String);
+        _serie = nil;
+    }
     
     
 
@@ -260,6 +261,7 @@ UIViewController *UnityGetGLViewController();
     [[DataHelper sharedManager].ccamVC setAnimationInfo:info];
 }
 - (void)cannotAddDifferentSerieCharacter{
+    _serie = nil;
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view.window animated:YES];
     [[[ViewHelper sharedManager] getCurrentVC].view.window addSubview:hud];
     hud.detailsLabelText = Babel(@"无法添加其他系列角色");
@@ -270,6 +272,7 @@ UIViewController *UnityGetGLViewController();
     
 }
 - (void)cannotAddMoreCharacter{
+    _serie = nil;
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[[ViewHelper sharedManager] getCurrentVC].view.window animated:YES];
     [[[ViewHelper sharedManager] getCurrentVC].view.window addSubview:hud];
     hud.labelText = Babel(@"无法添加更多角色");

@@ -32,6 +32,12 @@
         [_stickerInfos addObject:sticker];
     }
     
+    BOOL isPad = NO;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        isPad = YES;
+    }
+    
+    
     if (_stickerCollection == nil) {
         CCamSerieContentLayout *layout = [[CCamSerieContentLayout alloc] init];
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
@@ -39,7 +45,12 @@
         [collectionView setBackgroundColor:CCamExLightGrayColor];
         [collectionView setDelegate:self];
         [collectionView setDataSource:self];
-        [collectionView setFrame:CGRectMake(15, 10, self.bounds.size.width-30, (self.bounds.size.width-30)/5*2)];
+        if (isPad) {
+            [collectionView setFrame:CGRectMake(30, 0, self.bounds.size.width-60, (self.bounds.size.width-60)/10)];
+        }else{
+            [collectionView setFrame:CGRectMake(15, 10, self.bounds.size.width-30, (self.bounds.size.width-30)/5*2)];
+        }
+        
         [collectionView registerClass:[CCStickerCell class] forCellWithReuseIdentifier:@"stickerCell"];
         [collectionView setBounces:NO];
         [collectionView setShowsHorizontalScrollIndicator:NO];

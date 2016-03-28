@@ -14,6 +14,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CCTimeLine (CoreDataProperties)
+@property (nullable, nonatomic, retain) NSString *timelineContestURL;
 @property (nullable, nonatomic, retain) NSString *checked;
 @property (nullable, nonatomic, retain) NSString *shareURL;
 @property (nullable, nonatomic, retain) NSString *shareTitle;

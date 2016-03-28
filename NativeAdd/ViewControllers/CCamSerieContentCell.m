@@ -290,7 +290,7 @@
         
         CCamAnimationCell * cell = (CCamAnimationCell*)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.row inSection:indexPath.section]];
         [cell UILoadingCharacter];
-
+//
         
         CCAnimation * cellAnimation = (CCAnimation*)[_characterInfos objectAtIndex:indexPath.row];
         CCCharacter * cellCharacter = [[CoreDataHelper sharedManager] getCharacter:cellAnimation.characterID];
@@ -345,76 +345,70 @@
                 }
             }
         }
-        UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
-        UnitySendMessage(UnityController.UTF8String, "GetAllCharacterList", "");
-
+//        UnitySendMessage(UnityController.UTF8String, "GetCurrentCharactersSerieID", "");
+//        UnitySendMessage(UnityController.UTF8String, "GetAddedCharacterList", "");
+//        NSString* currentSerieID = [[iOSBindingManager sharedManager] getContestSerieID];
+//        NSString* currentCharacters = [[iOSBindingManager sharedManager] getSubmitCharactersList];
+//        
+//        NSLog(@"原始%@ *** %@",currentSerieID,currentCharacters);
+//        
+//        CCSerie *targetSerie = cellCharacter.serie;
+//        if ([currentSerieID isEqualToString:@"0"]&&targetSerie) {
+//            currentSerieID = targetSerie.serieID;
+//        }
+//        
+//        NSLog(@"处理%@ *** %@",currentSerieID,currentCharacters);
+//        
+//        if (targetSerie && [targetSerie.serieID isEqualToString:currentSerieID]) {
+//            NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
+//            [lightDic setObject:targetSerie.environmentMin forKey:@"environmentMin"];
+//            [lightDic setObject:targetSerie.environmentMax forKey:@"environmentMax"];
+//            [lightDic setObject:targetSerie.mainLightMin forKey:@"mainLightMin"];
+//            [lightDic setObject:targetSerie.mainLightMax forKey:@"mainLightMax"];
+//            [lightDic setObject:targetSerie.hdrAdd forKey:@"hdrAdd"];
+//            [lightDic setObject:targetSerie.addThread forKey:@"addThread"];
+//            [lightDic setObject:targetSerie.reflectionMax forKey:@"reflectionMax"];
+//            NSLog(@"%@%@灯光参数设置：%@",targetSerie.serieID,targetSerie.nameCN,lightDic);
+//            
+//            NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
+//            NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+//            UnitySendMessage(UnityController.UTF8String, "SetLightData", jsonString.UTF8String);
+//        }
+        [iOSBindingManager sharedManager].serie = cellCharacter.serie;
         
-        [self performSelector:@selector(setCharacterLightAndAddCharacter:) withObject:[NSArray arrayWithObjects:cellCharacter,cellAnimation, nil] afterDelay:0.1];
-        
-    }
-}
-- (void)setCharacterLightAndAddCharacter:(NSArray*)options{
-    
-    CCCharacter *theCharacter = (CCCharacter*)[options objectAtIndex:0];
-    CCAnimation *theAnimation = (CCAnimation*)[options objectAtIndex:1];
-    
-    NSString* currentSerieID = [[iOSBindingManager sharedManager] getContestSerieID];
-    NSString* currentCharacters = [[iOSBindingManager sharedManager] getSubmitCharactersList];
-    
-    NSLog(@"原始%@ *** %@",currentSerieID,currentCharacters);
-    
-    CCSerie *targetSerie = theCharacter.serie;
-    if ([currentSerieID isEqualToString:@"0"]&&targetSerie) {
-        currentSerieID = targetSerie.serieID;
-    }
-    
-    NSLog(@"处理%@ *** %@",currentSerieID,currentCharacters);
-    
-    if (targetSerie && [targetSerie.serieID isEqualToString:currentSerieID]) {
-        NSMutableDictionary *lightDic = [[NSMutableDictionary alloc] init];
-        [lightDic setObject:targetSerie.environmentMin forKey:@"environmentMin"];
-        [lightDic setObject:targetSerie.environmentMax forKey:@"environmentMax"];
-        [lightDic setObject:targetSerie.mainLightMin forKey:@"mainLightMin"];
-        [lightDic setObject:targetSerie.mainLightMax forKey:@"mainLightMax"];
-        [lightDic setObject:targetSerie.hdrAdd forKey:@"hdrAdd"];
-        [lightDic setObject:targetSerie.addThread forKey:@"addThread"];
-        [lightDic setObject:targetSerie.reflectionMax forKey:@"reflectionMax"];
-        NSLog(@"%@%@灯光参数设置：%@",targetSerie.serieID,targetSerie.nameCN,lightDic);
-        
-        NSData*jsonData = [NSJSONSerialization dataWithJSONObject:lightDic options:0 error:nil];
-        NSString *jsonString  =[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        UnitySendMessage(UnityController.UTF8String, "SetLightData", jsonString.UTF8String);
-    }
-    
-    
-    NSString *mPath = [NSString stringWithFormat:@"file://%@",[[FileHelper sharedManager] getCharacterFilePath:theCharacter]];
-    NSString *mSerieID = theCharacter.serieID;
-    NSString *mCharacterID = theCharacter.characterID;
-    NSString *mSelectPose = theAnimation.clipName;
-    NSString *mSelectFace = theAnimation.poseFace;
-    NSMutableArray *mPoseList = [[NSMutableArray alloc] initWithCapacity:0];
-    NSMutableArray *mFaceList = [[NSMutableArray alloc] initWithCapacity:0];
-    for (CCAnimation*animation in theCharacter.animations) {
-        if ([animation.type isEqualToString:@"pose"]) {
-            [mPoseList addObject:animation.clipName];
-        }else if ([animation.type isEqualToString:@"face"]){
-            [mFaceList addObject:animation.clipName];
+        NSString *mPath = [NSString stringWithFormat:@"file://%@",[[FileHelper sharedManager] getCharacterFilePath:cellCharacter]];
+        NSString *mSerieID = cellCharacter.serieID;
+        NSString *mCharacterID = cellCharacter.characterID;
+        NSString *mSelectPose = cellAnimation.clipName;
+        NSString *mSelectFace = cellAnimation.poseFace;
+        NSMutableArray *mPoseList = [[NSMutableArray alloc] initWithCapacity:0];
+        NSMutableArray *mFaceList = [[NSMutableArray alloc] initWithCapacity:0];
+        for (CCAnimation*animation in cellCharacter.animations) {
+            if ([animation.type isEqualToString:@"pose"]) {
+                [mPoseList addObject:animation.clipName];
+            }else if ([animation.type isEqualToString:@"face"]){
+                [mFaceList addObject:animation.clipName];
+            }
         }
+        NSMutableDictionary * animationJson = [[NSMutableDictionary alloc] init];
+        [animationJson setObject:mPath forKey:@"mPath"];
+        [animationJson setObject:mSerieID forKey:@"mSerieID"];
+        [animationJson setObject:mCharacterID forKey:@"mCharacterID"];
+        [animationJson setObject:mSelectPose forKey:@"mSelectPose"];
+        [animationJson setObject:mSelectFace forKey:@"mSelectFace"];
+        [animationJson setObject:mPoseList forKey:@"mPoseList"];
+        [animationJson setObject:mFaceList forKey:@"mFaceList"];
+        
+        NSData * jsonData = [NSJSONSerialization dataWithJSONObject:animationJson options:0 error:nil];
+        NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        
+        NSLog(@"%@",jsonString);
+        
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"加载模型" message:jsonString delegate:nil cancelButtonTitle:@"哦" otherButtonTitles: nil];
+//        [alert show];
+        UnitySendMessage("_plantFormInteractions", "OnClickACharacter", jsonString.UTF8String);
+        
     }
-    NSMutableDictionary * animationJson = [[NSMutableDictionary alloc] init];
-    [animationJson setObject:mPath forKey:@"mPath"];
-    [animationJson setObject:mSerieID forKey:@"mSerieID"];
-    [animationJson setObject:mCharacterID forKey:@"mCharacterID"];
-    [animationJson setObject:mSelectPose forKey:@"mSelectPose"];
-    [animationJson setObject:mSelectFace forKey:@"mSelectFace"];
-    [animationJson setObject:mPoseList forKey:@"mPoseList"];
-    [animationJson setObject:mFaceList forKey:@"mFaceList"];
-    
-    NSData * jsonData = [NSJSONSerialization dataWithJSONObject:animationJson options:0 error:nil];
-    NSString * jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-    NSLog(@"%@",jsonString);
-
-    UnitySendMessage("_plantFormInteractions", "OnClickACharacter", jsonString.UTF8String);
 }
+
 @end

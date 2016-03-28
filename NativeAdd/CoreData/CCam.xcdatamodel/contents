@@ -195,6 +195,7 @@
         <attribute name="shareTitle" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="shareURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineContestID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timelineContestURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineDes" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timelineUserID" optional="YES" attributeType="String" syncable="YES"/>
@@ -246,7 +247,7 @@
         <element name="CCSerie" positionX="-659" positionY="9" width="128" height="495"/>
         <element name="CCSticker" positionX="-450" positionY="162" width="128" height="225"/>
         <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
-        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="450"/>
+        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="465"/>
         <element name="CCUser" positionX="-108" positionY="180" width="128" height="495"/>
     </elements>
 </model>

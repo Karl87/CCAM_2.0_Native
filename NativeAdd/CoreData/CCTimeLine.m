@@ -46,6 +46,7 @@ extern const CGFloat maxContentLabelHeight;
     self.report = GetValidString([dic objectForKey:@"Report"]);
     self.dateStart = GetValidString([dic objectForKey:@"start_date"]);
     self.dateEnd = GetValidString([dic objectForKey:@"end_date"]);
+    self.timelineContestURL = GetValidString([dic objectForKey:@"contest_url"]);
 }
 //- (NSString *)timelineDes{
 //    CGFloat contentW = [UIScreen mainScreen].bounds.size.width - 70;

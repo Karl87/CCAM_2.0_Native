@@ -445,6 +445,14 @@
 
             [self updateDeviceToken];
             
+            if (_webVC) {
+                
+                if ([_webVC isKindOfClass:[KLWebViewController class]]) {
+                    KLWebViewController*webVC = (KLWebViewController*)_webVC;
+                    [webVC refreshWebPage];
+                }
+                
+            }
             [self performSelector:@selector(dismissAuthorizeView) withObject:nil afterDelay:1.0];
         }else{
             if ([jsonStr isEqualToString:@"-1"] || [jsonStr isEqualToString:@"-4"]) {
@@ -529,6 +537,14 @@
             
             [self updateDeviceToken];
             
+            if (_webVC) {
+                
+                if ([_webVC isKindOfClass:[KLWebViewController class]]) {
+                    KLWebViewController*webVC = (KLWebViewController*)_webVC;
+                    [webVC refreshWebPage];
+                }
+                
+            }
             if (!login) {
                 _authorizeView.dismissType = @"userinfo";
             }

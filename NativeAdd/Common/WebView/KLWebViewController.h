@@ -12,4 +12,6 @@
 
 @property (nonatomic,copy) NSString * webURL;
 @property (nonatomic,strong) CCEvent *event;
+
+- (void)refreshWebPage;
 @end

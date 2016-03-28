@@ -44,7 +44,17 @@
 @end
 
 @implementation KLWebViewController
-
+- (void)refreshWebPage{
+    
+    NSLog(@"************网页登录刷新");
+    
+    NSURL *url = self.webView.request.URL;
+    NSString *body = [NSString stringWithFormat: @"token=%@",[[AuthorizeHelper sharedManager] getUserToken]];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL: url];
+    [request setHTTPMethod: @"POST"];
+    [request setHTTPBody: [body dataUsingEncoding: NSUTF8StringEncoding]];
+    [_webView loadRequest: request];
+}
 - (void)webOpenCameraWithContestInfo:(id)info{
     
     if (![[AuthorizeHelper sharedManager] checkToken]) {
@@ -83,6 +93,8 @@
 }
 - (void)viewDidLoad{
     [super viewDidLoad];
+    
+    [AuthorizeHelper sharedManager].webVC = self;
     
     [self.view setBackgroundColor:CCamViewBackgroundColor];
     
@@ -292,13 +304,13 @@
     
     [_webView.scrollView setDelegate:self];
     NSLog(@"%@",self.webURL);
-//    NSURL *url = [NSURL URLWithString:self.webURL];
-//    NSString *body = [NSString stringWithFormat: @"token=%@",[[AuthorizeHelper sharedManager] getUserToken]];
-//    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL: url];
-//    [request setHTTPMethod: @"POST"];
-//    [request setHTTPBody: [body dataUsingEncoding: NSUTF8StringEncoding]];
-//    [_webView loadRequest: request];
-    [_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.webURL]]];
+    NSURL *url = [NSURL URLWithString:self.webURL];
+    NSString *body = [NSString stringWithFormat: @"token=%@",[[AuthorizeHelper sharedManager] getUserToken]];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL: url];
+    [request setHTTPMethod: @"POST"];
+    [request setHTTPBody: [body dataUsingEncoding: NSUTF8StringEncoding]];
+    [_webView loadRequest: request];
+//    [_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.webURL]]];
 }
 - (void)dissmisShareViewWith:(NSIndexPath *)indexPath{
     NSLog(@"%ld-%ld打开了ShareView",(long)indexPath.section,(long)indexPath.row);

@@ -62,7 +62,7 @@
 @property (nonatomic,strong) UIButton *captureShupBtn;
 @property (nonatomic,strong) UIButton *captureBtn;
 @property (nonatomic,strong) UIImageView *captureShup;
-
+@property (nonatomic,strong) UIView *captureEffect;
 @property (nonatomic,assign) BOOL *autoLoadWhenDidAppear;
 @end
 
@@ -101,6 +101,15 @@
             [_captureShup setBackgroundColor:[UIColor clearColor]];
             [_captureShup setUserInteractionEnabled:NO];
             [_fastCamera.view addSubview:_captureShup];
+            
+        }
+        
+        if (!_captureEffect) {
+            _captureEffect = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _fastCamera.view.frame.size.width, _fastCamera.view.frame.size.height)];
+            [_captureEffect setBackgroundColor:[UIColor whiteColor]];
+            [_captureEffect setHidden:YES];
+            [_captureEffect setUserInteractionEnabled:NO];
+            [_fastCamera.view addSubview:_captureEffect];
             
         }
         
@@ -383,7 +392,7 @@
     [_albumNaviContinue.titleLabel setFont:[UIFont systemFontOfSize:14.]];
     [_albumNaviContinue setTitleColor:CCamRedColor forState:UIControlStateNormal];
     [_albumNaviContinue sizeToFit];
-    [_albumNaviContinue setFrame:CGRectMake(0, 0, _albumNaviContinue.frame.size.width+24, _albumNavi.frame.size.height-16)];
+    [_albumNaviContinue setFrame:CGRectMake(0, 0, _albumNaviContinue.frame.size.width+24, _albumNaviContinue.frame.size.height+2)];
     [_albumNaviContinue setCenter:CGPointMake(_albumNavi.frame.size.width-15-_albumNaviContinue.frame.size.width/2, _albumNavi.frame.size.height/2)];
     [_albumNaviContinue.layer setCornerRadius:_albumNaviContinue.frame.size.height/2];    [_albumNaviContinue setBackgroundColor:[UIColor whiteColor]];
     [_albumNaviContinue setTintColor:CCamRedColor];
@@ -474,7 +483,20 @@
     [self.view addSubview:_captureBG];
     [_captureBG setHidden:YES];
     
-    _captureButtonsBG = [[UIView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight+CCamViewWidth, CCamViewWidth, CCamThinNaviHeight)];
+    
+    BOOL isPad = NO;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        isPad = YES;
+    }
+    
+    if (isPad) {
+        _captureButtonsBG = [[UIView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight+CCamViewWidth, CCamViewWidth, 44)];
+
+    }else{
+        _captureButtonsBG = [[UIView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight+CCamViewWidth, CCamViewWidth, CCamThinNaviHeight)];
+    }
+    
     [_captureButtonsBG setBackgroundColor:CCamSegmentColor];
     [_captureBG addSubview:_captureButtonsBG];
     
@@ -507,7 +529,12 @@
     [_captureButtonsBG addSubview:_captureShupBtn];
     [_captureShupBtn addTarget:self action:@selector(setCaptureShupState) forControlEvents:UIControlEventTouchUpInside];
     
-    UIView *captureButView = [[UIView alloc] initWithFrame:CGRectMake(0, 88+CCamViewWidth, CCamViewWidth, CCamViewHeight-CCamViewWidth-88)];
+    UIView *captureButView;
+    if (isPad) {
+        captureButView= [[UIView alloc] initWithFrame:CGRectMake(0, 100+CCamViewWidth, CCamViewWidth, CCamViewHeight-CCamViewWidth-100)];
+    }else{
+        captureButView= [[UIView alloc] initWithFrame:CGRectMake(0, 88+CCamViewWidth, CCamViewWidth, CCamViewHeight-CCamViewWidth-88)];
+    }
     [captureButView setBackgroundColor:[UIColor whiteColor]];
     [_captureBG addSubview:captureButView];
     
@@ -631,6 +658,22 @@
     [_captureBG pop_addAnimation:anim forKey:@"position"];
 }
 - (void)takeCapture{
+    
+    _captureEffect.hidden = NO;
+    
+    POPBasicAnimation *anim = [POPBasicAnimation animationWithPropertyNamed:kPOPViewAlpha];
+    anim.fromValue =@(1.0);
+    anim.toValue = @(0.0);
+    anim.beginTime = CACurrentMediaTime();
+    anim.duration = 0.25;
+    [anim setCompletionBlock:^(POPAnimation *anim,BOOL finish){
+        if(finish) {
+            NSLog(@"!");
+            [_captureEffect setHidden:YES];
+        }
+    }];
+    [_captureEffect pop_addAnimation:anim forKey:@"position"];
+    
     [self.fastCamera takePicture];
 }
 - (UIImage *)normalizedImage:(UIImage*)image {
@@ -891,6 +934,7 @@ static CGRect TWScaleRect(CGRect rect, CGFloat scale)
 }
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [ALAssetsLibrary disableSharedPhotoStreamsSupport];
     [self.navigationController setNavigationBarHidden:YES];
 }
 @end

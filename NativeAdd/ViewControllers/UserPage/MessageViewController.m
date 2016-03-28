@@ -59,13 +59,17 @@
 //    [messageFooter setTitle:@"亲，没有更多消息了" forState:MJRefreshStateNoMoreData];
     _message.mj_footer = messageFooter;
     
+    
+    
+   
+}
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
     if (_showLastest) {
         [self loadUnreadMessage];
     }else{
         [self loadAllMessage];
     }
-    
-   
 }
 - (void)loadUnreadMessage{
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
