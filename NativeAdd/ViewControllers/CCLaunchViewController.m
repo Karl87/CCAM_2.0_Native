@@ -12,11 +12,15 @@
 #import "VBFPopFlatButton.h"
 #import <SMS_SDK/SMSSDK.h>
 
-#import <ShareSDK/ShareSDK.h>
-#import <ShareSDKUI/ShareSDK+SSUI.h>
+#import "UMSocial.h"
+
 #import <MBProgressHUD/MBProgressHUD.h>
 
 #import "AFViewShaker.h"
+
+#import "WXApi.h"
+#import <TencentOpenAPI/TencentOAuth.h>
+#import <TencentOpenAPI/QQApiInterface.h>
 
 @interface CCLaunchViewController ()<UIScrollViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate>{
     BOOL show;
@@ -185,17 +189,22 @@
     }];
 }
 -(void)wechatLogin{
-    
-    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"2" shareType:SSDKPlatformTypeWechat isLogin:YES];
+
+    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"2" shareType:UMShareToWechatSession isLogin:YES];
+//    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"2" shareType:SSDKPlatformTypeWechat isLogin:YES];
 }
 - (void)weiboLogin{
-    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"3" shareType:SSDKPlatformTypeSinaWeibo isLogin:YES];
+    
+    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"3" shareType:UMShareToSina isLogin:YES];
+//    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"3" shareType:SSDKPlatformTypeSinaWeibo isLogin:YES];
 }
 - (void)qqLogin{
-    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"4" shareType:SSDKPlatformTypeQQ isLogin:YES];
+    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"4" shareType:UMShareToQQ isLogin:YES];
+//    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"4" shareType:SSDKPlatformTypeQQ isLogin:YES];
 }
 - (void)facebookLogin{
-    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"5" shareType:SSDKPlatformTypeFacebook isLogin:YES];
+    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"5" shareType:UMShareToFacebook isLogin:YES];
+//    [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"5" shareType:SSDKPlatformTypeFacebook isLogin:YES];
 }
 - (void)segItemOnClick:(id)sender{
     [self.view endEditing:YES];
@@ -589,9 +598,13 @@
     [paltformTitle setBackgroundColor:CCamRedColor];
     [_platformsBG addSubview:paltformTitle];
     
+    
+   
+    
+    
     _wechatBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_wechatBtn setFrame:CGRectMake(0, 0, 44, 44)];
-    [_wechatBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2-30-66, _platformsBG.bounds.size.height/2)];
+//    [_wechatBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2-30-66, _platformsBG.bounds.size.height/2)];
     [_wechatBtn setBackgroundImage:[UIImage imageNamed:@"wechatIcon"] forState:UIControlStateNormal];
     [_wechatBtn setBackgroundColor:CCamRedColor];
     [_wechatBtn.layer setMasksToBounds:YES];
@@ -612,7 +625,7 @@
     [wechatLab setText:Babel(@"推荐")];
     [wechatLab sizeToFit];
     [wechatLab setFrame:CGRectMake(0, 0, wechatLab.frame.size.width+10, wechatLab.frame.size.height+2)];
-    [wechatLab setCenter:CGPointMake(_wechatBtn.center.x, _wechatBtn.center.y-_wechatBtn.frame.size.height/2-12)];
+//    [wechatLab setCenter:CGPointMake(_wechatBtn.center.x, _wechatBtn.center.y-_wechatBtn.frame.size.height/2-12)];
     [wechatLab.layer setCornerRadius:wechatLab.frame.size.height/2];
     [wechatLab.layer setBorderColor:[UIColor whiteColor].CGColor];
     [wechatLab.layer setBorderWidth:1.0];
@@ -620,7 +633,7 @@
     
     _weiboBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_weiboBtn setFrame:CGRectMake(0, 0, 44, 44)];
-    [_weiboBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2-10-22, _platformsBG.bounds.size.height/2)];
+//    [_weiboBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2-10-22, _platformsBG.bounds.size.height/2)];
     [_weiboBtn setBackgroundImage:[UIImage imageNamed:@"weiboIcon"] forState:UIControlStateNormal];
     [_weiboBtn setBackgroundColor:CCamRedColor];
     [_weiboBtn.layer setMasksToBounds:YES];
@@ -631,7 +644,7 @@
     
     _qqBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_qqBtn setFrame:CGRectMake(0, 0, 44, 44)];
-    [_qqBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2+10+22, _platformsBG.bounds.size.height/2)];
+//    [_qqBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2+10+22, _platformsBG.bounds.size.height/2)];
     [_qqBtn setBackgroundImage:[UIImage imageNamed:@"qqIcon"] forState:UIControlStateNormal];
     [_qqBtn setBackgroundColor:CCamRedColor];
     [_qqBtn.layer setMasksToBounds:YES];
@@ -642,13 +655,52 @@
     
     _facebookBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_facebookBtn setFrame:CGRectMake(0, 0, 44, 44)];
-    [_facebookBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2+30+66, _platformsBG.bounds.size.height/2)];
+//    [_facebookBtn setCenter:CGPointMake(_platformsBG.bounds.size.width/2+30+66, _platformsBG.bounds.size.height/2)];
     [_facebookBtn setBackgroundImage:[UIImage imageNamed:@"facebookIcon"] forState:UIControlStateNormal];
     [_facebookBtn setBackgroundColor:CCamRedColor];
     [_facebookBtn.layer setMasksToBounds:YES];
     [_facebookBtn.layer setCornerRadius:_facebookBtn.frame.size.height/2];
     [_platformsBG addSubview:_facebookBtn];
     [_facebookBtn addTarget:self action:@selector(facebookLogin) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    NSMutableArray * platforms = [NSMutableArray new];
+    if ([WXApi isWXAppInstalled]&&[WXApi isWXAppSupportApi]) {
+        [platforms addObject:_wechatBtn];
+    }else{
+        [_wechatBtn setHidden:YES];
+        [wechatLab setHidden:YES];
+    }
+    [platforms addObject:_weiboBtn];
+    if ([QQApiInterface isQQInstalled]&&[QQApiInterface isQQSupportApi]){
+        [platforms addObject:_qqBtn];
+    }else{
+        [_qqBtn setHidden:YES];
+    }
+    [platforms addObject:_facebookBtn];
+    
+    NSArray *platformCenters;
+    
+    CGFloat platformCenterY = _platformsBG.bounds.size.height/2;
+    CGFloat platformCenterX = _platformsBG.bounds.size.width/2;
+    
+    if ([platforms count]==2) {
+        platformCenters = @[[NSValue valueWithCGPoint:CGPointMake(platformCenterX-32, platformCenterY)],[NSValue valueWithCGPoint:CGPointMake(platformCenterX+32, platformCenterY)]];
+        
+    }else if([platforms count]==3){
+        platformCenters = @[[NSValue valueWithCGPoint:CGPointMake(platformCenterX-44-20, platformCenterY)],[NSValue valueWithCGPoint:CGPointMake(platformCenterX, platformCenterY)],[NSValue valueWithCGPoint:CGPointMake(platformCenterX+44+20, platformCenterY)]];
+    }else if ([platforms count]==4){
+        platformCenters = @[[NSValue valueWithCGPoint:CGPointMake(platformCenterX-30-66, platformCenterY)],[NSValue valueWithCGPoint:CGPointMake(platformCenterX-10-22, platformCenterY)],[NSValue valueWithCGPoint:CGPointMake(platformCenterX+10+22, platformCenterY)],[NSValue valueWithCGPoint:CGPointMake(platformCenterX+30+66, platformCenterY)]];
+    }
+    
+    for (int i =0; i<[platforms count]; i++) {
+        UIButton* btn = (UIButton*)[platforms objectAtIndex:i];
+        CGPoint btnCenter = [[platformCenters objectAtIndex:i] CGPointValue];
+        [btn setCenter:btnCenter];
+        if (btn == _wechatBtn) {
+            [wechatLab setCenter:CGPointMake(_wechatBtn.center.x, _wechatBtn.center.y-_wechatBtn.frame.size.height/2-12)];
+        }
+    }
     
     _agreementBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_agreementBtn setTitle:Babel(@"我同意《角色相机使用协议》") forState:UIControlStateNormal];

@@ -10,8 +10,10 @@
 #import "KLWebViewController.h"
 #import "LicensesViewController.h"
 #import "CCamHelper.h"
+#import <MessageUI/MFMailComposeViewController.h>
+#import <MBProgressHUD/MBProgressHUD.h>
 
-@interface AboutUsViewController ()
+@interface AboutUsViewController ()<UIActionSheetDelegate,MFMailComposeViewControllerDelegate>
 @property (nonatomic,strong) UIImageView *logo;
 @property (nonatomic,strong) UIImageView *titleImage;
 @property (nonatomic,strong) UILabel *version;
@@ -120,6 +122,68 @@
     [_homepageBtn.layer setBorderColor:[UIColor whiteColor].CGColor];
     [_homepageBtn.layer setBorderWidth:1.0];
     [self.view addSubview:_homepageBtn];
+    
+    UIBarButtonItem *contact = [[UIBarButtonItem alloc] initWithTitle:Babel(@"联系我们") style:UIBarButtonItemStylePlain target:self action:@selector(cantactus)];
+    [self.navigationItem setRightBarButtonItem:contact];
+    
+}
+- (void)cantactus{
+    
+    NSString *mail = [NSString stringWithFormat:@"Mail: enquiry@i-craftsmen.com"];
+    NSString *wechat = [NSString stringWithFormat:@"%@: 角色相机Center",Babel(@"微信")];
+    
+    UIActionSheet *actionSheet = [[UIActionSheet alloc]
+                                  initWithTitle:Babel(@"联系我们")
+                                  delegate:self
+                                  cancelButtonTitle:Babel(@"取消")
+                                  destructiveButtonTitle:nil
+                                  otherButtonTitles:mail,wechat,nil];
+    actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
+    [actionSheet showInView:self.view];
+}
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (buttonIndex ==0) {
+        if ([MFMailComposeViewController canSendMail]){
+            MFMailComposeViewController *mailPicker = [[MFMailComposeViewController alloc] init];
+            mailPicker.mailComposeDelegate = self;
+            [mailPicker setToRecipients:@[@"enquiry@i-craftsmen.com"]];
+            [self presentViewController:mailPicker animated:YES completion:nil];
+        }else{
+            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+            pasteboard.string = @"enquiry@i-craftsmen.com";
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+            hud.mode = MBProgressHUDModeText;
+            hud.labelText = Babel(@"已复制邮件到粘贴板");
+            [hud hide:YES afterDelay:1.0];
+        }
+    }else if (buttonIndex ==1){
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        pasteboard.string = @"角色相机Center";
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+        hud.mode = MBProgressHUDModeText;
+        hud.labelText = Babel(@"已复制微信公众号到粘贴板");
+        [hud hide:YES afterDelay:1.0];
+    }
+}
+- (void)mailComposeController:(MFMailComposeViewController*)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError*)error{
+    
+    switch (result){
+            
+        case MFMailComposeResultCancelled:  NSLog(@"Mail send canceled…");
+            break;
+        case MFMailComposeResultSaved:    NSLog(@"Mail saved…");
+            break;
+        case MFMailComposeResultSent:             NSLog(@"Mail sent…");
+            break;
+        case MFMailComposeResultFailed:  NSLog(@"Mail send errored: %@…", [error localizedDescription]);
+            break;
+        default:
+            break;
+            
+    }
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 - (void)callAgreement{
     KLWebViewController *agree = [[KLWebViewController alloc] init];

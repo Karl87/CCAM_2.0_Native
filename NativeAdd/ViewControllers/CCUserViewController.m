@@ -538,6 +538,15 @@
         
         if(![GetValidString([receiveDic objectForKey:@"member"]) isEqualToString:@""]){
             
+            NSString* state =[NSString stringWithFormat:@"%@",[receiveDic objectForKey:@"member"]];
+            
+            NSLog(@"state = %@,length = %lu",state,(unsigned long)state.length);
+            
+            if (state.length ==1) {
+                [[AuthorizeHelper sharedManager] loginStateError];
+                return ;
+            }
+            
             [_titleLab setText:GetValidString([[receiveDic objectForKey:@"member"] objectForKey:@"name"])];
             [_userProfile sd_setImageWithURL:[NSURL URLWithString:[[receiveDic objectForKey:@"member"] objectForKey:@"image_url"]]];
             [_photoCount setAttributedTitle:[self returnStrWithTitle:[receiveDic objectForKey:@"workNums"] andSubtitle:Babel(@"提交照片")] forState:UIControlStateNormal];
@@ -884,6 +893,7 @@
     PersonInfoViewController * infoPage = [[PersonInfoViewController alloc] init];
     infoPage.parent = self;
     infoPage.vcTitle = Babel(@"编辑个人信息");
+    [AuthorizeHelper sharedManager].personInfoVC = infoPage;
     infoPage.hidesBottomBarWhenPushed = YES;
     UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
     backItem.title=@"";

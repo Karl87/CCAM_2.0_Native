@@ -63,38 +63,38 @@ const CGFloat imageSize = 20.0;
         [_typeImage setImage:[UIImage imageNamed:@"infoNickName"]];
         [_typeLabel setText:[_info objectForKey:@"name"]];
         if ([[_info objectForKey:@"name"] isEqualToString:@""]) {
-            [_typeLabel setText:@"请填写您的昵称"];
+            [_typeLabel setText:Babel(@"请填写您的昵称")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"gender"]){
         [_typeImage setImage:[UIImage imageNamed:@"infoGender"]];
         
         if ([[_info objectForKey:@"sex"] isEqualToString:@"1"]) {
-            [_typeLabel setText:@"男"];
+            [_typeLabel setText:Babel(@"男")];
 
         }else if ([[_info objectForKey:@"sex"] isEqualToString:@"2"]) {
-            [_typeLabel setText:@"女"];
+            [_typeLabel setText:Babel(@"女")];
 
         }else if ([[_info objectForKey:@"sex"] isEqualToString:@"3"]) {
-            [_typeLabel setText:@"保密"];
+            [_typeLabel setText:Babel(@"保密")];
 
         }
         if ([[_info objectForKey:@"sex"] isEqualToString:@""]) {
-            [_typeLabel setText:@"请选择您的性别"];
+            [_typeLabel setText:Babel(@"请选择您的性别")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"birth"]){
         [_typeImage setImage:[UIImage imageNamed:@"infoBirth"]];
         [_typeLabel setText:[_info objectForKey:@"birthday"]];
         if ([[_info objectForKey:@"birthday"] isEqualToString:@""]) {
-            [_typeLabel setText:@"请填写您的生日"];
+            [_typeLabel setText:Babel(@"请填写您的生日")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"des"]){
         [_typeImage setImage:[UIImage imageNamed:@"infoDes"]];
         [_typeLabel setText:[_info objectForKey:@"description"]];
         if ([[_info objectForKey:@"description"] isEqualToString:@""]) {
-            [_typeLabel setText:@"请填写您的简介"];
+            [_typeLabel setText:Babel(@"请填写您的简介")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"trueName"]){
@@ -122,28 +122,28 @@ const CGFloat imageSize = 20.0;
         [_typeImage setImage:[UIImage imageNamed:@"infoMobile"]];
         [_typeLabel setText:[_info objectForKey:@"phone"]];
         if ([[_info objectForKey:@"phone"] isEqualToString:@""]) {
-            [_typeLabel setText:@"尚未绑定手机号码"];
+            [_typeLabel setText:Babel(@"尚未绑定")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"bandWechat"]){
         [_typeImage setImage:[[UIImage imageNamed:@"wechatIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
         [_typeImage setTintColor:CCamRedColor];        [_typeLabel setText:[_info objectForKey:@"wechat_name"]];
         if ([[_info objectForKey:@"wechat_name"] isEqualToString:@""]) {
-            [_typeLabel setText:@"尚未绑定微信"];
+            [_typeLabel setText:Babel(@"尚未绑定")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"bandWeibo"]){
         [_typeImage setImage:[[UIImage imageNamed:@"weiboIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
         [_typeImage setTintColor:CCamRedColor];        [_typeLabel setText:[_info objectForKey:@"weibo_name"]];
         if ([[_info objectForKey:@"weibo_name"] isEqualToString:@""]) {
-            [_typeLabel setText:@"尚未绑定新浪微博"];
+            [_typeLabel setText:Babel(@"尚未绑定")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"bandQQ"]){
         [_typeImage setImage:[[UIImage imageNamed:@"qqIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
         [_typeImage setTintColor:CCamRedColor];        [_typeLabel setText:[_info objectForKey:@"QQ_name"]];
         if ([[_info objectForKey:@"QQ_name"] isEqualToString:@""]) {
-            [_typeLabel setText:@"尚未绑定QQ"];
+            [_typeLabel setText:Babel(@"尚未绑定")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }else if ([_type isEqualToString:@"bandFacebook"]){
@@ -151,7 +151,7 @@ const CGFloat imageSize = 20.0;
         [_typeImage setTintColor:CCamRedColor];
         [_typeLabel setText:[_info objectForKey:@"facebook_name"]];
         if ([[_info objectForKey:@"facebook_name"] isEqualToString:@""]) {
-            [_typeLabel setText:@"尚未绑定Facebook"];
+            [_typeLabel setText:Babel(@"尚未绑定")];
             [_typeLabel setTextColor:CCamViewBackgroundColor];
         }
     }

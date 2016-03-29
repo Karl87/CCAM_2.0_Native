@@ -364,7 +364,13 @@ static NSString *const MJCollectionViewCellIdentifier = @"color";
     
     [manager POST:CCamGetTimeLineURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         
-        NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
+       
+        NSString *result =[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+         NSLog(@"%@",result);
+        if ([result isEqualToString:@"-1"]||[result isEqualToString:@"false"]) {
+            [[AuthorizeHelper sharedManager] loginStateError];
+            return;
+        }
         
         [[CoreDataHelper sharedManager] deleteStoreInfoWithEntity:@"CCTimeLine"];
 

@@ -14,8 +14,6 @@
 
 #import "CCamHelper.h"
 #import "HXEasyCustomShareView.h"
-#import <ShareSDK/ShareSDK.h>
-#import <ShareSDKUI/ShareSDK+SSUI.h>
 
 #import "CCPhotoViewController.h"
 #import <MBProgressHUD/MBProgressHUD.h>
@@ -23,7 +21,7 @@
 
 #import "CCamRefreshHeader.h"
 
-@interface KLWebViewController () <UIWebViewDelegate,UIScrollViewDelegate,UIAlertViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIActionSheetDelegate>
+@interface KLWebViewController () <UIWebViewDelegate,UIScrollViewDelegate,UIAlertViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UIActionSheetDelegate,UMSocialUIDelegate>
 
 @property (nonatomic,strong) UIWebView *webView;
 
@@ -329,9 +327,6 @@
             return;
         }
         
-        NSArray* imageArray = @[_timeline.image_fullsize];
-        NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-        
         if ([_timeline.shareURL isEqualToString:@""]) {
             _timeline.shareURL = @"http://www.c-cam.cc";
         }
@@ -339,117 +334,82 @@
             _timeline.shareTitle = Babel(@"角色相机");
         }
         if ([_timeline.shareSubTitle isEqualToString:@""]) {
-//            _timeline.shareSubTitle = [NSString stringWithFormat:@"请为%@的照片点赞",_timeline.timelineUserName];
         }
+        NSString*type = @"";
         
-        if (isShare) {
-            [shareParams SSDKSetupShareParamsByText:_timeline.shareSubTitle
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeImage];
-            
-        }else{
-            [shareParams SSDKSetupShareParamsByText:_timeline.shareSubTitle
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeAuto];
-        }
-        
-        SSDKPlatformType shareType;
-        
-        if ([title isEqualToString:Babel(@"微信")]){
-            shareType = SSDKPlatformSubTypeWechatSession;
-        }else if ([title isEqualToString:Babel(@"朋友圈")]){
-            shareType = SSDKPlatformSubTypeWechatTimeline;
-        }else if ([title isEqualToString:Babel(@"新浪微博")]){
-            shareType = SSDKPlatformTypeSinaWeibo;
-            [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@%@",_timeline.shareSubTitle,_timeline.shareURL]
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeAuto];
-            [ShareSDK showShareEditor:shareType otherPlatformTypes:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
-                if (!error) {
-                    switch (state) {
-                        case SSDKResponseStateSuccess:
+                //分享链接
+                UMSocialUrlResource *urlResource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:
+                                                    _timeline.image_fullsize];
+                if ([title isEqualToString:Babel(@"微信")]){
+                    type = UMShareToWechatSession;
+                    [UMSocialData defaultData].extConfig.wechatSessionData.url = _timeline.shareURL;
+                    [UMSocialData defaultData].extConfig.wechatSessionData.title =_timeline.shareTitle;
+                    [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
+                    [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:self completion:^(UMSocialResponseEntity *response){
+                        if (response.responseCode == UMSResponseCodeSuccess) {
                             NSLog(@"分享成功！");
-                            break;
-                        case SSDKResponseStateCancel:
-                            NSLog(@"取消分享！");
-                            break;
-                        case SSDKResponseStateFail:
-                            NSLog(@"分享失败！");
-                            break;
-                        default:
-                            break;
-                    }
-                }else{
-                    NSLog(@"%@",error.description);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败" message:error.description delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil];
-                    [alert show];
-                    [ShareSDK cancelAuthorize:shareType];
-                }
-            }];
-            return;
-        }else if ([title isEqualToString:Babel(@"QQ")]){
-            shareType = SSDKPlatformSubTypeQQFriend;
-        }else if ([title isEqualToString:Babel(@"QQ空间")]){
-            shareType = SSDKPlatformSubTypeQZone;
-        }else if ([title isEqualToString:Babel(@"Facebook")]){
-            shareType = SSDKPlatformTypeFacebook;
-            [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@%@",_timeline.shareSubTitle,_timeline.shareURL]
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeAuto];
-            [ShareSDK showShareEditor:shareType otherPlatformTypes:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
-                if (!error) {
-                    switch (state) {
-                        case SSDKResponseStateSuccess:
+                        }
+                    }];
+                }else if ([title isEqualToString:Babel(@"朋友圈")]){
+                    type = UMShareToWechatTimeline;
+                    
+                    [UMSocialData defaultData].extConfig.wechatTimelineData.url = _timeline.shareURL;
+                    [UMSocialData defaultData].extConfig.wechatTimelineData.title = _timeline.shareTitle;
+                    [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
+                    [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:self completion:^(UMSocialResponseEntity *response){
+                        if (response.responseCode == UMSResponseCodeSuccess) {
                             NSLog(@"分享成功！");
-                            break;
-                        case SSDKResponseStateCancel:
-                            NSLog(@"取消分享！");
-                            break;
-                        case SSDKResponseStateFail:
-                            NSLog(@"分享失败！");
-                            break;
-                        default:
-                            break;
-                    }
-                }else{
-                    NSLog(@"%@",error.description);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败" message:error.description delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil];
-                    [alert show];
-                    [ShareSDK cancelAuthorize:shareType];
+                        }
+                    }];
+                }else if ([title isEqualToString:Babel(@"新浪微博")]){
+                    type = UMShareToSina;
+                    
+                    [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeImage url:_timeline.image_fullsize];
+                    
+                    [[UMSocialControllerService defaultControllerService] setShareText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL] shareImage:nil socialUIDelegate:self];
+                    
+                    [UMSocialSnsPlatformManager getSocialPlatformWithName:type].snsClickHandler(self,[UMSocialControllerService defaultControllerService],YES);
+                    
+                }else if ([title isEqualToString:Babel(@"QQ")]){
+                    type = UMShareToQQ;
+                    [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeDefault;
+                    [UMSocialData defaultData].extConfig.qqData.url = _timeline.shareURL;
+                    [UMSocialData defaultData].extConfig.qqData.title =_timeline.shareTitle;
+                    [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:self completion:^(UMSocialResponseEntity *response){
+                        if (response.responseCode == UMSResponseCodeSuccess) {
+                            NSLog(@"分享成功！");
+                        }
+                    }];
+                }else if ([title isEqualToString:Babel(@"QQ空间")]){
+                    type = UMShareToQzone;
+                    [UMSocialData defaultData].extConfig.qzoneData.url = _timeline.shareURL;
+                    [UMSocialData defaultData].extConfig.qzoneData.title =_timeline.shareTitle;
+                    [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:self completion:^(UMSocialResponseEntity *response){
+                        if (response.responseCode == UMSResponseCodeSuccess) {
+                            NSLog(@"分享成功！");
+                        }
+                    }];
+                }else if ([title isEqualToString:Babel(@"Facebook")]){
+                    
+                    type = UMShareToFacebook;
+                    
+                    
+                    [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeImage url:_timeline.image_fullsize];
+                    
+                    [[UMSocialControllerService defaultControllerService] setShareText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL] shareImage:nil socialUIDelegate:self];
+                    [UMSocialSnsPlatformManager getSocialPlatformWithName:UMShareToFacebook].snsClickHandler(self,[UMSocialControllerService defaultControllerService],YES);
                 }
-            }];
-            return;
-        }
-        [ShareSDK share:shareType parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
-            if (!error) {
-                switch (state) {
-                    case SSDKResponseStateSuccess:
-                        NSLog(@"分享成功！");
-                        break;
-                    case SSDKResponseStateCancel:
-                        NSLog(@"取消分享！");
-                        break;
-                    case SSDKResponseStateFail:
-                        NSLog(@"分享失败！");
-                        break;
-                    default:
-                        break;
-                }
-            }else{
-                NSLog(@"%@",error.description);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败" message:error.description delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil];
-                [alert show];
-            }
-        }];
-        
+
+
+    }
+}
+-(void)didFinishGetUMSocialDataInViewController:(UMSocialResponseEntity *)response
+{
+    //根据`responseCode`得到发送结果,如果分享成功
+    if(response.responseCode == UMSResponseCodeSuccess)
+    {
+        //得到分享到的微博平台名
+        NSLog(@"share to sns name is %@",[[response.data allKeys] objectAtIndex:0]);
     }
 }
 - (void)callMoreActivityViewController{
@@ -469,12 +429,16 @@
         urlimage =_event.shareImage;
         content  = _event.shareSubtitle;
         url =_event.eventURL;
+        
     }else{
         title  = Babel(@"角色相机");
         urlimage = @"";
         content  = @"";
         url =_webURL;
     }
+    
+    NSLog(@"%@,%@,%@,%@",title,urlimage,content,url);
+
     
     timeline.image_fullsize = photourl;
     timeline.image_share = urlimage;

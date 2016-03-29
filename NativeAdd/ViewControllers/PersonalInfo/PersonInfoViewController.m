@@ -27,7 +27,7 @@
 - (void)getPersonalInfo{
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    [hud setLabelText:@"加载中..."];
+    [hud setLabelText:Babel(@"加载中")];
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -48,7 +48,7 @@
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"网络故障";
+        hud.labelText = Babel(@"网络故障");
         [hud hide:YES afterDelay:1.0];
     }];
 }
@@ -59,7 +59,7 @@
     [super viewDidLoad];
     
     if ([self.navigationController.viewControllers count]==1) {
-        UIBarButtonItem * dismissBtn = [[UIBarButtonItem alloc] initWithTitle:@"关闭" style:UIBarButtonItemStylePlain target:self action:@selector(returnWhenPresentSelf)];
+        UIBarButtonItem * dismissBtn = [[UIBarButtonItem alloc] initWithTitle:Babel(@"完成") style:UIBarButtonItemStylePlain target:self action:@selector(returnWhenPresentSelf)];
         self.navigationItem.rightBarButtonItem = dismissBtn;
         
     }
@@ -90,20 +90,30 @@
 
 #pragma mark - UITableView Delegate and Datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    
+
     switch (section) {
         case 0:
             return 5;
         case 1:
-            return 3;
-        case 2:
             return 5;
         default:
             return 0;
     }
+    
+//    switch (section) {
+//        case 0:
+//            return 5;
+//        case 1:
+//            return 3;
+//        case 2:
+//            return 5;
+//        default:
+//            return 0;
+//    }
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+//    return 3;
+    return 2;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
@@ -137,26 +147,25 @@
             return cell;
         }
     }else if (indexPath.section ==1){
-        PersonBasicInfoCell *cell = [tableView dequeueReusableCellWithIdentifier:@"infoCell"];
-        switch (indexPath.row) {
-            case 0:
-                cell.type = @"trueName";
-                break;
-            case 1:
-                cell.type = @"trueMobile";
-                break;
-            case 2:
-                cell.type = @"trueAddress";
-                break;
-                        default:
-                break;
-        }
-        cell.info = _userInfo;
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
-        return cell;
+//        PersonBasicInfoCell *cell = [tableView dequeueReusableCellWithIdentifier:@"infoCell"];
+//        switch (indexPath.row) {
+//            case 0:
+//                cell.type = @"trueName";
+//                break;
+//            case 1:
+//                cell.type = @"trueMobile";
+//                break;
+//            case 2:
+//                cell.type = @"trueAddress";
+//                break;
+//                        default:
+//                break;
+//        }
+//        cell.info = _userInfo;
+//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//        cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+//        return cell;
 
-    }else if (indexPath.section ==2){
         PersonBasicInfoCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bandCell"];
         switch (indexPath.row) {
             case 0:
@@ -183,6 +192,33 @@
         return cell;
 
     }
+//    else if (indexPath.section ==2){
+//        PersonBasicInfoCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bandCell"];
+//        switch (indexPath.row) {
+//            case 0:
+//                cell.type = @"bandMobile";
+//                break;
+//            case 1:
+//                cell.type = @"bandWechat";
+//                break;
+//            case 2:
+//                cell.type = @"bandWeibo";
+//                break;
+//            case 3:
+//                cell.type = @"bandQQ";
+//                break;
+//            case 4:
+//                cell.type = @"bandFacebook";
+//                break;
+//            default:
+//                break;
+//        }
+//        cell.info = _userInfo;
+//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//        cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+//        return cell;
+//
+//    }
     
     static NSString *identifier = @"timelineCell";
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
@@ -203,7 +239,7 @@
     
     if (indexPath.section == 0) {
         if (indexPath.row == 0) {
-            UIActionSheet *actionsheet = [[UIActionSheet alloc] initWithTitle:@"编辑照片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"从相册选择",@"拍照", nil];
+            UIActionSheet *actionsheet = [[UIActionSheet alloc] initWithTitle:@"编辑照片" delegate:self cancelButtonTitle:Babel(@"取消") destructiveButtonTitle:nil otherButtonTitles:Babel(@"从相册选择"),Babel(@"拍照"), nil];
             [actionsheet showInView:self.view];
 
         }else{
@@ -213,18 +249,18 @@
             switch (indexPath.row) {
                 case 1:
                     edit.type = @"nickName";
-                    edit.vcTitle = @"编辑昵称";
+                    edit.vcTitle = Babel(@"编辑昵称");
                     break;
                 case 2:
                     edit.vcTitle = @"编辑性别";
-                    edit.type = @"gender";
+                    edit.type = Babel(@"编辑性别");
                     break;
                 case 3:
-                    edit.vcTitle = @"编辑生日";
+                    edit.vcTitle = Babel(@"编辑生日");
                     edit.type = @"birth";
                     break;
                 case 4:
-                    edit.vcTitle = @"编辑简介";
+                    edit.vcTitle = Babel(@"编辑简介");
                     edit.type = @"des";
                     break;
                 default:
@@ -236,31 +272,70 @@
             [self.navigationController pushViewController:edit animated:YES];
         }
     }else if (indexPath.section ==1){
-        PersonBasicInfoCell *cell = (PersonBasicInfoCell*)[tableView cellForRowAtIndexPath:indexPath];
-        EditInfoViewController *edit = [[EditInfoViewController alloc] init];
-        edit.note = cell.note;
-        switch (indexPath.row) {
-            case 0:
-                edit.vcTitle = @"编辑收奖人姓名";
-                edit.type = @"trueName";
-                break;
-            case 1:
-                edit.vcTitle = @"编辑收奖手机号码";
-                edit.type = @"trueMobile";
-                break;
-            case 2:
-                edit.vcTitle = @"编辑收奖地址";
-                edit.type = @"trueAddress";
-                break;
-            default:
-                break;
+         PersonBasicInfoCell *cell = (PersonBasicInfoCell*)[tableView cellForRowAtIndexPath:indexPath];
+        if ([cell.type isEqualToString:@"bandMobile"]) {
+            
+            
+        }else if ([cell.type isEqualToString:@"bandWechat"]) {
+            if ([[cell.info objectForKey:@"wechat_name"] isEqualToString:@""]) {
+                [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"2" shareType:UMShareToWechatSession isLogin:NO];
+
+            }else{
+                [[AuthorizeHelper sharedManager] unbindPlatformWithTypeID:@"2"];
+            }
+
+        }else if ([cell.type isEqualToString:@"bandWeibo"]) {
+            if ([[cell.info objectForKey:@"weibo_name"] isEqualToString:@""]) {
+                [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"3" shareType:UMShareToSina isLogin:NO];
+
+            }else{
+                [[AuthorizeHelper sharedManager] unbindPlatformWithTypeID:@"3"];
+            }
+
+        }else if ([cell.type isEqualToString:@"bandQQ"]) {
+            if ([[cell.info objectForKey:@"QQ_name"] isEqualToString:@""]) {
+                [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"4" shareType:UMShareToQQ isLogin:NO];
+
+            }else{
+                [[AuthorizeHelper sharedManager] unbindPlatformWithTypeID:@"4"];
+            }
+
+        }else if ([cell.type isEqualToString:@"bandFacebook"]) {
+            if ([[cell.info objectForKey:@"facebook_name"] isEqualToString:@""]) {
+                [[AuthorizeHelper sharedManager] getSocialPlatformInfoWithTypeID:@"5" shareType:UMShareToFacebook isLogin:NO];
+
+            }else{
+                [[AuthorizeHelper sharedManager] unbindPlatformWithTypeID:@"5"];
+            }
+
         }
-        UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
-        backItem.title=@"";
-        self.navigationItem.backBarButtonItem=backItem;
-        [self.navigationController pushViewController:edit animated:YES];
-        
     }
+//    else if (indexPath.section ==1){
+//        PersonBasicInfoCell *cell = (PersonBasicInfoCell*)[tableView cellForRowAtIndexPath:indexPath];
+//        EditInfoViewController *edit = [[EditInfoViewController alloc] init];
+//        edit.note = cell.note;
+//        switch (indexPath.row) {
+//            case 0:
+//                edit.vcTitle = @"编辑收奖人姓名";
+//                edit.type = @"trueName";
+//                break;
+//            case 1:
+//                edit.vcTitle = @"编辑收奖手机号码";
+//                edit.type = @"trueMobile";
+//                break;
+//            case 2:
+//                edit.vcTitle = @"编辑收奖地址";
+//                edit.type = @"trueAddress";
+//                break;
+//            default:
+//                break;
+//        }
+//        UIBarButtonItem *backItem=[[UIBarButtonItem alloc]init];
+//        backItem.title=@"";
+//        self.navigationItem.backBarButtonItem=backItem;
+//        [self.navigationController pushViewController:edit animated:YES];
+//        
+//    }
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 
@@ -300,10 +375,11 @@
     
     switch (section) {
         case 0:
-            [groupTitle setText:@"基础信息"];
+            [groupTitle setText:Babel(@"基础信息")];
             break;
         case 1:
-            [groupTitle setText:@"奖品发放信息"];
+            [groupTitle setText:Babel(@"账号关联信息")];
+//            [groupTitle setText:@"奖品发放信息"];
             break;
         case 2:
             [groupTitle setText:@"账号关联信息"];
@@ -386,7 +462,7 @@
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     hud.mode = MBProgressHUDModeAnnularDeterminate;
-    hud.labelText = @"上传头像中...";
+    hud.labelText = Babel(@"发布照片中");
     
     AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     NSURLSessionUploadTask *uploadTask;
@@ -404,13 +480,13 @@
                       if (error) {
                           NSLog(@"Error: %@", error);
                           hud.mode = MBProgressHUDModeText;
-                          hud.labelText = @"上传头像失败!";
+                          hud.labelText = Babel(@"发布照片成功");
                           [hud hide:YES afterDelay:2.0];
                           
                       } else {
                           NSLog(@"%@ %@", response, responseObject);
                           hud.mode = MBProgressHUDModeText;
-                          hud.labelText = @"上传头像成功!";
+                          hud.labelText = Babel(@"发布照片失败");
                           [hud hide:YES afterDelay:1.0];
                           [self performSelector:@selector(getPersonalInfo) withObject:nil afterDelay:1.0];
                       }

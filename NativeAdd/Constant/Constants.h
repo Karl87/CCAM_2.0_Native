@@ -139,6 +139,8 @@
 
 #define CCamUpdateDeviceToeknURL @"http://www.c-cam.cc/index.php/Api_new/Login/update_device_token.html"
 
+#define CCamUnbindURL @"http://www.c-cam.cc/index.php/Api/Unbind/unbind.html"
+
 #define CCamPullUpdate @"下拉列表刷新数据"
 #define CCamReleaseUpdate @"释放列表进行刷新"
 #define CCamUpdating @"更新数据..."

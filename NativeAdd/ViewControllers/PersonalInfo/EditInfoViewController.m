@@ -31,11 +31,11 @@
     [super viewWillDisappear:animated];
 }
 - (NSString*)returnNumFormGender:(NSString*)gender{
-    if ([gender isEqualToString:@"男"]) {
+    if ([gender isEqualToString:Babel(@"男")]) {
         return @"1";
-    }else if ([gender isEqualToString:@"女"]){
+    }else if ([gender isEqualToString:Babel(@"女")]){
         return @"2";
-    }else if ([gender isEqualToString:@"保密"]){
+    }else if ([gender isEqualToString:Babel(@"保密")]){
         return @"3";
     }
     return @"";
@@ -43,7 +43,7 @@
 - (void)updateUserInfo{
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    hud.labelText = @"更新信息中...";
+    hud.labelText = Babel(@"加载中");
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -68,13 +68,13 @@
     [manager POST:CCamEditUserInfoURL parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSLog(@"%@",[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding]);
         
-        hud.labelText = @"更新成功";
+        hud.labelText = Babel(@"更新成功");
         hud.mode = MBProgressHUDModeText;
         [hud hide:YES afterDelay:1.0];
         [self performSelector:@selector(returnToPersonInfo) withObject:nil afterDelay:1.1];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        hud.labelText = @"网络故障";
+        hud.labelText = Babel(@"网络故障");
         hud.mode = MBProgressHUDModeText;
         [hud hide:YES afterDelay:1.0];
     }];
@@ -85,7 +85,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:@"保存" style:UIBarButtonItemStylePlain target:self action:@selector(updateUserInfo)];
+    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:Babel(@"提交") style:UIBarButtonItemStylePlain target:self action:@selector(updateUserInfo)];
     [self.navigationItem setRightBarButtonItem:rightButton];
     
     _inputTable = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStyleGrouped];
@@ -176,13 +176,13 @@
         
         switch (indexPath.row) {
             case 0:
-                cell.textLabel.text = @"男";
+                cell.textLabel.text = Babel(@"男");
                 break;
             case 1:
-                cell.textLabel.text = @"女";
+                cell.textLabel.text = Babel(@"女");
                 break;
             case 2:
-                cell.textLabel.text = @"保密";
+                cell.textLabel.text = Babel(@"保密");
                 break;
             default:
                 break;
@@ -223,11 +223,11 @@
         [self.inputTable deselectRowAtIndexPath:indexPath animated:NO];
     }else{
         if (indexPath.row ==0) {
-            self.userGender = @"男";
+            self.userGender = Babel(@"男");
         }else if (indexPath.row ==1){
-            self.userGender = @"女";
+            self.userGender = Babel(@"女");
         }else if (indexPath.row==2){
-            self.userGender = @"保密";
+            self.userGender = Babel(@"保密");
         }
         [self updateUserInfo];
     }

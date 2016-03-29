@@ -17,8 +17,6 @@
 #import "CCComment.h"
 #import "CCLike.h"
 
-#import <ShareSDK/ShareSDK.h>
-#import <ShareSDKUI/ShareSDK+SSUI.h>
 #import "HXEasyCustomShareView.h"
 #import <MBProgressHUD/MBProgressHUD.h>
 #import <SDAutoLayout/UIView+SDAutoLayout.h>
@@ -33,7 +31,7 @@
 
 #import "WLCircleProgressView.h"
 
-@interface TimelineCell ()<UIGestureRecognizerDelegate,UIActionSheetDelegate,ShareViewDelegate,UIAlertViewDelegate>
+@interface TimelineCell ()<UIGestureRecognizerDelegate,UIActionSheetDelegate,ShareViewDelegate,UIAlertViewDelegate,UMSocialUIDelegate>
 @property (nonatomic,strong) UIAlertView *deleteAlert;
 @property (nonatomic,strong) WLCircleProgressView *photoProgress;
 @end
@@ -43,7 +41,7 @@
 - (void)setUpTimelineCell{
     
     _comments = [NSMutableArray new];
-
+    
     _likes = [NSMutableArray new];
     
     _cellBG = [UIView new];
@@ -74,7 +72,7 @@
     [_privacySign setTintColor:CCamRedColor];
     
     _photo = [UIImageView new];
-//    [_photo setBackgroundColor:[UIColor lightGrayColor]];
+    //    [_photo setBackgroundColor:[UIColor lightGrayColor]];
     
     _photoLomo = [UIImageView new];
     [_photoLomo setBackgroundColor:[UIColor clearColor]];
@@ -100,7 +98,7 @@
     [_photoTitle setBackgroundColor:[UIColor whiteColor]];
     [_photoTitle setImage:[UIImage imageNamed:@"joinEventIcon"] forState:UIControlStateNormal];
     [_photoTitle setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
-//    [_photoTitle setBackgroundImage:[[[UIImage imageNamed:@"eventTitleBG"] stretchableImageWithLeftCapWidth:30.0 topCapHeight:0.0] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    //    [_photoTitle setBackgroundImage:[[[UIImage imageNamed:@"eventTitleBG"] stretchableImageWithLeftCapWidth:30.0 topCapHeight:0.0] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_photoTitle setBackgroundColor:CCamRedColor];
     [_photoTitle setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_photoTitle setTintColor:CCamRedColor];
@@ -140,7 +138,7 @@
     [_photoLike setImage:[[UIImage imageNamed:@"likeIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_photoLike setTintColor:[UIColor lightGrayColor]];
     [_photoLike addTarget:self action:@selector(likePhoto) forControlEvents:UIControlEventTouchUpInside];
-
+    
     
     _photoMore = [UIButton new];
     [_photoMore setImage:[[UIImage imageNamed:@"moreIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
@@ -166,19 +164,19 @@
     [views enumerateObjectsUsingBlock:^(UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.contentView addSubview:obj];
     }];
-//    UIView *contentView = self.contentView;
+    //    UIView *contentView = self.contentView;
     
     
-
-//    [self setupAutoHeightWithBottomViewsArray:@[_photoLike,_likeView,_photoTitle,_photoDes,_commentTable] bottomMargin:25];
-//    [self setupAutoHeightWithBottomView:_commentTable bottomMargin:25];
+    
+    //    [self setupAutoHeightWithBottomViewsArray:@[_photoLike,_likeView,_photoTitle,_photoDes,_commentTable] bottomMargin:25];
+    //    [self setupAutoHeightWithBottomView:_commentTable bottomMargin:25];
 }
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         [self setUpTimelineCell];
-
+        
     }
     return self;
 }
@@ -406,7 +404,7 @@
     
     [_userName setText:_timeline.timelineUserName];
     
-//    [_photo sd_setImageWithURL:[NSURL URLWithString:_timeline.image_fullsize] placeholderImage:nil];
+    //    [_photo sd_setImageWithURL:[NSURL URLWithString:_timeline.image_fullsize] placeholderImage:nil];
     
     [_photoProgress setHidden:NO];
     
@@ -423,7 +421,7 @@
     [_userButton addTarget:self action:@selector(callUserPage:) forControlEvents:UIControlEventTouchUpInside];
     
     if(_indexPath.row==0&&![_timeline.timelineContestID isEqualToString:@"-1"]&&[_timeline.timelineUserID isEqualToString:[[AuthorizeHelper sharedManager] getUserID]]){
-//        [_photoMore setTintColor:CCamRedColor];
+        //        [_photoMore setTintColor:CCamRedColor];
         [_shareSign setText:[NSString stringWithFormat:@"%@ ➜",Babel(@"马上分享")]];
         [_shareSign sizeToFit];
         [_shareSign setFrame:CGRectMake(0, 0, _shareSign.frame.size.width+18, _shareSign.frame.size.height+10)];
@@ -440,11 +438,11 @@
     }else{
         [_shareSign setHidden:YES];
     }
-
+    
     
     if (![_timeline.timelineContestID isEqualToString:@"-1"]) {
         [_privacySign setHidden:YES];
-            }
+    }
     
     if ([_timeline.checked isEqualToString:@"3"]) {
         _photoLomo.hidden = NO;
@@ -454,10 +452,10 @@
     if (![_timeline.cNameCN isEqualToString:@""]&&![_timeline.cNameCN isEqualToString:@"<null>"]) {
         
         _contestDes.hidden = YES;
-
+        
         [_photoTitle setTitle:[NSString stringWithFormat:@"%@",_timeline.cNameCN] forState:UIControlStateNormal];
         [_photoTitle sizeToFit];
-//        [_photoTitle setTag:[_timeline.timelineContestID intValue]];
+        //        [_photoTitle setTag:[_timeline.timelineContestID intValue]];
         [_photoTitle addTarget:self action:@selector(callContestWeb:) forControlEvents:UIControlEventTouchUpInside];
         _photoTitle.sd_layout.widthIs(_photoTitle.bounds.size.width+28);
         _photoTitle.sd_layout.heightIs(_photoTitle.bounds.size.height+8);
@@ -470,7 +468,7 @@
         _photoTitle.sd_layout.heightIs(0).topSpaceToView(_profileImage,0);
         _photo.sd_layout.topSpaceToView(_photoTitle,5);
     }
-
+    
     if ([_timeline.liked isEqualToString:@"1"]) {
         [_photoLike setTintColor:CCamRedColor];
     }else{
@@ -555,41 +553,41 @@
         
     }
     
-//    if (_photoTitle.hidden&&_photoDes.hidden&&_likeView.hidden&&_commentTable.hidden) {
-//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
-//    }
-////    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
-////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:40];
-////    }
-//    else if (_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
-//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
-//    }else if (!_photoTitle.hidden&&_photoDes.hidden&&_likeView.hidden&&_commentTable.hidden) {
-//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
-//    }
-////    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
-////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:20];
-////    }
-////    else if (_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
-////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
-////    }
-////    else if (_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
-////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
-////    }
-//    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
-//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
-//    }else if (!_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
-//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
-//    }else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
-//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
-//    }
-//    else{
-//        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
-//    }
-
+    //    if (_photoTitle.hidden&&_photoDes.hidden&&_likeView.hidden&&_commentTable.hidden) {
+    //        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+    //    }
+    ////    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+    ////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:40];
+    ////    }
+    //    else if (_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+    //        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+    //    }else if (!_photoTitle.hidden&&_photoDes.hidden&&_likeView.hidden&&_commentTable.hidden) {
+    //        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+    //    }
+    ////    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+    ////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:20];
+    ////    }
+    ////    else if (_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+    ////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+    ////    }
+    ////    else if (_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+    ////        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+    ////    }
+    //    else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+    //        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+    //    }else if (!_photoTitle.hidden&&!_photoDes.hidden&&!_likeView.hidden&&!_commentTable.hidden) {
+    //        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:15];
+    //    }else if (!_photoTitle.hidden&&_photoDes.hidden&&!_likeView.hidden&&_commentTable.hidden) {
+    //        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+    //    }
+    //    else{
+    //        [self setupAutoHeightWithBottomView:_commentTable bottomMargin:30];
+    //    }
+    
     
     UIView *bottomView;
     bottomView = _commentTable;
-
+    
     if (_commentTable.hidden) {
         _commentTable.fixedHeight = @0;
         if (_photoDes.hidden) {
@@ -599,20 +597,20 @@
                 if (_photoTitle.hidden) {
                     _photoTitle.fixedHeight = @0;
                 }else{
-//                    _photoTitle.fixedHeight = nil;
+                    //                    _photoTitle.fixedHeight = nil;
                 }
             }else{
-//                _likeView.fixedHeight = nil;
+                //                _likeView.fixedHeight = nil;
             }
         }else{
-//            _photoDes.fixedHeight = nil;
+            //            _photoDes.fixedHeight = nil;
         }
     }else{
-//        _commentTable.fixedHeight = nil;
+        //        _commentTable.fixedHeight = nil;
     }
     
     [self setupAutoHeightWithBottomView:bottomView bottomMargin:15];
-
+    
     
     _cellBG.sd_layout
     .topSpaceToView(self.contentView,5)
@@ -622,8 +620,8 @@
     
     [self reloadLikes];
     
-//    NSLog(@"%@---%@--%@--%@--%@",_timeline.timelineID,[self retureBool: _photoTitle.hidden ],[self retureBool: _photoDes.hidden ],[self retureBool: _likeView.hidden ],[self retureBool: _commentTable.hidden ]);
-
+    //    NSLog(@"%@---%@--%@--%@--%@",_timeline.timelineID,[self retureBool: _photoTitle.hidden ],[self retureBool: _photoDes.hidden ],[self retureBool: _likeView.hidden ],[self retureBool: _commentTable.hidden ]);
+    
     
 }
 - (NSString *)retureBool:(BOOL)state{
@@ -647,12 +645,12 @@
     }else if((temp = temp/24) <7){
         result = [NSString stringWithFormat:@"%ld%@",temp,Babel(@"天前")];
     }
-//    else if((temp = temp/30) <12){
-//        result = [NSString stringWithFormat:@"%ld月前",temp];
-//    }
+    //    else if((temp = temp/30) <12){
+    //        result = [NSString stringWithFormat:@"%ld月前",temp];
+    //    }
     else{
-//        temp = temp/12;
-//        result = [NSString stringWithFormat:@"%ld年前",temp];
+        //        temp = temp/12;
+        //        result = [NSString stringWithFormat:@"%ld年前",temp];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"yyyy.MM.dd"];
         result = [dateFormatter stringFromDate:compareDate];
@@ -690,7 +688,7 @@
     
 }
 - (void)reloadLikes{
-
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [_likesButton setTitle:[NSString stringWithFormat:@" %@",_timeline.likeCount] forState:UIControlStateNormal];
         [_likesButton sizeToFit];
@@ -722,7 +720,7 @@
             [likeBtn setTag:likeIndex];
             [likeBtn addTarget:self action:@selector(callLikeUserPage:) forControlEvents:UIControlEventTouchUpInside];
         }
-    
+        
     });
     
 }
@@ -756,7 +754,7 @@
         [cell.textLabel setTextColor:[UIColor lightGrayColor]];
         [cell.textLabel setText:[NSString stringWithFormat:@"%@%@%@",Babel(@"全部"),_timeline.commentCount,Babel(@"条评论")]];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-
+        
         cell.textLabel.sd_layout
         .leftSpaceToView(cell.contentView,10)
         .rightSpaceToView(cell.contentView,10)
@@ -774,7 +772,7 @@
     return cell;
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-
+    
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
@@ -835,7 +833,7 @@
 - (void)shareViewBtnClickWithType:(NSString *)type andTitle:(NSString *)title isShareImage:(BOOL)isShare{
     NSLog(@"%@:%@",type,title);
     if ([type isEqualToString:@"Option"]) {
-
+        
         if ([title isEqualToString:Babel(@"删除照片")]){
             [self deletePhoto];
         }else if ([title isEqualToString:Babel(@"下载照片")]){
@@ -862,9 +860,6 @@
             return;
         }
         
-        NSArray* imageArray = @[_timeline.image_fullsize];
-        NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-        
         if ([_timeline.shareURL isEqualToString:@""]) {
             _timeline.shareURL = @"http://www.c-cam.cc";
         }
@@ -874,118 +869,146 @@
         if ([_timeline.shareSubTitle isEqualToString:@""]) {
             //            _timeline.shareSubTitle = [NSString stringWithFormat:@"请为%@的照片点赞",_timeline.timelineUserName];
         }
-        
         if (isShare) {
-            [shareParams SSDKSetupShareParamsByText:_timeline.shareSubTitle
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeImage];
-            
-        }else{
-            [shareParams SSDKSetupShareParamsByText:_timeline.shareSubTitle
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeAuto];
-        }
-        
-        SSDKPlatformType shareType;
-        
-        if ([title isEqualToString:Babel(@"微信")]){
-            shareType = SSDKPlatformSubTypeWechatSession;
-        }else if ([title isEqualToString:Babel(@"朋友圈")]){
-            shareType = SSDKPlatformSubTypeWechatTimeline;
-        }else if ([title isEqualToString:Babel(@"新浪微博")]){
-            shareType = SSDKPlatformTypeSinaWeibo;
-            [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL]
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeAuto];
-            [ShareSDK showShareEditor:shareType otherPlatformTypes:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
-                if (!error) {
-                    switch (state) {
-                        case SSDKResponseStateSuccess:
-                            NSLog(@"分享成功！");
-                            break;
-                        case SSDKResponseStateCancel:
-                            NSLog(@"取消分享！");
-                            break;
-                        case SSDKResponseStateFail:
-                            NSLog(@"分享失败！");
-                            break;
-                        default:
-                            break;
-                    }
-                }else{
-                    NSLog(@"%@",error.description);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败" message:error.description delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil];
-                    [alert show];
-                    [ShareSDK cancelAuthorize:shareType];
-                }
-            }];
-            return;
-        }else if ([title isEqualToString:Babel(@"QQ")]){
-            shareType = SSDKPlatformSubTypeQQFriend;
-        }else if ([title isEqualToString:Babel(@"QQ空间")]){
-            shareType = SSDKPlatformSubTypeQZone;
-        }else if ([title isEqualToString:Babel(@"Facebook")]){
-            shareType = SSDKPlatformTypeFacebook;
-            [shareParams SSDKSetupShareParamsByText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL]
-                                             images:imageArray
-                                                url:[NSURL URLWithString:_timeline.shareURL]
-                                              title:_timeline.shareTitle
-                                               type:SSDKContentTypeAuto];
-            [ShareSDK showShareEditor:shareType otherPlatformTypes:nil shareParams:shareParams onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
-                if (!error) {
-                    switch (state) {
-                        case SSDKResponseStateSuccess:
-                            NSLog(@"分享成功！");
-                            break;
-                        case SSDKResponseStateCancel:
-                            NSLog(@"取消分享！");
-                            break;
-                        case SSDKResponseStateFail:
-                            NSLog(@"分享失败！");
-                            break;
-                        default:
-                            break;
-                    }
-                }else{
-                    NSLog(@"%@",error.description);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败" message:error.description delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil];
-                    [alert show];
-                    [ShareSDK cancelAuthorize:shareType];
-                }
-            }];
-            return;
-            
-        }
-        [ShareSDK share:shareType parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
-            if (!error) {
-                switch (state) {
-                    case SSDKResponseStateSuccess:
+            //分享照片
+            UMSocialUrlResource *urlResource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:
+                                                _timeline.image_fullsize];
+            if ([title isEqualToString:Babel(@"微信")]){
+                type = UMShareToWechatSession;
+                [UMSocialData defaultData].extConfig.wechatSessionData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.wechatSessionData.title =_timeline.shareTitle;
+                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeImage;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
                         NSLog(@"分享成功！");
-                        break;
-                    case SSDKResponseStateCancel:
-                        NSLog(@"取消分享！");
-                        break;
-                    case SSDKResponseStateFail:
-                        NSLog(@"分享失败！");
-                        break;
-                    default:
-                        break;
-                }
-            }else{
-                NSLog(@"%@",error.description);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败" message:error.description delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil];
-                [alert show];
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"朋友圈")]){
+                type = UMShareToWechatTimeline;
+                
+                [UMSocialData defaultData].extConfig.wechatTimelineData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.wechatTimelineData.title = _timeline.shareTitle;
+                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeImage;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
+                        NSLog(@"分享成功！");
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"新浪微博")]){
+                type = UMShareToSina;
+                
+                [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeImage url:_timeline.image_fullsize];
+                
+                [[UMSocialControllerService defaultControllerService] setShareText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL] shareImage:nil socialUIDelegate:self];
+                
+                [UMSocialSnsPlatformManager getSocialPlatformWithName:type].snsClickHandler(_parent,[UMSocialControllerService defaultControllerService],YES);
+                
+            }else if ([title isEqualToString:Babel(@"QQ")]){
+                type = UMShareToQQ;
+                [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeImage;
+                [UMSocialData defaultData].extConfig.qqData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.qqData.title =_timeline.shareTitle;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
+                        NSLog(@"分享成功！");
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"QQ空间")]){
+                type = UMShareToQzone;
+                [UMSocialData defaultData].extConfig.qzoneData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.qzoneData.title =_timeline.shareTitle;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
+                        NSLog(@"分享成功！");
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"Facebook")]){
+                
+                type = UMShareToFacebook;
+                
+                
+                [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeImage url:_timeline.image_fullsize];
+                
+                [[UMSocialControllerService defaultControllerService] setShareText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL] shareImage:nil socialUIDelegate:self];
+                [UMSocialSnsPlatformManager getSocialPlatformWithName:UMShareToFacebook].snsClickHandler(_parent,[UMSocialControllerService defaultControllerService],YES);
             }
-        }];
+
+        }else{
+            //分享链接
+            UMSocialUrlResource *urlResource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:
+                                                _timeline.image_fullsize];
+            if ([title isEqualToString:Babel(@"微信")]){
+                type = UMShareToWechatSession;
+                [UMSocialData defaultData].extConfig.wechatSessionData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.wechatSessionData.title =_timeline.shareTitle;
+                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
+                        NSLog(@"分享成功！");
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"朋友圈")]){
+                type = UMShareToWechatTimeline;
+                
+                [UMSocialData defaultData].extConfig.wechatTimelineData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.wechatTimelineData.title = _timeline.shareTitle;
+                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
+                        NSLog(@"分享成功！");
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"新浪微博")]){
+                type = UMShareToSina;
+                
+                [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeImage url:_timeline.image_fullsize];
+                
+                [[UMSocialControllerService defaultControllerService] setShareText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL] shareImage:nil socialUIDelegate:self];
+                
+                [UMSocialSnsPlatformManager getSocialPlatformWithName:type].snsClickHandler(_parent,[UMSocialControllerService defaultControllerService],YES);
+                
+            }else if ([title isEqualToString:Babel(@"QQ")]){
+                type = UMShareToQQ;
+                [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeDefault;
+                [UMSocialData defaultData].extConfig.qqData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.qqData.title =_timeline.shareTitle;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
+                        NSLog(@"分享成功！");
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"QQ空间")]){
+                type = UMShareToQzone;
+                [UMSocialData defaultData].extConfig.qzoneData.url = _timeline.shareURL;
+                [UMSocialData defaultData].extConfig.qzoneData.title =_timeline.shareTitle;
+                [[UMSocialDataService defaultDataService]  postSNSWithTypes:@[type] content:_timeline.shareSubTitle image:nil location:nil urlResource:urlResource presentedController:_parent completion:^(UMSocialResponseEntity *response){
+                    if (response.responseCode == UMSResponseCodeSuccess) {
+                        NSLog(@"分享成功！");
+                    }
+                }];
+            }else if ([title isEqualToString:Babel(@"Facebook")]){
+                
+                type = UMShareToFacebook;
+                
+                
+                [[UMSocialData defaultData].urlResource setResourceType:UMSocialUrlResourceTypeImage url:_timeline.image_fullsize];
+                
+                [[UMSocialControllerService defaultControllerService] setShareText:[NSString stringWithFormat:@"%@ %@",_timeline.shareSubTitle,_timeline.shareURL] shareImage:nil socialUIDelegate:self];
+                [UMSocialSnsPlatformManager getSocialPlatformWithName:UMShareToFacebook].snsClickHandler(_parent,[UMSocialControllerService defaultControllerService],YES);
+            }
+        }
+        
     }
 }
-
+-(void)didFinishGetUMSocialDataInViewController:(UMSocialResponseEntity *)response
+{
+    //根据`responseCode`得到发送结果,如果分享成功
+    if(response.responseCode == UMSResponseCodeSuccess)
+    {
+        //得到分享到的微博平台名
+        NSLog(@"share to sns name is %@",[[response.data allKeys] objectAtIndex:0]);
+    }
+}
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if (alertView == _deleteAlert) {
         if (buttonIndex == 1) {
@@ -1120,7 +1143,7 @@
             if (self.likeButtonBlock) {
                 self.likeButtonBlock(self.indexPath);
             }
-
+            
         }else if ([likeResult isEqualToString:@"-1"]){
             NSLog(@"likephoto result is failed!");
             [_photoLike setTintColor:CCamPhotoSegLightGray];

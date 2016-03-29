@@ -180,13 +180,13 @@
 "反馈发布成功" = "Message sent";
 "您的意见对我们十分重要，我们将尽快处理" = "Your opinion is important to us, we will process asap!";
 
-"关于角色相机" = "About Charact Cam";
+"关于角色相机" = "About Character Cam";
 "版本" = "Version ";
 "官方网站" = "Homepage";
 "查看用户协议" = "Terms of services";
 "Licenses" = "License";
 "版权声明" = "Copyright© i-Craftsmen Limited.";//Copyright© 2015 i-Craftsmen Limited. All rights reserved.
-
+"联系我们" = "Contact";
 //制作部分
 "下一步" = "Next";
 "3D角色" = "3D";
@@ -213,7 +213,7 @@
 
 "正在下载" = "Downloading";
 
-"免费下载" = "Free download";
+"免费下载" = "Download";
 "动作表情调节" = "Pose & Look";
 "灯光阴影调节" = "Light & Shadow";
 "阴影强度" = "Shadow";
@@ -250,6 +250,35 @@
 //
 "表情" = "Look";
 "动作" = "Pose";
+
+"已复制邮件到粘贴板" = "Mail copied";
+"已复制微信公众号到粘贴板" = "Wechat name copied";
+
+
+"编辑照片" = "Edit Photo";
+"编辑昵称" = "Nickname";
+"编辑生日" = "Birthday";
+"编辑性别" = "Gender";
+"编辑简介" = "About Me";
+"基础信息" = "Basic Information";
+"账号关联信息" = "Link Account";
+"请填写您的昵称" = "Nickname";
+"男" = "Male";
+"女" = "Female";
+"保密" = "Secret";
+"请选择您的性别" = "Gender";
+"请填写您的生日" = "Birthday";
+"请填写您的简介" = "About me";
+"尚未绑定" = "Not connected";
+"更新成功" = "Updated";
+
+
+
+
+
+
+
+
 
 
 

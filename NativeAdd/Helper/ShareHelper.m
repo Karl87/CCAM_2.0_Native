@@ -7,17 +7,22 @@
 //
 
 #import "ShareHelper.h"
-#import <ShareSDK/ShareSDK.h>
-#import <ShareSDKConnector/ShareSDKConnector.h>
+
 //腾讯开放平台（对应QQ和QQ空间）SDK头文件
-#import <TencentOpenAPI/TencentOAuth.h>
-#import <TencentOpenAPI/QQApiInterface.h>
+//#import <TencentOpenAPI/TencentOAuth.h>
+//#import <TencentOpenAPI/QQApiInterface.h>
 
 //微信SDK头文件
-#import "WXApi.h"
+//#import "WXApi.h"
 
 //新浪微博SDK头文件
-#import "WeiboSDK.h"
+//#import "WeiboSDK.h"
+
+#import "UMSocial.h"
+#import "UMSocialWechatHandler.h"
+#import "UMSocialSinaSSOHandler.h"
+#import "UMSocialFacebookHandler.h"
+#import "UMSocialQQHandler.h"
 
 #import "ShareViewController.h"
 
@@ -38,60 +43,67 @@
     });
     return _sharedInstance;
 }
+- (void)initShareKit{
+    [UMSocialData setAppKey:@"5598da7367e58e4243001b46"];
+    [UMSocialSinaSSOHandler openNewSinaSSOWithAppKey:@"879416201" secret:@"d0622fbb1ac78e0bf0d43263a84597f4" RedirectURL:@"http://sns.whalecloud.com/sina2/callback"];
+    [UMSocialWechatHandler setWXAppId:@"wxb0bc0ae7d90dc61e" appSecret:@"f898d8973add85934790c35260748a84" url:@"http://www.c-cam.cc"];
+    [UMSocialFacebookHandler setFacebookAppID:@"366856386836374" shareFacebookWithURL:@"http://c-cam.cc"];
+    [UMSocialQQHandler setQQWithAppId:@"1104554620" appKey:@"WknCGrPLmV4sFqPU" url:@"http://c-cam.cc"];
+}
 - (void)initShareSDK{
-    [ShareSDK registerApp:@"76f976b22c31"
-     
-          activePlatforms:@[@(SSDKPlatformTypeSinaWeibo),
-                            @(SSDKPlatformTypeWechat),
-                            @(SSDKPlatformSubTypeQQFriend),
-                            @(SSDKPlatformTypeFacebook)]
-                 onImport:^(SSDKPlatformType platformType)
-     {
-         switch (platformType)
-         {
-             case SSDKPlatformTypeWechat:
-                 [ShareSDKConnector connectWeChat:[WXApi class]];
-                 break;
-             case SSDKPlatformTypeQQ:
-                 [ShareSDKConnector connectQQ:[QQApiInterface class] tencentOAuthClass:[TencentOAuth class]];
-                 break;
-             case SSDKPlatformTypeSinaWeibo:
-                 [ShareSDKConnector connectWeibo:[WeiboSDK class]];
-                 break;
-             default:
-                 break;
-         }
-     }
-          onConfiguration:^(SSDKPlatformType platformType, NSMutableDictionary *appInfo)
-     {
-         
-         switch (platformType)
-         {
-             case SSDKPlatformTypeSinaWeibo:
-                 [appInfo SSDKSetupSinaWeiboByAppKey:@"879416201"
-                                           appSecret:@"d0622fbb1ac78e0bf0d43263a84597f4"
-                                         redirectUri:@"http://sns.whalecloud.com/sina2/callback"
-                                            authType:SSDKAuthTypeBoth];
-                 break;
-             case SSDKPlatformTypeWechat:
-                 [appInfo SSDKSetupWeChatByAppId:@"wxb0bc0ae7d90dc61e"
-                                       appSecret:@"f898d8973add85934790c35260748a84"];
-                 break;
-             case SSDKPlatformTypeQQ:
-                 [appInfo SSDKSetupQQByAppId:@"1104554620"
-                                      appKey:@"WknCGrPLmV4sFqPU"
-                                    authType:SSDKAuthTypeBoth];
-                 break;
-                 
-             case SSDKPlatformTypeFacebook:
-                 [appInfo        SSDKSetupFacebookByApiKey:@"366856386836374"
-                                                 appSecret:@"b872811651cf238a6fdcc349a66125be"
-                                                  authType:SSDKAuthTypeBoth];
-                 break;
-            default:
-                 break;
-         }
-     }];
+//    [ShareSDK registerApp:@"76f976b22c31"
+//     
+//          activePlatforms:@[@(SSDKPlatformTypeSinaWeibo),
+//                            @(SSDKPlatformTypeWechat),
+//                            @(SSDKPlatformSubTypeQQFriend),
+//                            @(SSDKPlatformTypeFacebook)]
+//                 onImport:^(SSDKPlatformType platformType)
+//     {
+//         switch (platformType)
+//         {
+//             case SSDKPlatformTypeWechat:
+//                 [ShareSDKConnector connectWeChat:[WXApi class]];
+//                 break;
+//             case SSDKPlatformTypeQQ:
+//                 [ShareSDKConnector connectQQ:[QQApiInterface class] tencentOAuthClass:[TencentOAuth class]];
+//                 break;
+//             case SSDKPlatformTypeSinaWeibo:
+//                 [ShareSDKConnector connectWeibo:[WeiboSDK class]];
+//                 break;
+//             default:
+//                 break;
+//         }
+//     }
+//          onConfiguration:^(SSDKPlatformType platformType, NSMutableDictionary *appInfo)
+//     {
+//         
+//         switch (platformType)
+//         {
+//             case SSDKPlatformTypeSinaWeibo:
+//                 [appInfo SSDKSetupSinaWeiboByAppKey:@"879416201"
+//                                           appSecret:@"d0622fbb1ac78e0bf0d43263a84597f4"
+//                                         redirectUri:@"http://sns.whalecloud.com/sina2/callback"
+//                                            authType:SSDKAuthTypeBoth];
+//                 break;
+//             case SSDKPlatformTypeWechat:
+//                 [appInfo SSDKSetupWeChatByAppId:@"wxb0bc0ae7d90dc61e"
+//                                       appSecret:@"f898d8973add85934790c35260748a84"];
+//                 break;
+//             case SSDKPlatformTypeQQ:
+//                 [appInfo SSDKSetupQQByAppId:@"1104554620"
+//                                      appKey:@"WknCGrPLmV4sFqPU"
+//                                    authType:SSDKAuthTypeBoth];
+//                 break;
+//                 
+//             case SSDKPlatformTypeFacebook:
+//                 [appInfo        SSDKSetupFacebookByApiKey:@"366856386836374"
+//                                                 appSecret:@"b872811651cf238a6fdcc349a66125be"
+//                                                  authType:SSDKAuthTypeBoth];
+//                 break;
+//            default:
+//                 break;
+//         }
+//     }];
 }
 - (void)callShareViewIsMyself:(BOOL)myself delegate:(id)delegate timeline:(CCTimeLine *)timeline timelineCell:(TimelineCell*)cell indexPath:(NSIndexPath *)indexPath onlyShare:(BOOL)onlyShare shareImage:(BOOL)shareImage{
     if (!_shareWindow) {

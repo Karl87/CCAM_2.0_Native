@@ -9,6 +9,7 @@
 #import "ChangeSceneViewController.h"
 #import <pop/POP.h>
 #import "iOSBindingManager.h"
+#import "CCamHelper.h"
 
 @interface ChangeSceneViewController ()
 
@@ -19,6 +20,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.0]];
+    
+    UIImageView *logo = [UIImageView new];
+    [logo setFrame:CGRectMake(0, 0, 200, 200)];
+    [self.view addSubview:logo];
+    [logo setBackgroundColor:[UIColor clearColor]];
+    [logo setCenter:self.view.center];
+    [logo setContentMode:UIViewContentModeScaleAspectFit];
+    NSString*language = [[SettingHelper sharedManager] getCurrentLanguage];
+    if ([language hasPrefix:@"zh-Hans"]) {
+        [logo setImage:[UIImage imageNamed:@"launchNoteCn"]];
+    }else{
+        [logo setImage:[UIImage imageNamed:@"launchNoteZh"]];
+    }
+    
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];

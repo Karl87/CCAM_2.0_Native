@@ -7,7 +7,17 @@
 //
 
 #import "PickPhotoCell.h"
+#import "Constants.h"
 
 @implementation PickPhotoCell
+- (id)initWithFrame:(CGRect)frame{
+    self = [super initWithFrame:frame];
+    if (self) {
+        UIView *selectedBG = [[UIView alloc] initWithFrame:self.bounds];
+        [selectedBG setBackgroundColor:CCamRedColor];
+        self.selectedBackgroundView = selectedBG;
 
+    }
+    return self;
+}
 @end

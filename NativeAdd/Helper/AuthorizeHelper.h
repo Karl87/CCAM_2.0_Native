@@ -7,10 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ShareSDK/ShareSDK.h>
+#import "UMSocial.h"
+
 
 @interface AuthorizeHelper : NSObject
 @property (nonatomic,strong) UIViewController *webVC;
+@property (nonatomic,strong) UIViewController *personInfoVC;
 + (AuthorizeHelper*)sharedManager;
 
 - (NSString *)getDeviceToken;
@@ -43,12 +45,14 @@
 - (void)logout;
 - (void)loginStateError;
 //social login
-- (void)getSocialPlatformInfoWithTypeID:(NSString*)typeID shareType:(SSDKPlatformType)type isLogin:(BOOL)isLogin;
-- (void)loginWithTypeID:(NSString *)typeID shareType:(SSDKPlatformType)type userInfo:(SSDKUser *)user isLogin:(BOOL)login;
+- (void)getSocialPlatformInfoWithTypeID:(NSString*)typeID shareType:(NSString*)type isLogin:(BOOL)isLogin;
+- (void)loginWithTypeID:(NSString *)typeID shareType:(NSString*)type userInfo:(UMSocialAccountEntity *)user isLogin:(BOOL)login;
 //mobile login
 - (void)mobileLoginWithPhone:(NSString*)phone password:(NSString*)password isLogin:(BOOL)login;
 //mobile reset psw
 - (void)mobileResetPasswordWithPhone:(NSString*)phone password:(NSString*)password;
+//unbindsocialaccount
+- (void)unbindPlatformWithTypeID:(NSString*)typeID;
 //sms time count
 - (void)startSmsTimer;
 @end

@@ -242,14 +242,17 @@
     }
     
     PickPhotoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifer forIndexPath:indexPath];
-    [cell setBackgroundColor:CCamRedColor];
+    
     
     if (cell.photoImage == nil) {
-        UIImageView *img = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, cell.contentView.frame.size.width, cell.contentView.frame.size.height)];
+        UIImageView *img = [[UIImageView alloc] initWithFrame:CGRectMake(2, 2, cell.contentView.frame.size.width-4, cell.contentView.frame.size.height-4)];
+        [cell setBackgroundColor:CCamViewBackgroundColor];
         if (indexPath.row == 0) {
             [img setFrame:CGRectMake(cell.contentView.frame.size.width/3, cell.contentView.frame.size.height/3, cell.contentView.frame.size.width/3, cell.contentView.frame.size.height/3)];
+            [cell setBackgroundColor:CCamRedColor];
         }
         [img setContentMode:UIViewContentModeScaleAspectFill];
+        [img setClipsToBounds:YES];
         [cell.contentView addSubview:img];
         cell.clipsToBounds = YES;
         cell.photoImage = img;
@@ -446,7 +449,7 @@
     [_albumImgFitSizeBtn addTarget:self action:@selector(changeImageToFitSize) forControlEvents:UIControlEventTouchUpInside];
     
     _albumImgBG = [[UIScrollView alloc] initWithFrame:CGRectMake(0, CCamThinNaviHeight, self.view.frame.size.width, self.view.frame.size.width)];
-    [_albumImgBG setMaximumZoomScale:2.0];
+    [_albumImgBG setMaximumZoomScale:4.0];
     [_albumImgBG setMinimumZoomScale:1.0];
     [_albumBG addSubview:_albumImgBG];
     [_albumImgBG setDelegate:self];
@@ -476,7 +479,7 @@
     [_photoCollection setBounces:NO];
     [_photoCollection setDataSource:self];
     [_photoCollection setDelegate:self];
-    
+    [_photoCollection setBackgroundColor:CCamViewBackgroundColor];
     
     _captureBG = [[UIView alloc] initWithFrame:self.view.frame];
     [_captureBG setBackgroundColor:CCamSegmentColor];

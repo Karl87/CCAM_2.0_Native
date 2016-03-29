@@ -64,7 +64,7 @@
 @property (nonatomic,strong) CCamCircleView *lightCircle;
 @property (nonatomic,strong) CCamCircleView *poseCircle;
 @property (nonatomic,strong) CCamCircleView *headCircle;
-@property (nonatomic,strong) UIView *headCircleMask;
+//@property (nonatomic,strong) UIView *headCircleMask;
 @property (nonatomic,strong) CCamCircleView *faceCircle;
 @property (nonatomic,strong) UIButton * lastPoseBtn;
 @property (nonatomic,strong) UIButton * nextPoseBtn;
@@ -158,15 +158,18 @@
     
     if (!_lastPoseBtn && !_nextPoseBtn && !_currentPoseBtn) {
         _currentPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_currentPoseBtn setImage:[UIImage imageNamed:@"poseIcon"] forState:UIControlStateNormal];
+        [_currentPoseBtn setImage:[[UIImage imageNamed:@"poseIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [_currentPoseBtn setTintColor:CCamRedColor];
         [_currentPoseBtn setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
         [_currentPoseBtn setFrame:CGRectMake(0, 0, 100, 40)];
         [_currentPoseBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
         [_currentPoseBtn.layer setCornerRadius:_currentPoseBtn.bounds.size.height/2];
         [_currentPoseBtn.layer setMasksToBounds:YES];
-        [_currentPoseBtn setBackgroundColor:CCamRedColor];
+        [_currentPoseBtn.layer setBorderColor:CCamRedColor.CGColor];
+        [_currentPoseBtn.layer setBorderWidth:1.0];
+        [_currentPoseBtn setBackgroundColor:[UIColor whiteColor]];
         [_currentPoseBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
-        [_currentPoseBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_currentPoseBtn setTitleColor:CCamRedColor forState:UIControlStateNormal];
         [_animationControl addSubview:_currentPoseBtn];
         
         _lastPoseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -190,15 +193,18 @@
     
     if (!_lastFaceBtn && !_nextFaceBtn && !_currentFaceBtn) {
         _currentFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_currentFaceBtn setImage:[UIImage imageNamed:@"lookIcon"] forState:UIControlStateNormal];
+        [_currentFaceBtn setImage:[[UIImage imageNamed:@"lookIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [_currentFaceBtn setTintColor:CCamRedColor];
         [_currentFaceBtn setImageEdgeInsets:UIEdgeInsetsMake(0, -5, 0, 5)];
         [_currentFaceBtn setFrame:CGRectMake(0, 0, 100, 40)];
         [_currentFaceBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
         [_currentFaceBtn.layer setCornerRadius:_currentFaceBtn.bounds.size.height/2];
         [_currentFaceBtn.layer setMasksToBounds:YES];
-        [_currentFaceBtn setBackgroundColor:CCamRedColor];
+        [_currentFaceBtn.layer setBorderWidth:1.0];
+        [_currentFaceBtn.layer setBorderColor:CCamRedColor.CGColor];
+        [_currentFaceBtn setBackgroundColor:[UIColor whiteColor]];
         [_currentFaceBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:14.0]];
-        [_currentFaceBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_currentFaceBtn setTitleColor:CCamRedColor forState:UIControlStateNormal];
         [_animationControl addSubview:_currentFaceBtn];
         
         _lastFaceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -240,12 +246,12 @@
         [_animationControl addSubview:_headCircle];
         [_headCircle setDelegate:self];
         
-        _headCircleMask = [[UIView alloc] initWithFrame:_headCircle.frame];
-        [_headCircleMask.layer setMasksToBounds:YES];
-        [_headCircleMask.layer setCornerRadius:_headCircleMask.frame.size.height/2];
-        [_headCircleMask setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.4]];
-        [_animationControl addSubview:_headCircleMask];
-        [_headCircleMask setHidden:YES];
+//        _headCircleMask = [[UIView alloc] initWithFrame:_headCircle.frame];
+//        [_headCircleMask.layer setMasksToBounds:YES];
+//        [_headCircleMask.layer setCornerRadius:_headCircleMask.frame.size.height/2];
+//        [_headCircleMask setBackgroundColor:[UIColor colorWithWhite:0.0 alpha:0.4]];
+//        [_animationControl addSubview:_headCircleMask];
+//        [_headCircleMask setHidden:YES];
     }
 }
 - (void)SetAnimationControlAppear{
@@ -365,15 +371,31 @@
 }
 - (void)setHeadDirectionAvilable:(BOOL)avilable X:(CGFloat)x andY:(CGFloat)y{
     if (avilable) {
-        [_headCircleMask setHidden:YES];
+//        [_headCircleMask setHidden:YES];
+        [_headCircle setHidden:NO];
         [_headCircle setUserInteractionEnabled:YES];
         [_headCircle.circlePoint setUserInteractionEnabled:YES];
         [_headCircle.circlePoint setCenter:CGPointMake(_headCircle.bounds.size.width/2+x*0.9*0.5*_headCircle.bounds.size.width, _headCircle.bounds.size.height/2+y*0.9*0.5*_headCircle.bounds.size.height)];
+        
+        [_currentPoseBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_lastPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x-5-(_currentPoseBtn.bounds.size.width+_lastPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_nextPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x+5+(_currentPoseBtn.bounds.size.width+_nextPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_currentFaceBtn setCenter:CGPointMake(_animationControl.bounds.size.width*0.25, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_lastFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x-5-(_currentFaceBtn.bounds.size.width+_lastFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_nextFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x+5+(_currentFaceBtn.bounds.size.width+_nextFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        
     }else{
-        [_headCircleMask setHidden:NO];
+        [_headCircle setHidden:YES];
         [_headCircle setUserInteractionEnabled:NO];
         [_headCircle.circlePoint setUserInteractionEnabled:NO];
         [_headCircle.circlePoint setCenter:CGPointMake(_headCircle.bounds.size.width/2, _headCircle.bounds.size.height/2)];
+        
+        [_currentPoseBtn setCenter:CGPointMake(_animationControl.bounds.size.width/2, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_lastPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x-5-(_currentPoseBtn.bounds.size.width+_lastPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_nextPoseBtn setCenter:CGPointMake(_currentPoseBtn.center.x+5+(_currentPoseBtn.bounds.size.width+_nextPoseBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2-30)];
+        [_currentFaceBtn setCenter:CGPointMake(_animationControl.bounds.size.width/2, (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_lastFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x-5-(_currentFaceBtn.bounds.size.width+_lastFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
+        [_nextFaceBtn setCenter:CGPointMake(_currentFaceBtn.center.x+5+(_currentFaceBtn.bounds.size.width+_nextFaceBtn.bounds.size.width)/2,  (_animationControl.bounds.size.height-CCamThinNaviHeight)/2+30)];
     }
 }
 - (void)SetLightControlAppear{

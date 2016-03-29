@@ -10,4 +10,5 @@
 
 @interface PersonInfoViewController : KLViewController
 @property (nonatomic,strong) UIViewController *parent;
+- (void)getPersonalInfo;
 @end
