@@ -12,6 +12,7 @@
 #import "CCTimeLine+CoreDataProperties.h"
 
 @implementation CCTimeLine (CoreDataProperties)
+@dynamic followed;
 @dynamic checked;
 @dynamic shareSubTitle;
 @dynamic shareTitle;

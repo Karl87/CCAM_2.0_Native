@@ -38,7 +38,7 @@
 "获取验证码" = "Get Code";
 "秒" = "sec";
 "社交平台账户登录" = "Sign in with SNS account";
-"我同意《角色相机使用协议》" = "By logging in, you are agreeing to the 《Character Cam Terms of Service》";
+"我同意《角色相机使用协议》" = "By logging in, you are agreeing to the\n《Character Cam Terms of Service》";
 "角色相机用户协议" = "Character Cam Terms of Service";
 "完善用户信息" = "Complete Profile";
 "登录角色相机中" = "Logging in...";
@@ -253,7 +253,9 @@
 
 "已复制邮件到粘贴板" = "Mail copied";
 "已复制微信公众号到粘贴板" = "Wechat name copied";
-
+"已复制QQ群号到粘贴板" = "QQ Group number copied";
+"QQ群" = "QQ Group";
+"商务合作" = "Cooperation";
 
 "编辑照片" = "Edit Photo";
 "编辑昵称" = "Nickname";

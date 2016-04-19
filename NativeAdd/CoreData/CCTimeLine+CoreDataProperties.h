@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, retain) NSString *likeCount;
 @property (nullable, nonatomic, retain) NSString *commentCount;
 @property (nullable, nonatomic, retain) NSString *liked;
+@property (nullable, nonatomic, retain) NSString *followed;
 @property (nullable, nonatomic, retain) NSString *ranking;
 @property (nullable, nonatomic, retain) NSString *report;
 @property (nullable, nonatomic, retain) NSString *timelineContestID;

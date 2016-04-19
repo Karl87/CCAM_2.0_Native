@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="14F27" minimumToolsVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10171" systemVersion="15E65" minimumToolsVersion="Automatic">
     <entity name="CCAnimation" representedClassName="CCAnimation" syncable="YES">
         <attribute name="animationID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="audio" optional="YES" attributeType="String" syncable="YES"/>
@@ -43,6 +43,8 @@
         <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="replyID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyUserID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyUserName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userImage" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
@@ -63,6 +65,13 @@
         <attribute name="shareImage" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="shareSubtitle" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="shareTitle" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="CCFilter" representedClassName="CCFilter" syncable="YES">
+        <attribute name="image_mini" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name_cn" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name_en" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name_file" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name_zh" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="CCLike" representedClassName="CCLike" syncable="YES">
         <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
@@ -184,6 +193,7 @@
         <attribute name="dateEnd" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateline" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dateStart" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="followed" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_contest" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_fullsize" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image_share" optional="YES" attributeType="String" syncable="YES"/>
@@ -239,7 +249,7 @@
     <elements>
         <element name="CCAnimation" positionX="-416" positionY="540" width="128" height="283"/>
         <element name="CCCharacter" positionX="-468" positionY="414" width="126" height="300"/>
-        <element name="CCComment" positionX="-459" positionY="153" width="128" height="180"/>
+        <element name="CCComment" positionX="-459" positionY="153" width="128" height="210"/>
         <element name="CCEvent" positionX="-108" positionY="9" width="128" height="255"/>
         <element name="CCLike" positionX="-450" positionY="162" width="128" height="135"/>
         <element name="CCMessage" positionX="-450" positionY="162" width="128" height="255"/>
@@ -247,7 +257,8 @@
         <element name="CCSerie" positionX="-659" positionY="9" width="128" height="495"/>
         <element name="CCSticker" positionX="-450" positionY="162" width="128" height="225"/>
         <element name="CCStickerSet" positionX="-459" positionY="153" width="128" height="180"/>
-        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="465"/>
+        <element name="CCTimeLine" positionX="-450" positionY="162" width="128" height="480"/>
         <element name="CCUser" positionX="-108" positionY="180" width="128" height="495"/>
+        <element name="CCFilter" positionX="-459" positionY="153" width="128" height="120"/>
     </elements>
 </model>

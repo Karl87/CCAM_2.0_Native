@@ -13,6 +13,8 @@
 
 @implementation CCComment (CoreDataProperties)
 
+@dynamic replyUserID;
+@dynamic replyUserName;
 @dynamic commentID;
 @dynamic photoID;
 @dynamic userID;

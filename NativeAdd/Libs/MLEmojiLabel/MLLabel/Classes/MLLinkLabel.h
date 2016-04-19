@@ -7,6 +7,7 @@
 //
 
 #import "MLLabel.h"
+#import "Constants.h"
 
 typedef NS_OPTIONS(NSUInteger, MLDataDetectorTypes) {
     MLDataDetectorTypeURL           = 1 << 1,          // 链接，不用link定义，是因为link作为统称
@@ -39,7 +40,7 @@ typedef NS_ENUM(NSUInteger, MLLinkType) {
 };
 
 #define kDefaultLinkColorForMLLinkLabel [UIColor colorWithRed:0.061 green:0.515 blue:0.862 alpha:1.000]
-#define kDefaultActiveLinkBackgroundColorForMLLinkLabel [UIColor colorWithWhite:0.215 alpha:0.300]
+#define kDefaultActiveLinkBackgroundColorForMLLinkLabel [UIColor clearColor]//[UIColor colorWithWhite:0.215 alpha:0.300]
 
 @class MLLink,MLLinkLabel;
 

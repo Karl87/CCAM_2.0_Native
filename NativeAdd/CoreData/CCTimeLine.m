@@ -43,6 +43,8 @@ extern const CGFloat maxContentLabelHeight;
     self.countDown = GetValidString(countDown);
     NSString *likeState = [NSString stringWithFormat:@"%d",[[dic objectForKey:@"liked"] intValue]];
     self.liked = GetValidString(likeState);
+    NSString *followState = [NSString stringWithFormat:@"%d",[[dic objectForKey:@"follow"] intValue]];
+    self.followed = GetValidString(followState);
     self.report = GetValidString([dic objectForKey:@"Report"]);
     self.dateStart = GetValidString([dic objectForKey:@"start_date"]);
     self.dateEnd = GetValidString([dic objectForKey:@"end_date"]);

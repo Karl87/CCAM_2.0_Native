@@ -22,6 +22,7 @@
     self.photoID = GetValidString([dic objectForKey:@"workid"]);
     self.replyID = GetValidString([dic objectForKey:@"replyid"]);
     self.dateline = GetValidString([dic objectForKey:@"dateline"]);
-    
+    self.replyUserName = GetValidString([dic objectForKey:@"replyMname"]);
+    self.replyUserID = GetValidString([dic objectForKey:@"replymemberid"]);
 }
 @end

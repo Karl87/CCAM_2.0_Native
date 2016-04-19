@@ -103,6 +103,9 @@
 }
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    
+    [[DataHelper sharedManager] updateSeriesInfo];
+    
     [self nameAnimation];
     [self logoAnimation];
 //    [self spotlightAnimation];

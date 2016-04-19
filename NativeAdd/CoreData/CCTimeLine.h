@@ -14,8 +14,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CCTimeLine : NSManagedObject
+
 @property (nonatomic, assign) BOOL isOpening;
 @property (nonatomic, assign, readonly) BOOL shouldShowMoreButton;
+
 - (void)initTimelineWith:(NSDictionary *)dic;
 
 @end

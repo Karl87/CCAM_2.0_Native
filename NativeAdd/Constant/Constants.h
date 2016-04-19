@@ -88,6 +88,7 @@
 #define CCamGetSeriesURL @"http://www.c-cam.cc/index.php/Api_new/Getmemberxml/get_series_json.html"
 #define CCamGetAnimationURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_animations_json.html"
 #define CCamGetStickersURL @"http://www.c-cam.cc/index.php/Api_new/Getsticker/get_sticker_json.html"
+#define CCamGetFiltersURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_filter.html"
 
 //#define CCamGetSerieURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_series_list.html"
 #define CCamGetEventURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_index.html"
@@ -116,6 +117,8 @@
 
 #define CCamGetCommentURL @"http://www.c-cam.cc/index.php/Api_new/Index/get_comment.html"
 #define CCamSendCommentURL @"http://www.c-cam.cc/index.php/Api_new/Index/send_comment.html"
+#define CCamSendReplyURL @"http://www.c-cam.cc/index.php/Api_new/Index/send_reply.html"
+#define CCamDeleteCommentURL @"http://www.c-cam.cc/index.php/Api_new/Index/delete_comment.html"
 
 #define CCamGetFollowURL @"http://www.c-cam.cc/index.php/Api_new/Member/get_follow_members.html"
 #define CCamGetFollowerURL @"http://www.c-cam.cc/index.php/Api_new/Member/get_fans_members.html"
@@ -132,7 +135,7 @@
 
 #define CCamFeedbackURL @"http://www.c-cam.cc/index.php/Api_new/Index/send_suggest.html"
 #define CCamAgreementURL @"http://www.c-cam.cc/page/useragreement.html"
-#define CCamHomepageURL @"http://www.c-cam.cc/"
+#define CCamHomepageURL @"http://www.i-craftsmen.com/"
 #define CCamLicensesURL @""
 
 #define CCamPrivacyURL @"http://www.c-cam.cc/index.php/Api_new/Uploadphoto/change_contestid.html"

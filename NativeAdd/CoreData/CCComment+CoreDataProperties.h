@@ -14,7 +14,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CCComment (CoreDataProperties)
-
+@property (nullable, nonatomic, retain) NSString *replyUserName;
+@property (nullable, nonatomic, retain) NSString *replyUserID;
 @property (nullable, nonatomic, retain) NSString *commentID;
 @property (nullable, nonatomic, retain) NSString *photoID;
 @property (nullable, nonatomic, retain) NSString *userID;
